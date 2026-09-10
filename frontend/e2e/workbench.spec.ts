@@ -1,235 +1,552 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test } from "./helpers";
+import { expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
-const catalog = JSON.parse(
-  await readFile(
-    new URL("../../data/artifacts/catalog.json", import.meta.url),
-    "utf8",
-  ),
-);
-const balanced = async (page: Page) =>
-  expect(page.getByTestId("solver-status")).toHaveText("Network balanced");
-async function load(page: Page) {
-  await page.goto("/");
-  await balanced(page);
-}
-async function slider(page: Page, label: string, value: string) {
-  await page.getByRole("slider", { name: label, exact: true }).fill(value);
-  await balanced(page);
-  await page.waitForTimeout(250);
-}
+import {
+  analyticalNetwork,
+  balanced,
+  defaults,
+  importProject,
+  mode,
+  numeric,
+  openWorkbench,
+  parameters,
+  project,
+  uiNumber,
+} from "./helpers";
+import type { Network } from "../src/contracts";
 
-test("spatial controls, real numerical change, baseline, undo and local recovery", async ({
+test.use({ locale: "en-US", actionTimeout: 10000 });
+
+test("draw, connect, move, add a fan, split, undo and recover the actual edited project", async ({
   page,
 }) => {
   const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  await load(page);
-  const initial = await page.getByTestId("power").innerText();
+  page.on("pageerror", (error) => errors.push(error.message));
+  await openWorkbench(page);
+  await page.getByRole("button", { name: "New design", exact: true }).click();
+  await page.getByLabel("Project name").fill("Browser authored mine");
   await page
-    .getByRole("button", { name: "Save baseline", exact: true })
+    .getByRole("button", { name: "Create design", exact: true })
     .click();
-  await slider(page, "Fan speed factor", "1.2");
-  await expect(page.getByTestId("power")).not.toHaveText(initial);
-  const changed = await page.getByTestId("power").innerText();
+  await page.getByRole("button", { name: "Draw", exact: true }).click();
   await page
-    .getByRole("combobox", { name: "Color by", exact: true })
-    .selectOption("change");
-  await page.getByRole("button", { name: "Pause flow animation" }).click();
-  await expect(
-    page.getByRole("button", { name: "Play flow animation" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Toggle context envelope" }).click();
-  await slider(page, "Section depth", "0.7");
-  await page.getByRole("button", { name: "Toggle focus mode" }).click();
-  await expect(page.locator(".controls-panel")).toBeHidden();
-  await page.getByRole("button", { name: "Toggle focus mode" }).click();
-  await page.getByRole("button", { name: "Undo change" }).click();
+    .getByRole("combobox", { name: /^Junction/ })
+    .selectOption("junction-1");
+  await page
+    .getByRole("combobox", { name: "Camera view", exact: true })
+    .selectOption("plan");
+  const canvas = page.locator("canvas"),
+    bounds = (await canvas.boundingBox())!;
+  await canvas.click({
+    position: { x: bounds.width * 0.7, y: bounds.height * 0.35 },
+  });
+  await expect(page.getByRole("combobox", { name: /^Junction/ })).toHaveValue(
+    "junction-2",
+  );
+  const drawn = await project(page);
+  expect(drawn.network.nodes).toHaveLength(3);
+  expect(drawn.network.edges).toHaveLength(2);
+  const created = drawn.network.nodes.find((node) => node.id === "junction-2")!;
+  expect(Math.hypot(created.x, created.y)).toBeGreaterThan(0);
+  expect(created.z).toBe(-30);
+  await page.getByRole("button", { name: "Connect", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: /^Junction/ })
+    .selectOption("surface");
+  await expect
+    .poll(async () => (await project(page)).network.edges.length)
+    .toBe(3);
+  await page.getByRole("button", { name: "Select", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: /^Junction/ })
+    .selectOption("junction-2");
+  await numeric(page, "X · m", created.x + 10);
+  const moved = await project(page);
+  expect(moved.network.nodes.find((node) => node.id === "junction-2")!.x).toBe(
+    created.x + 10,
+  );
+  await page.getByRole("button", { name: "Fan", exact: true }).click();
   await balanced(page);
-  await expect(page.getByTestId("power")).toHaveText(initial);
-  await page.getByRole("button", { name: "Redo change" }).click();
-  await balanced(page);
-  await expect(page.getByTestId("power")).toHaveText(changed);
-  await page.waitForTimeout(600);
+  expect(
+    (await project(page)).network.edges.filter((edge) => edge.fan),
+  ).toHaveLength(1);
+  await page.getByRole("button", { name: "Split", exact: true }).click();
+  const split = await project(page);
+  expect(split.network.nodes).toHaveLength(4);
+  expect(split.network.edges).toHaveLength(4);
+  expect(split.network.edges.filter((edge) => edge.fan)).toHaveLength(1);
+  await page.getByRole("button", { name: "Undo edit", exact: true }).click();
+  expect((await project(page)).network.edges).toHaveLength(3);
+  await page.getByRole("button", { name: "Redo edit", exact: true }).click();
+  await expect
+    .poll(async () =>
+      page.evaluate(() => localStorage.getItem("aerovia.project.v1")),
+    )
+    .toContain("junction-3");
   await page.reload();
   await balanced(page);
-  await expect(page.getByTestId("power")).toHaveText(changed);
+  const recovered = await project(page);
+  expect(recovered.network).toEqual(split.network);
+  expect(recovered.options).toEqual(split.options);
   expect(errors).toEqual([]);
 });
 
-test("airway edits change flow and closure reports model consequences", async ({
+test("pointer orbit changes the projection and an axis drag commits a real node coordinate", async ({
   page,
 }) => {
-  await load(page);
-  const initial = await page.locator(".inspector-flow strong").innerText();
-  const resistance = page.getByRole("spinbutton", {
-    name: "Airway resistance",
-    exact: true,
+  await openWorkbench(page);
+  const network = analyticalNetwork();
+  network.nodes[1].x = 100;
+  network.edges[0].area = 1;
+  await importProject(page, network);
+  await page.getByRole("checkbox", { name: "Labels", exact: true }).check();
+  const canvas = page.locator("canvas"),
+    box = (await canvas.boundingBox())!;
+  const node = page.getByRole("button", { name: "Junction b", exact: true });
+  const beforeOrbit = await node.evaluate((element) => ({
+    x: element.style.left,
+    y: element.style.top,
+  }));
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.7);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.65, box.y + box.height * 0.6, {
+    steps: 8,
   });
-  await resistance.fill("1.5");
-  await resistance.press("Enter");
-  await balanced(page);
-  await expect(page.locator(".inspector-flow strong")).not.toHaveText(initial);
-  await page.getByRole("checkbox", { name: "Close this airway" }).check();
-  await page.waitForTimeout(400);
-  await expect(
-    page.getByRole("checkbox", { name: "Close this airway" }),
-  ).toBeChecked();
-  await page.getByRole("checkbox", { name: "Close this airway" }).uncheck();
-  await balanced(page);
+  await page.mouse.up();
+  await expect
+    .poll(() =>
+      node.evaluate((element) => ({
+        x: element.style.left,
+        y: element.style.top,
+      })),
+    )
+    .not.toEqual(beforeOrbit);
+  expect((await project(page)).network.nodes).toEqual(network.nodes);
+  await page
+    .getByRole("combobox", { name: "Camera view", exact: true })
+    .selectOption("plan");
+  await page.getByRole("button", { name: "Move", exact: true }).click();
+  await page.getByRole("combobox", { name: /^Junction/ }).selectOption("b");
+  const point = await node.evaluate((element) => ({
+    x: Number.parseFloat(element.style.left),
+    y: Number.parseFloat(element.style.top),
+  }));
+  await page.mouse.move(box.x + point.x + 30, box.y + point.y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + point.x + 100, box.y + point.y, { steps: 10 });
+  await page.mouse.up();
+  await expect
+    .poll(async () => (await project(page)).network.nodes[1])
+    .not.toEqual(network.nodes[1]);
+  await page.getByRole("button", { name: "Undo edit", exact: true }).click();
+  expect((await project(page)).network.nodes).toEqual(network.nodes);
 });
 
-test("optimization, operating curves and sensitivity produce actionable calculations", async ({
+test("flow controls change actual flow and power and closure has a recoverable model consequence", async ({
   page,
 }) => {
-  await load(page);
+  await openWorkbench(page);
+  await importProject(page, analyticalNetwork());
+  await mode(page, "Airflow & paths");
+  const intake = () =>
+    page.locator(".av-viz-readout > strong").innerText().then(uiNumber);
+  expect(await intake()).toBeCloseTo(10, 2);
   await page
-    .getByRole("button", { name: "Find minimum fan speed", exact: true })
-    .first()
-    .click();
-  await expect(
-    page.getByRole("button", { name: "Apply setting", exact: true }),
-  ).toBeVisible();
+    .getByRole("slider", { name: "Fan speed", exact: true })
+    .fill("0.5");
+  await expect.poll(intake).toBeCloseTo(5, 2);
+  await expect(page.locator(".av-viz-readout")).toContainText("0.16 kW");
   await page
-    .getByRole("button", { name: "Apply setting", exact: true })
-    .click();
-  await balanced(page);
-  await expect(page.locator(".target-number")).toContainText("100");
+    .getByRole("checkbox", { name: "Close this airway", exact: true })
+    .check();
+  await expect.poll(intake).toBe(0);
+  expect((await project(page)).options.overrides.ab.closed).toBe(true);
   await page
-    .getByRole("button", { name: "Calculate operating envelope", exact: true })
-    .click();
-  await expect(
-    page.getByRole("img", { name: /Common-speed operating envelope/ }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Rank resistance sensitivity", exact: true })
-    .click();
-  await expect(page.locator(".sensitivity-list>button")).toHaveCount(12);
-  await page.locator(".sensitivity-list>button").first().click();
-  await expect(
-    page.getByRole("heading", {
-      name: catalog.cases[0].network.name.en,
-      exact: true,
-    }),
-  ).toBeVisible();
+    .getByRole("checkbox", { name: "Close this airway", exact: true })
+    .uncheck();
+  await expect.poll(intake).toBeCloseTo(5, 2);
 });
 
-test("JSON project export roundtrips exact edited inputs, malformed imports preserve state", async ({
+test("JSON imports preserve current inputs on failure and round-trip an edited operating state", async ({
   page,
 }) => {
-  await load(page);
-  await slider(page, "Fan speed factor", "0.83");
-  const power = await page.getByTestId("power").innerText();
-  const downloadEvent = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Save project", exact: true }).click();
-  const file = await downloadEvent;
-  const content = await readFile((await file.path())!, "utf8");
-  const project = JSON.parse(content);
-  expect(project.options.speed).toBe(0.83);
+  await openWorkbench(page);
+  await mode(page, "Airflow & paths");
   await page
-    .getByRole("button", { name: "Import network", exact: true })
+    .getByRole("slider", { name: "Fan speed", exact: true })
+    .fill("0.83");
+  const original = await project(page);
+  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await page.getByLabel(/Saved project or network JSON/).setInputFiles({
+    name: "malformed.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"schema":"invalid"}'),
+  });
+  await expect(page.getByRole("dialog").getByRole("alert")).toBeVisible();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  const unchanged = await project(page);
+  expect(unchanged.network).toEqual(original.network);
+  expect(unchanged.options).toEqual(original.options);
+  await importProject(page, analyticalNetwork());
+  await importProject(page, original.network, original.options);
+  const roundTrip = await project(page);
+  expect(roundTrip.network).toEqual(original.network);
+  expect(roundTrip.options).toEqual(original.options);
+});
+
+test("two CSV uploads map units and languages, while malformed joins leave the current design intact", async ({
+  page,
+}) => {
+  await openWorkbench(page);
+  const before = await project(page);
+  const nodes =
+    'Node ID,Easting,Northing,Elevation,pressure_pa\n"surface-in",0,0,0,100\nend,100,0,-10,0';
+  const good =
+    'ID,Start,End,Area,R,nameEn,nameEs\na,"surface-in",end,100,0.2,"Intake, north","Entrada, norte"';
+  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await page.getByLabel("Junction CSV", { exact: true }).setInputFiles({
+    name: "nodes.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(nodes),
+  });
+  await page.getByLabel("Airway CSV", { exact: true }).setInputFiles({
+    name: "edges.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(good.replace(",end,100", ",missing,100")),
+  });
+  await page
+    .getByRole("combobox", { name: /^Geometry units/ })
+    .selectOption("ft");
+  await page
+    .getByRole("button", { name: "Validate and load tables", exact: true })
     .click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText(
+    "unknown node",
+  );
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  expect((await project(page)).network).toEqual(before.network);
+  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await page.getByLabel("Junction CSV", { exact: true }).setInputFiles({
+    name: "nodes.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(nodes),
+  });
+  await page.getByLabel("Airway CSV", { exact: true }).setInputFiles({
+    name: "edges.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(good),
+  });
   await page
-    .getByRole("textbox", { name: "Network JSON", exact: true })
-    .fill('{"schema":"invalid"}');
+    .getByRole("combobox", { name: /^Geometry units/ })
+    .selectOption("ft");
   await page
-    .getByRole("button", { name: "Validate and load", exact: true })
-    .click();
-  await expect(page.locator(".inline-error")).toBeVisible();
-  await expect(page.getByTestId("power")).toHaveText(power);
-  await page
-    .getByRole("textbox", { name: "Network JSON", exact: true })
-    .fill(content);
-  await page
-    .getByRole("button", { name: "Validate and load", exact: true })
+    .getByRole("button", { name: "Validate and load tables", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeHidden();
   await balanced(page);
-  await expect(page.getByTestId("power")).toHaveText(power);
-  await page.getByRole("button", { name: "Network", exact: true }).click();
-  const csvEvent = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Results CSV", exact: true }).click();
-  const csv = await readFile((await (await csvEvent).path())!, "utf8");
-  expect(csv).toContain("flow_m3_s");
-  expect(csv.split("\n").length).toBe(project.network.edges.length + 1);
+  const imported = await project(page);
+  expect(imported.network.nodes[1].x).toBeCloseTo(30.48, 8);
+  expect(imported.network.edges[0].area).toBeCloseTo(9.290304, 8);
+  expect(imported.network.edges[0].name).toEqual({
+    en: "Intake, north",
+    es: "Entrada, norte",
+  });
+  await page
+    .getByRole("button", { name: "Network tables", exact: true })
+    .click();
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Airway CSV", exact: true }).click();
+  const csv = await readFile((await (await pending).path())!, "utf8");
+  expect(csv).toContain("nameEn,nameEs");
+  expect(csv).toContain("Entrada, norte");
 });
 
-test("all cases solve and all view/theme/language combinations fit the viewport", async ({
+test("optimization, operating curve and sensitivity are calculated and applied through current controls", async ({
   page,
-}, testInfo) => {
-  // This complete matrix saves 24 WebGL screenshots; software rendering on CI
-  // needs a larger total capture budget. Individual state assertions keep their limit.
-  testInfo.setTimeout(120_000);
-  const errors: string[] = [];
-  page.on("pageerror", (e) => errors.push(e.message));
-  await load(page);
-  for (const c of catalog.cases) {
-    await page
-      .getByRole("combobox", { name: "Engineering case", exact: true })
-      .selectOption(c.network.id);
-    await balanced(page);
-    await expect(
-      page.getByRole("heading", { name: c.network.name.en, exact: true }),
-    ).toBeVisible();
-    await page.screenshot({
-      path: testInfo.outputPath(`${c.network.id}-dark.png`),
-    });
-  }
-  for (const theme of ["dark", "light"]) {
-    if (theme === "light")
-      await page.getByRole("button", { name: "Toggle theme" }).click();
-    for (const route of ["Workspace", "Analysis", "Network", "Evidence"]) {
-      await page.getByRole("button", { name: route, exact: true }).click();
-      await page.waitForTimeout(150);
-      const fit = await page.evaluate(() => ({
-        w: document.documentElement.scrollWidth,
-        h: document.documentElement.scrollHeight,
-        iw: innerWidth,
-        ih: innerHeight,
-      }));
-      expect(fit.w).toBe(fit.iw);
-      expect(fit.h).toBe(fit.ih);
-      await page.screenshot({
-        path: testInfo.outputPath(`${route}-${theme}.png`),
-      });
-    }
-  }
-  await page.getByRole("button", { name: "Change language" }).click();
+}) => {
+  await openWorkbench(page);
+  await mode(page, "Fan operations");
+  await page
+    .getByRole("button", {
+      name: "Find minimum speed meeting targets",
+      exact: true,
+    })
+    .click();
   await expect(
-    page.getByRole("button", { name: "Espacio", exact: true }),
+    page.getByRole("button", { name: "Apply operating point", exact: true }),
   ).toBeVisible();
-  for (const route of ["Espacio", "Análisis", "Red", "Evidencia"]) {
-    await page.getByRole("button", { name: route, exact: true }).click();
-    await page.screenshot({ path: testInfo.outputPath(`es-${route}.png`) });
+  await page
+    .getByRole("button", { name: "Apply operating point", exact: true })
+    .click();
+  await balanced(page);
+  expect((await project(page)).options.speed).not.toBe(1);
+  await expect(page.locator(".av-viz-readout")).toContainText(
+    "0/12 targets short",
+  );
+  await page
+    .getByRole("button", { name: "Sweep the fan speed", exact: true })
+    .click();
+  await expect(
+    page.getByRole("img", { name: /Fan speed sweep/ }),
+  ).toBeVisible();
+  await page
+    .getByRole("combobox", { name: /^Operating question/ })
+    .selectOption("sensitivity");
+  await page
+    .getByRole("button", { name: "Rank resistance interventions", exact: true })
+    .click();
+  await expect(page.locator(".av-sensitivity-bars button")).toHaveCount(8);
+  const intervention = page.locator(".av-sensitivity-bars button").first();
+  const selectedName = await intervention.locator("span").innerText();
+  await intervention.click();
+  await mode(page, "Airflow & paths");
+  await expect(page.locator(".av-selected-readout h3")).toHaveText(
+    selectedName,
+  );
+});
+
+test("all twelve authored cases remain selectable and solvable through rapid case changes", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  const cases = JSON.parse(
+    await readFile(new URL("../../data/cases.json", import.meta.url), "utf8"),
+  ) as Network[];
+  await openWorkbench(page);
+  for (const network of cases) {
+    await page
+      .getByRole("combobox", { name: "Network case", exact: true })
+      .selectOption(network.id);
+    await expect(page.locator(".av-instrument")).toContainText(network.name.en);
+    await balanced(page);
+    expect((await project(page)).network.id).toBe(network.id);
   }
+  await page
+    .getByRole("combobox", { name: "Network case", exact: true })
+    .selectOption(cases[0].id);
+  await page
+    .getByRole("combobox", { name: "Network case", exact: true })
+    .selectOption(cases[11].id);
+  await balanced(page);
   expect(errors).toEqual([]);
 });
 
-test("mobile tools remain reachable and every page fits", async ({
+test("recorded uncertainty selects an airway and disappears when the operating inputs no longer match", async ({
   page,
-}, testInfo) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await load(page);
-  await page.getByRole("button", { name: "Controls", exact: true }).click();
-  await slider(page, "Fan speed factor", "1.1");
+}) => {
+  const catalog = JSON.parse(
+    await readFile(
+      new URL("../../data/artifacts/catalog.json", import.meta.url),
+      "utf8",
+    ),
+  ) as { cases: Array<{ network: Network; ensemble: { flowP50: number[] } }> };
+  await openWorkbench(page);
+  const current = await project(page);
+  const item = catalog.cases.find(
+    (item) => item.network.id === current.network.id,
+  )!;
+  const lastIndex = item.network.edges.reduce(
+    (last, edge, index) => (edge.target > 0 ? index : last),
+    -1,
+  );
+  const last = item.network.edges[lastIndex];
+  await mode(page, "Uncertainty");
+  const plot = page.getByRole("img", { name: /^Working-airway uncertainty/ });
+  await expect(plot).toBeVisible();
+  await expect(plot.locator("path")).toHaveCount(4);
+  const box = (await plot.boundingBox())!;
+  await plot.click({ position: { x: box.width - 14, y: box.height / 2 } });
+  await expect(page.locator(".av-interval-readout h3")).toHaveText(
+    last.name.en,
+  );
+  const median = page
+    .locator(".av-interval-readout > div")
+    .filter({ has: page.getByText("Median", { exact: true }) })
+    .locator("strong");
+  expect(uiNumber(await median.innerText())).toBeCloseTo(
+    item.ensemble.flowP50[lastIndex],
+    2,
+  );
+  await mode(page, "Airflow & paths");
   await page
-    .getByRole("button", { name: "Close controls", exact: true })
+    .getByRole("slider", { name: "Fan speed", exact: true })
+    .fill("0.8");
+  await balanced(page);
+  await mode(page, "Uncertainty");
+  await expect(plot).toHaveCount(0);
+  await expect(page.locator(".av-controls")).toContainText(
+    "This edited state has no baked ensemble",
+  );
+  await page
+    .getByRole("button", { name: "Reset canonical case", exact: true })
     .click();
-  await page.getByRole("button", { name: "Inspect", exact: true }).click();
+  await balanced(page);
+  await expect(plot).toBeVisible();
+});
+
+test("learned fields are labeled approximations and reject a changed topology without substituting fabricated output", async ({
+  page,
+}) => {
+  await openWorkbench(page);
+  await mode(page, "Learned screening");
+  await page
+    .getByRole("button", { name: "Run both models", exact: true })
+    .click();
+  const predicted = page.getByRole("button", {
+    name: "Show predicted field in the mine",
+    exact: true,
+  });
+  await expect(predicted).toBeVisible({ timeout: 60000 });
   await expect(
-    page.getByRole("spinbutton", { name: "Airway resistance", exact: true }),
+    page.getByRole("img", { name: /^Where the approximation differs,/ }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Close inspector" }).click();
-  for (const name of ["Workspace", "Analysis", "Network", "Evidence"]) {
-    await page.getByRole("button", { name, exact: true }).click();
-    await page.waitForTimeout(150);
-    const fit = await page.evaluate(() => [
-      document.documentElement.scrollWidth,
-      document.documentElement.scrollHeight,
-      innerWidth,
-      innerHeight,
-    ]);
-    expect(fit[0]).toBe(fit[2]);
-    expect(fit[1]).toBe(fit[3]);
-    await page.screenshot({ path: testInfo.outputPath(`mobile-${name}.png`) });
-  }
+  await predicted.click();
+  await expect(page.locator(".av-viz-readout")).toContainText(
+    "topology-mlp · approximation",
+  );
+  await page
+    .getByRole("button", { name: "Numerical field", exact: true })
+    .click();
+  await balanced(page);
+  await page.getByRole("tab", { name: /^Graph surrogate/ }).click();
+  await predicted.click();
+  await expect(page.locator(".av-viz-readout")).toContainText(
+    "graph-surrogate · approximation",
+  );
+  await importProject(page, analyticalNetwork());
+  await mode(page, "Learned screening");
+  await page
+    .getByRole("button", { name: "Run both models", exact: true })
+    .click();
+  await expect(page.locator(".av-learned-domain")).toContainText(
+    "Outside training domain",
+  );
+  await expect(predicted).toHaveCount(0);
+  await expect(
+    page.getByRole("img", { name: /^Where the approximation differs,/ }),
+  ).toHaveCount(0);
+  await balanced(page);
+});
+
+test("energy and cost use actual solved fan power and preserve the captured comparison baseline", async ({
+  page,
+}) => {
+  await openWorkbench(page);
+  await importProject(page, analyticalNetwork());
+  await mode(page, "Fan operations");
+  await numeric(page, "Operating hours", 8000);
+  await numeric(page, "Electricity tariff", 0.2);
+  const energy = page.getByRole("region", {
+    name: "Energy and cost",
+    exact: true,
+  });
+  const value = (name: string) =>
+    energy
+      .locator("div")
+      .filter({ has: page.getByText(name, { exact: true }) })
+      .locator("strong");
+  expect(uiNumber(await value("Annual energy").innerText())).toBe(10);
+  expect(uiNumber(await value("Annual cost").innerText())).toBe(2000);
+  await page
+    .getByRole("combobox", { name: "Operating question", exact: true })
+    .selectOption("baseline");
+  await page
+    .getByRole("button", { name: "Capture current baseline", exact: true })
+    .click();
+  await page
+    .getByRole("slider", { name: "Fan speed", exact: true })
+    .fill("0.5");
+  await balanced(page);
+  expect(uiNumber(await value("Annual energy").innerText())).toBe(1.25);
+  expect(uiNumber(await value("Annual cost").innerText())).toBe(250);
+  expect(uiNumber(await value("Cost change from baseline").innerText())).toBe(
+    -1750,
+  );
+  await page
+    .getByRole("button", { name: "Show spatial flow differences", exact: true })
+    .click();
+  await expect(page.locator(".av-legend")).toContainText(
+    "Flow difference from baseline",
+  );
+  await numeric(page, "Operating hours", 0);
+  expect(uiNumber(await value("Annual energy").innerText())).toBe(0);
+  expect(uiNumber(await value("Annual cost").innerText())).toBe(0);
+  expect((await project(page)).options.speed).toBe(0.5);
+});
+
+test("isolating a working level changes actual scene hit testing without altering hydraulic inputs", async ({
+  page,
+}) => {
+  const network = analyticalNetwork();
+  network.nodes = [
+    { id: "a", x: -100, y: -50, z: 0, boundary: 100 },
+    { id: "b", x: 100, y: -50, z: 0, boundary: 0 },
+    { id: "c", x: -100, y: 50, z: 0, boundary: 100 },
+    { id: "d", x: 100, y: 50, z: 0, boundary: 0 },
+  ];
+  network.edges[0] = {
+    ...network.edges[0],
+    kind: "working",
+    level: 0,
+    name: { en: "Upper working passage", es: "Labor superior" },
+  };
+  delete network.edges[0].fan;
+  network.edges.push({
+    ...network.edges[0],
+    id: "cd",
+    from: "c",
+    to: "d",
+    level: 1,
+    name: { en: "Lower working passage", es: "Labor inferior" },
+  });
+  await openWorkbench(page);
+  await importProject(page, network);
+  await mode(page, "Airflow & paths");
+  await page.getByRole("checkbox", { name: "Labels", exact: true }).check();
+  await page
+    .getByRole("combobox", { name: "Camera view", exact: true })
+    .selectOption("plan");
+  const canvas = page.locator("canvas");
+  const selectPassage = async (from: string, to: string) => {
+    const a = await page
+      .getByRole("button", { name: `Junction ${from}`, exact: true })
+      .evaluate((element) => ({
+        x: parseFloat(element.style.left),
+        y: parseFloat(element.style.top),
+      }));
+    const b = await page
+      .getByRole("button", { name: `Junction ${to}`, exact: true })
+      .evaluate((element) => ({
+        x: parseFloat(element.style.left),
+        y: parseFloat(element.style.top),
+      }));
+    await canvas.click({
+      position: { x: a.x + (b.x - a.x) * 0.43, y: a.y + (b.y - a.y) * 0.43 },
+    });
+  };
+  await selectPassage("c", "d");
+  await expect(page.locator(".av-selected-readout h3")).toHaveText(
+    "Lower working passage",
+  );
+  const before = await project(page),
+    flow = await page.locator(".av-viz-readout").innerText();
+  await page
+    .getByRole("combobox", { name: "Level", exact: true })
+    .selectOption("1");
+  await selectPassage("a", "b");
+  await expect(page.locator(".av-selected-readout h3")).toHaveText(
+    "Lower working passage",
+  );
+  await page
+    .getByRole("combobox", { name: "Level", exact: true })
+    .selectOption("all");
+  await selectPassage("a", "b");
+  await expect(page.locator(".av-selected-readout h3")).toHaveText(
+    "Upper working passage",
+  );
+  const after = await project(page);
+  expect(after.network).toEqual(before.network);
+  expect(after.options).toEqual(before.options);
+  expect(await page.locator(".av-viz-readout").innerText()).toBe(flow);
 });

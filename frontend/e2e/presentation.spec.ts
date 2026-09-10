@@ -1,279 +1,310 @@
+import { test } from "./helpers";
+import { expect } from "@playwright/test";
 import {
-  test,
-  expect,
-  type Locator,
-  type Page,
-  type TestInfo,
-} from "@playwright/test";
+  balanced,
+  mode,
+  noDocumentOverflow,
+  numeric,
+  openWorkbench,
+  parameters,
+  project,
+  uiNumber,
+} from "./helpers";
 
-type Language = "en" | "es";
-type Theme = "dark" | "light";
-const appearances: { language: Language; theme: Theme }[] = [
-  { language: "en", theme: "dark" },
-  { language: "en", theme: "light" },
-  { language: "es", theme: "dark" },
-  { language: "es", theme: "light" },
+test.use({ locale: "en-US", actionTimeout: 10000 });
+const appearances = [
+  { lang: "en", theme: "dark" },
+  { lang: "en", theme: "light" },
+  { lang: "es", theme: "dark" },
+  { lang: "es", theme: "light" },
+] as const;
+const routes = [
+  { path: "/", en: "App", es: "App" },
+  { path: "/introduction", en: "Introduction", es: "Introducción" },
+  { path: "/methodology", en: "Methodology", es: "Metodología" },
+  { path: "/implementation", en: "Implementation", es: "Implementación" },
+  { path: "/experiments", en: "Experiments", es: "Experimentos" },
+  { path: "/benchmark", en: "Benchmark", es: "Benchmark" },
 ];
-
-function watchErrors(page: Page) {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
-  });
-  return errors;
-}
-
-async function open(page: Page, language: Language, theme: Theme) {
-  await page.goto("/");
-  await expect(page.getByTestId("solver-status")).toHaveText(
-    "Network balanced",
-  );
-  if (theme === "light")
+async function appearance(
+  page: import("@playwright/test").Page,
+  lang: "en" | "es",
+  theme: "dark" | "light",
+) {
+  await openWorkbench(page);
+  if ((await page.locator("html").getAttribute("data-theme")) !== theme)
     await page
-      .getByRole("button", { name: "Toggle theme", exact: true })
+      .getByRole("button", { name: "Toggle light / dark", exact: true })
       .click();
-  if (language === "es")
+  if (lang === "es")
     await page
-      .getByRole("button", { name: "Change language", exact: true })
+      .getByRole("button", { name: "Switch language", exact: true })
       .click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+  await expect(page.locator("html")).toHaveAttribute("lang", lang);
 }
 
-async function noDocumentOverflow(page: Page) {
-  const dimensions = await page.evaluate(() => ({
-    width: document.documentElement.scrollWidth,
-    height: document.documentElement.scrollHeight,
-    viewportWidth: innerWidth,
-    viewportHeight: innerHeight,
-  }));
-  expect(dimensions.width).toBeLessThanOrEqual(dimensions.viewportWidth);
-  expect(dimensions.height).toBeLessThanOrEqual(dimensions.viewportHeight);
-}
-
-async function capture(page: Page, info: TestInfo, name: string) {
-  await noDocumentOverflow(page);
-  await page.screenshot({
-    path: info.outputPath(`${name}.png`),
-    animations: "disabled",
-  });
-}
-
-/** Scroll the app's own panel, keeping the document itself fixed in the viewport. */
-async function reveal(target: Locator, panelSelector: string) {
-  await target.evaluate((element, selector) => {
-    const panel = element.closest(selector);
-    if (!(panel instanceof HTMLElement))
-      throw new Error(`Missing scroll panel: ${selector}`);
-    const offset =
-      element.getBoundingClientRect().top - panel.getBoundingClientRect().top;
-    panel.scrollTop += offset - 20;
-  }, panelSelector);
-  await expect(target).toBeVisible();
-}
-
-for (const { language, theme } of appearances) {
-  const localized = (en: string, es: string) => (language === "en" ? en : es);
-
-  test(`Evidence subtabs and computed analysis remain readable in ${language} ${theme}`, async ({
+for (const { lang, theme } of appearances)
+  test(`the six shared-shell routes and deep content panels work in ${lang}/${theme}`, async ({
     page,
   }, info) => {
-    const errors = watchErrors(page);
-    await open(page, language, theme);
-    await page
-      .getByRole("button", {
-        name: localized("Evidence", "Evidencia"),
-        exact: true,
-      })
-      .click();
-    const tabs = [
-      {
-        id: "use",
-        name: localized("Use the workbench", "Usar la herramienta"),
-        heading: localized(
-          "An intervention, traced through the mine",
-          "Una intervención, seguida por toda la mina",
-        ),
-      },
-      {
-        id: "physics",
-        name: localized("Physics & limits", "Física y límites"),
-        heading: localized(
-          "Pressure drives a conserved network flow",
-          "La presión impulsa un flujo conservado",
-        ),
-      },
-      {
-        id: "data",
-        name: localized("Your data", "Sus datos"),
-        heading: localized(
-          "Your network stays on your computer",
-          "Su red permanece en su equipo",
-        ),
-      },
-      {
-        id: "verification",
-        name: localized("Verification", "Verificación"),
-        heading: localized(
-          "Evidence you can reproduce",
-          "Evidencia reproducible",
-        ),
-      },
-    ];
-    for (const tab of tabs) {
-      await page.locator(".evidence").evaluate((element) => {
-        element.scrollTop = 0;
-      });
-      await page.getByRole("button", { name: tab.name, exact: true }).click();
-      await expect(
-        page.getByRole("heading", { name: tab.heading, exact: true }),
-      ).toBeVisible();
-      await capture(page, info, `evidence-${tab.id}-top`);
-      if (tab.id === "verification") {
-        await expect(page.locator(".evidence details")).not.toHaveAttribute(
-          "open",
-          "",
-        );
-        const metrics = page.locator(".evidence .analysis-grid");
-        await expect(metrics.locator(".analysis-card")).toHaveCount(4);
-        await reveal(metrics, ".evidence");
-        await capture(page, info, "evidence-verification-metrics");
-        await page.locator(".evidence summary").click();
-        await expect(page.locator(".evidence pre")).toContainText(
-          '"device": "cuda"',
-        );
-        await reveal(page.locator(".evidence pre"), ".evidence");
-        await capture(page, info, "evidence-verification-raw-record");
-        await page.locator(".evidence summary").click();
+    info.setTimeout(120000);
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await appearance(page, lang, theme);
+    await expect(page.locator(".main-nav a")).toHaveCount(6);
+    for (const route of routes) {
+      await page
+        .locator(".main-nav")
+        .getByRole("link", { name: route[lang], exact: true })
+        .click();
+      await expect.poll(() => new URL(page.url()).pathname).toBe(route.path);
+      if (route.path === "/") await balanced(page, lang);
+      else {
+        await expect(
+          page.getByRole("heading", { name: route[lang], exact: true }).first(),
+        ).toBeVisible();
+        const tabs = page.getByRole("tab");
+        for (let i = 0, count = await tabs.count(); i < count; i++) {
+          await tabs.nth(i).click();
+          await expect(tabs.nth(i)).toHaveAttribute("aria-selected", "true");
+          await expect(page.getByRole("tabpanel")).toBeVisible();
+          await expect(page.locator(".katex-error")).toHaveCount(0);
+          await expect(page.getByRole("tabpanel")).not.toBeEmpty();
+          await noDocumentOverflow(page);
+        }
+        if (await tabs.count()) await tabs.first().click();
       }
-      await reveal(page.locator(".evidence article > p").last(), ".evidence");
-      await capture(page, info, `evidence-${tab.id}-bottom`);
+      await noDocumentOverflow(page);
+      await page.screenshot({
+        path: info.outputPath(`${route.en.toLowerCase()}-${lang}-${theme}.png`),
+        animations: "disabled",
+      });
     }
-
-    await page
-      .getByRole("button", {
-        name: localized("Analysis", "Análisis"),
-        exact: true,
-      })
-      .click();
-    const actionPanel = page.locator(".analysis-actions");
-    await actionPanel
-      .getByRole("button", {
-        name: localized(
-          "Calculate operating envelope",
-          "Calcular envolvente operativa",
-        ),
-        exact: true,
-      })
-      .click();
-    const envelope = page.getByRole("heading", {
-      name: localized(
-        "Common-speed operating envelope",
-        "Envolvente de velocidad común",
-      ),
-      exact: true,
-    });
-    await expect(envelope).toBeVisible();
-    await actionPanel
-      .getByRole("button", {
-        name: localized("Rank resistance sensitivity", "Ordenar sensibilidad"),
-        exact: true,
-      })
-      .click();
-    await expect(page.locator(".sensitivity-list > button")).toHaveCount(12);
-    await expect(page.locator(".uncertainty .intervals > button")).toHaveCount(
-      12,
-    );
-
-    const panels = [
-      { id: "energy", target: page.locator(".big-energy") },
-      {
-        id: "fan-operating-point",
-        target: page.getByRole("heading", {
-          name: localized(
-            "Fan operating point",
-            "Punto de operación del ventilador",
-          ),
-          exact: true,
-        }),
-      },
-      { id: "operating-envelope", target: envelope },
-      {
-        id: "sensitivity",
-        target: page
-          .locator(".analysis-card")
-          .filter({ has: page.locator(".sensitivity-list") }),
-      },
-      { id: "resistance-intervals", target: page.locator(".uncertainty") },
-    ];
-    for (const panel of panels) {
-      await reveal(panel.target, ".analysis-page");
-      await capture(page, info, `analysis-${panel.id}`);
-    }
-    await reveal(page.locator(".uncertainty .percentiles"), ".analysis-page");
-    await capture(page, info, "analysis-uncertainty-power-and-scope");
     expect(errors).toEqual([]);
   });
 
-  for (const mobile of [false, true]) {
-    test(`Architecture modal keyboard and focus ${mobile ? "mobile" : "desktop"} ${language} ${theme}`, async ({
-      page,
-    }, info) => {
-      const errors = watchErrors(page);
-      if (mobile) await page.setViewportSize({ width: 390, height: 844 });
-      await open(page, language, theme);
-      const trigger = page.getByRole("button", {
-        name: localized("App architecture", "Arquitectura de la aplicación"),
+test("the benchmark reruns exact calculations and exposes same-input numerical agreement", async ({
+  page,
+}) => {
+  await openWorkbench(page);
+  await page
+    .locator(".main-nav")
+    .getByRole("link", { name: "Benchmark", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Run exact local calculation", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText(
+    "The local solution meets residual limits",
+  );
+  const difference = page
+    .getByRole("row")
+    .filter({
+      has: page.getByRole("rowheader", {
+        name: "Maximum flow difference (m³/s)",
         exact: true,
-      });
-      await trigger.focus();
-      await page.keyboard.press("Enter");
-      const modal = page.getByRole("dialog", {
-        name: localized("How Aerovia works", "Cómo funciona Aerovia"),
+      }),
+    })
+    .getByRole("cell")
+    .first();
+  expect(uiNumber(await difference.innerText())).toBeLessThan(1e-5);
+  await expect(
+    page.getByRole("img", { name: /^Signed error by airway,/ }),
+  ).toBeVisible();
+  const selector = page.getByRole("combobox", { name: /^Comparison case/ });
+  await selector.selectOption("deep-five-level");
+  await expect(
+    page.getByRole("img", { name: /^Signed error by airway,/ }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Run exact local calculation", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText(
+    "The local solution meets residual limits",
+  );
+  expect(uiNumber(await difference.innerText())).toBeLessThan(1e-5);
+});
+
+test("held-out browser inference runs both exported models and renders actual comparison errors", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await openWorkbench(page);
+  await page
+    .locator(".main-nav")
+    .getByRole("link", { name: "Benchmark", exact: true })
+    .click();
+  await page
+    .getByRole("tab", { name: "Held-out inference", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Run reference and both models", exact: true })
+    .click();
+  await expect(
+    page.getByRole("cell", { name: "Approximation executed", exact: true }),
+  ).toHaveCount(2, { timeout: 60000 });
+  await expect(
+    page.getByRole("cell", { name: "Accepted", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", {
+      name: /^Prediction and reference on the same input,/,
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("combobox", { name: /^Inspect method/ })
+    .selectOption("graph-surrogate");
+  await page.getByRole("combobox", { name: /^Quantity/ }).selectOption("flow");
+  await expect(
+    page.locator(".plot").filter({
+      has: page.getByRole("heading", {
+        name: "Prediction and reference on the same input",
         exact: true,
-      });
-      const close = modal.getByRole("button", {
-        name: "Close / Cerrar",
-        exact: true,
-      });
-      const guide = modal.getByRole("link", {
-        name: localized(
-          "Architecture, contracts and reproduction guides",
-          "Arquitectura, contratos y guías de reproducción",
-        ),
-        exact: true,
-      });
-      await expect(modal).toBeVisible();
-      await expect(close).toBeFocused();
-      await expect(modal.locator(".architecture-node")).toHaveCount(6);
-      const bounds = await modal.boundingBox();
-      expect(bounds).not.toBeNull();
-      expect(bounds!.x).toBeGreaterThanOrEqual(0);
-      expect(bounds!.y).toBeGreaterThanOrEqual(0);
-      expect(bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
-      expect(bounds!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
-      await capture(page, info, "architecture-top");
-      if (mobile) {
-        await reveal(
-          modal.locator(".architecture-map > section").nth(1),
-          "dialog",
-        );
-        await expect(
-          modal.locator(".architecture-map > section").nth(1),
-        ).toBeInViewport({ ratio: 0.8 });
-        await capture(page, info, "architecture-offline-path");
-      }
-      await page.keyboard.press("Shift+Tab");
-      await expect(guide).toBeFocused();
-      await guide.scrollIntoViewIfNeeded();
-      await capture(page, info, "architecture-boundaries-and-guides");
-      await page.keyboard.press("Tab");
-      await expect(close).toBeFocused();
-      await page.keyboard.press("Escape");
-      await expect(modal).toBeHidden();
-      await expect(trigger).toBeFocused();
-      await noDocumentOverflow(page);
-      expect(errors).toEqual([]);
+      }),
+    }),
+  ).toContainText("Graph surrogate");
+  await page.getByText("Inspect airway values", { exact: true }).click();
+  await expect(
+    page.getByRole("columnheader", { name: "Prediction (m³/s)", exact: true }),
+  ).toBeVisible();
+});
+
+for (const mobile of [false, true])
+  test(`architecture diagrams and keyboard focus remain usable on ${mobile ? "mobile" : "desktop"}`, async ({
+    page,
+  }, info) => {
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 });
+    await openWorkbench(page);
+    const trigger = page.getByRole("button", {
+      name: "Architecture / How it works",
+      exact: true,
     });
-  }
-}
+    await trigger.focus();
+    await trigger.press("Enter");
+    const dialog = page.getByRole("dialog", {
+      name: "How Aerovia works",
+      exact: true,
+    });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole("button", { name: "close", exact: true }),
+    ).toBeFocused();
+    const tabs = dialog.getByRole("tab");
+    await expect(tabs).toHaveCount(5);
+    for (let i = 0; i < 5; i++) {
+      await tabs.nth(i).click();
+      const svg = dialog.locator("svg");
+      await expect(svg).toHaveCount(1);
+      await svg.scrollIntoViewIfNeeded();
+      const escaped = await svg.evaluate((element) => {
+        const bounds = element.getBoundingClientRect();
+        return [...element.querySelectorAll("text")]
+          .filter((text) => {
+            const r = text.getBoundingClientRect();
+            return (
+              r.width > 0 &&
+              r.height > 0 &&
+              (r.left < bounds.left - 1 ||
+                r.right > bounds.right + 1 ||
+                r.top < bounds.top - 1 ||
+                r.bottom > bounds.bottom + 1)
+            );
+          })
+          .map((text) => text.textContent);
+      });
+      expect(escaped).toEqual([]);
+      if (mobile) {
+        const fittedWidth = (await svg.boundingBox())!.width;
+        await dialog
+          .getByRole("button", { name: "Read at full size", exact: true })
+          .click();
+        expect((await svg.boundingBox())!.width).toBeGreaterThan(
+          fittedWidth * 2,
+        );
+        const region = dialog.getByRole("region", {
+          name: "Architecture diagram",
+          exact: true,
+        });
+        expect(
+          await region.evaluate(
+            (element) => element.scrollWidth > element.clientWidth,
+          ),
+        ).toBe(true);
+        await region.focus();
+        await region.press("ArrowRight");
+        await expect
+          .poll(() => region.evaluate((element) => element.scrollLeft))
+          .toBeGreaterThan(0);
+        await dialog
+          .getByRole("button", { name: "Fit diagram", exact: true })
+          .click();
+        expect((await svg.boundingBox())!.width).toBeCloseTo(fittedWidth, 0);
+      }
+      await noDocumentOverflow(page);
+    }
+    await page.screenshot({
+      path: info.outputPath(
+        `architecture-${mobile ? "mobile" : "desktop"}.png`,
+      ),
+    });
+    for (let i = 0; i < 12; i++) {
+      await page.keyboard.press("Tab");
+      expect(
+        await dialog.evaluate((element) =>
+          element.contains(document.activeElement),
+        ),
+      ).toBe(true);
+    }
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(trigger).toBeFocused();
+  });
+
+test("mobile tool panels, focus view and appearance changes preserve the engineering state", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openWorkbench(page);
+  await noDocumentOverflow(page);
+  await mode(page, "Airflow & paths");
+  await parameters(page);
+  await page
+    .getByRole("slider", { name: "Fan speed", exact: true })
+    .fill("0.7");
+  await balanced(page);
+  const controls = page.locator(".av-controls");
+  await controls.locator(".av-panel-close").click();
+  const before = await project(page);
+  expect(before.options.speed).toBe(0.7);
+  await page
+    .getByRole("button", { name: "Toggle focus view", exact: true })
+    .click();
+  await expect(page.locator(".av-workbench")).toHaveClass(/av-focus/);
+  await noDocumentOverflow(page);
+  await page
+    .getByRole("button", { name: "Toggle focus view", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Toggle light / dark", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Switch language", exact: true })
+    .click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+  await expect(
+    page.getByRole("tab", { name: "Flujo y rutas", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await noDocumentOverflow(page);
+  await page.screenshot({
+    path: info.outputPath("mobile-spanish-light.png"),
+    animations: "disabled",
+  });
+  await page.reload();
+  await balanced(page, "es");
+  await expect(page.locator("html")).toHaveAttribute("lang", "es");
+  await page
+    .getByRole("button", { name: "Cambiar idioma", exact: true })
+    .click();
+  expect((await project(page)).options).toEqual(before.options);
+});
