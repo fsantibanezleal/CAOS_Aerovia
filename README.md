@@ -8,7 +8,7 @@
 
 Aerovia combines direct spatial authoring, pressure-flow analysis, conservative passive transport and two actual trained airflow surrogates. Draw or import a network, change a connection or fan, and inspect the consequences in the mine, plots and numerical tables. No login, API key or processing-server upload is required. Imported designs stay on the visitor's device.
 
-The interface uses the published **CAOS app shell 0.6.8**, with English/Spanish, light/dark themes, a dominant spatial instrument and one contextual control area. Focus mode hides that area; mobile controls open as an overlay. Its six routes are **App, Introduction, Methodology, Implementation, Experiments and Benchmark**. The scientific pages provide equations, assumptions, primary references and interactive evidence.
+The interface uses the published **CAOS app shell 0.6.8**, with English/Spanish, light/dark themes, a dominant spatial instrument and one contextual control area divided into named task sections. Linked plots and results share this area with the tools. Focus fills the viewport; mobile controls open as an overlay. Its six routes are **App, Introduction, Methodology, Implementation, Experiments and Benchmark**. The scientific pages provide equations, assumptions, primary references and interactive evidence.
 
 ## What you can do
 

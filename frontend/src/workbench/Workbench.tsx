@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import ToolPages from "./ToolPages";
 import { CaseSelector, Tabs, useLangStore } from "@fasl-work/caos-app-shell";
 import {
   MousePointer2,
@@ -65,6 +66,14 @@ export default function Workbench() {
   const [dialog, setDialog] = useState<
     "new" | "import" | "tables" | "context" | null
   >(null);
+  useEffect(() => {
+    if (!w.focus) return;
+    const leaveFocus = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !dialog) w.setFocus(false);
+    };
+    window.addEventListener("keydown", leaveFocus);
+    return () => window.removeEventListener("keydown", leaveFocus);
+  }, [w.focus, w.setFocus, dialog]);
   if (!w.network || !w.effective || !w.catalog)
     return (
       <div className="page-body prose">
@@ -242,7 +251,8 @@ function WorkspaceMode({
             ? "route"
             : "flow",
     ),
-    [panel, setPanel] = useState(false);
+    [panel, setPanel] = useState(false),
+    [toolPage, setToolPage] = useState("primary");
   const [source, setSource] = useState(
       n.edges.find((e) => e.kind === "working")?.id ?? n.edges[0].id,
     ),
@@ -403,6 +413,7 @@ function WorkspaceMode({
     w.safeBaseline,
   );
   function runTransport() {
+    setToolPage("monitor");
     t.run({
       durationSeconds: duration,
       frameCount: 151,
@@ -467,37 +478,149 @@ function WorkspaceMode({
               "Select a tunnel to inspect and edit its geometry, equipment and hydraulic inputs.",
               "Seleccione una galería para inspeccionar y editar su geometría, equipos y entradas hidráulicas.",
             );
-  return (
-    <div className={`av-mode av-mode-${mode}${panel ? " av-panel-open" : ""}`}>
-      <aside
-        className="av-controls"
-        aria-label={b("Tool parameters", "Parámetros de la herramienta")}
-      >
-        <div className="av-control-title">
-          <h2>
-            {mode === "design"
-              ? b("Build the mine", "Construir la mina")
-              : mode === "flow"
-                ? b("Trace the airflow", "Seguir el flujo")
-                : mode === "transport"
-                  ? b("Release & response", "Emisión y respuesta")
-                  : mode === "operations"
-                    ? b("Operating strategy", "Estrategia operativa")
-                    : mode === "models"
-                      ? b(
-                          "Compare learned models",
-                          "Comparar modelos aprendidos",
-                        )
-                      : b("Test the margin", "Evaluar el margen")}
-          </h2>
-          <button
-            className="av-panel-close icon-btn"
-            onClick={() => setPanel(false)}
-          >
-            ×
-          </button>
+
+  const conditionsPage = {
+    id: "conditions",
+    label: b("Operating conditions", "Condiciones operativas"),
+    content: (
+      <>
+        <OperatingInputs w={w} scope="global" />
+      </>
+    ),
+  };
+  const equipmentPage = {
+    id: "equipment",
+    label: b("Selected equipment", "Equipo seleccionado"),
+    content: (
+      <>
+        <OperatingInputs w={w} scope="edge" />
+      </>
+    ),
+  };
+  const viewPage = {
+    id: "view",
+    label: b("Display and section", "Visualización y corte"),
+    content: (
+      <>
+        <div className="av-display-controls">
+          {mode !== "transport" && (
+            <select
+              aria-label={b("Spatial metric", "Métrica espacial")}
+              value={metric}
+              onChange={(e) => {
+                setMetric(e.target.value as Metric);
+                setFlowTool("field");
+              }}
+            >
+              {[
+                ["flow", b("Flow", "Caudal")],
+                ["velocity", b("Velocity", "Velocidad")],
+                ["target", b("Target deficit", "Déficit")],
+                ["route", b("Airway types", "Tipos de galería")],
+                ["pressure", b("Pressure", "Presión")],
+                ["change", b("Baseline delta", "Cambio con referencia")],
+              ].map(([v, l]) => (
+                <option value={v} key={v}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          )}
+          <label>
+            {b("Tunnel width", "Ancho visual")}{" "}
+            <input
+              type="range"
+              min="1"
+              max="5"
+              step=".25"
+              value={widthScale}
+              onChange={(e) => setWidthScale(+e.target.value)}
+            />
+            <output>{widthScale}×</output>
+          </label>
+          <label>
+            {b("Separate levels", "Separar niveles")}
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step=".1"
+              value={separation}
+              onChange={(e) => setSeparation(+e.target.value)}
+            />
+          </label>
+          <label>
+            {b("Level", "Nivel")}
+            <select
+              value={w.level ?? "all"}
+              onChange={(e) =>
+                w.setLevel(e.target.value === "all" ? null : +e.target.value)
+              }
+            >
+              <option value="all">
+                {b("All levels", "Todos los niveles")}
+              </option>
+              {w.levels.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="av-check">
+            <input
+              type="checkbox"
+              checked={labels}
+              onChange={(e) => setLabels(e.target.checked)}
+            />
+            {b("Labels", "Etiquetas")}
+          </label>
+          <label className="av-check">
+            <input
+              type="checkbox"
+              checked={cut}
+              onChange={(e) => setCut(e.target.checked)}
+            />
+            {b("Cut", "Corte")}
+          </label>
+          {cut && (
+            <input
+              aria-label={b("Cut elevation", "Elevación de corte")}
+              type="range"
+              min={Math.min(...n.nodes.map((n) => n.z)) - 1}
+              max={Math.max(...n.nodes.map((n) => n.z)) + 1}
+              value={cutZ}
+              onChange={(e) => setCutZ(+e.target.value)}
+            />
+          )}
         </div>
-        {mode === "design" ? (
+      </>
+    ),
+  };
+  const inspectPage = {
+    id: "inspect",
+    label: b("Selected result", "Resultado seleccionado"),
+    content: (
+      <>
+        <div className="av-pane-readout">
+          <EngineeringReadout
+            w={w}
+            result={displayResult}
+            approximation={mode === "models" ? predictionMethod : null}
+            mode={mode}
+            analysis={analysis}
+            route={routing?.path?.edgeIds ?? []}
+          />
+        </div>
+      </>
+    ),
+  };
+  const pages = {
+    design: [
+      {
+        id: "primary",
+        label: b("Draw and move", "Dibujar y mover"),
+        content: (
           <>
             <div
               className="av-edit-tools"
@@ -546,6 +669,36 @@ function WorkspaceMode({
                 ))}
               </select>
             </label>
+            {tool === "draw" && (
+              <div className="av-coordinate-grid">
+                <Numeric
+                  label={b("Draw elevation", "Elevación de dibujo")}
+                  value={elevation}
+                  min={-1e6}
+                  max={1e6}
+                  step={1}
+                  change={setElevation}
+                  unit="m"
+                />
+                <Numeric
+                  label={b("Grid snap", "Ajuste a cuadrícula")}
+                  value={snap}
+                  min={0}
+                  max={1000}
+                  step={1}
+                  change={setSnap}
+                  unit="m"
+                />
+              </div>
+            )}
+          </>
+        ),
+      },
+      {
+        id: "node",
+        label: b("Junction coordinates", "Coordenadas de unión"),
+        content: (
+          <>
             {node ? (
               <section className="av-field-group">
                 <div className="av-coordinate-grid">
@@ -594,28 +747,23 @@ function WorkspaceMode({
                 )}
               </section>
             ) : null}
-            {tool === "draw" && (
-              <div className="av-coordinate-grid">
-                <Numeric
-                  label={b("Draw elevation", "Elevación de dibujo")}
-                  value={elevation}
-                  min={-1e6}
-                  max={1e6}
-                  step={1}
-                  change={setElevation}
-                  unit="m"
-                />
-                <Numeric
-                  label={b("Grid snap", "Ajuste a cuadrícula")}
-                  value={snap}
-                  min={0}
-                  max={1000}
-                  step={1}
-                  change={setSnap}
-                  unit="m"
-                />
-              </div>
+
+            {!node && (
+              <p>
+                {b(
+                  "Select a junction in the scene or the Draw and move section.",
+                  "Seleccione una unión en la escena o la sección Dibujar y mover.",
+                )}
+              </p>
             )}
+          </>
+        ),
+      },
+      {
+        id: "airway",
+        label: b("Selected airway", "Galería seleccionada"),
+        content: (
+          <>
             {edge && (
               <section className="av-field-group">
                 <h3>{edge.name[w.lang]}</h3>
@@ -738,7 +886,16 @@ function WorkspaceMode({
               </section>
             )}
           </>
-        ) : mode === "transport" ? (
+        ),
+      },
+      inspectPage,
+      viewPage,
+    ],
+    transport: [
+      {
+        id: "primary",
+        label: b("Release", "Emisión"),
+        content: (
           <>
             <label>
               {b("Release airway", "Galería de emisión")}
@@ -812,6 +969,42 @@ function WorkspaceMode({
                 />
               )}
             </div>
+            <button
+              className="av-primary"
+              disabled={!w.valid || t.busy}
+              onClick={runTransport}
+            >
+              {t.busy
+                ? b("Computing…", "Calculando…")
+                : b("Simulate transport", "Simular transporte")}
+            </button>
+            {t.busy && (
+              <button onClick={t.cancel}>
+                {b("Cancel simulation", "Cancelar simulación")}
+              </button>
+            )}
+            {t.error && (
+              <p className="av-error" role="alert">
+                {t.error}
+              </p>
+            )}
+            {t.result && !t.result.completed && (
+              <p role="alert">{t.result.message}</p>
+            )}
+            <p className="av-hint">
+              {b(
+                "Passive tracer in mixed airway cells. Geometry supplies volume and travel distance; no fire, heat or emergency-response model.",
+                "Trazador pasivo en celdas de galería mezcladas. La geometría determina volumen y distancia; no modela incendios, calor ni respuesta de emergencia.",
+              )}
+            </p>
+          </>
+        ),
+      },
+      {
+        id: "schedule",
+        label: b("Ventilation change", "Cambio de ventilación"),
+        content: (
+          <>
             <label className="av-check">
               <input
                 type="checkbox"
@@ -884,6 +1077,117 @@ function WorkspaceMode({
             {t.result && !t.result.completed && (
               <p role="alert">{t.result.message}</p>
             )}
+          </>
+        ),
+      },
+      {
+        id: "monitor",
+        label: b("Playback and monitor", "Reproducción y monitor"),
+        content: (
+          <>
+            <div className="av-analysis-dock av-transport-dock">
+              {t.busy && <button onClick={t.cancel}>{b("Cancel simulation", "Cancelar simulación")}</button>}
+              {(t.error || (t.result && !t.result.completed)) && <div role="alert" className="av-error">
+                <p>{t.error || t.result?.message}</p>
+                <button onClick={() => setToolPage("primary")}>{b("Edit release", "Editar emisión")}</button>
+              </div>}
+              <div className="av-timeline">
+                <button
+                  onClick={t.play}
+                  disabled={!t.result?.frames.length}
+                  aria-label={b(
+                    t.playing ? "Pause transport" : "Play transport",
+                    t.playing ? "Pausar transporte" : "Reproducir transporte",
+                  )}
+                >
+                  {t.playing ? <Pause size={17} /> : <Play size={17} />}
+                </button>
+                <input
+                  aria-label={b("Simulation time", "Tiempo de simulación")}
+                  type="range"
+                  min="0"
+                  max={Math.max(1, (t.result?.frames.length ?? 2) - 1)}
+                  value={t.frame}
+                  onChange={(e) => t.scrub(+e.target.value)}
+                  disabled={!t.result}
+                />
+                <output>{fmt(transportFrame?.timeSeconds, 1)} s</output>
+                <select
+                  aria-label={b("Playback speed", "Velocidad de reproducción")}
+                  value={t.rate}
+                  onChange={(e) => t.setRate(+e.target.value)}
+                >
+                  {[1, 5, 10, 30, 60].map((r) => (
+                    <option key={r} value={r}>
+                      {r}×
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {t.result && selectedIndex >= 0 ? (
+                <Plot
+                  title={`${b("Monitor", "Monitor")}: ${edge?.name[w.lang]}`}
+                  xlabel="s"
+                  ylabel="mg/m³"
+                  onSelect={(time) => {
+                    const index = t.result!.frames.reduce(
+                      (best, f, i) =>
+                        Math.abs(f.timeSeconds - time) <
+                        Math.abs(t.result!.frames[best].timeSeconds - time)
+                          ? i
+                          : best,
+                      0,
+                    );
+                    t.scrub(index);
+                  }}
+                  series={[
+                    {
+                      label: b("Airway mean", "Media de galería"),
+                      color: "#e5a94f",
+                      values: t.result.frames.map((f) => ({
+                        x: f.timeSeconds,
+                        y: f.concentrations[selectedIndex],
+                      })),
+                    },
+                  ]}
+                  markers={
+                    transportFrame
+                      ? [
+                          {
+                            x: transportFrame.timeSeconds,
+                            y: transportFrame.concentrations[selectedIndex],
+                            label: b("Now", "Ahora"),
+                            color: "#df816c",
+                          },
+                        ]
+                      : []
+                  }
+                />
+              ) : (
+                <div className="av-empty-instrument">
+                  <strong>
+                    {b(
+                      "Follow arrival, dilution and clearance",
+                      "Siga la llegada, dilución y limpieza",
+                    )}
+                  </strong>
+                  <span>
+                    {b(
+                      "Select a release airway and run the transport model. Then pick any tunnel to compare its time history with the concentration field.",
+                      "Seleccione una galería de emisión y ejecute el modelo. Luego elija cualquier galería para comparar su historia temporal con el campo de concentración.",
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
+          </>
+        ),
+      },
+      {
+        id: "ledger",
+        label: b("Mass balance and export", "Balance de masa y exportación"),
+        content: (
+          <>
             {transportFrame && (
               <section className="av-ledger">
                 <h3>{b("Mass balance", "Balance de masa")}</h3>
@@ -932,28 +1236,15 @@ function WorkspaceMode({
               )}
             </p>
           </>
-        ) : mode === "models" ? (
-          <>
-            <OperatingInputs w={w} />
-            {w.valid && w.result && (
-              <LearnedComparison
-                network={n}
-                options={w.options}
-                reference={w.result}
-                selected={predictionMethod}
-                onSelect={(result, method) => {
-                  setPredictedField(
-                    result && method
-                      ? { network: n, options: w.options, result, method }
-                      : null,
-                  );
-                }}
-                onAirwaySelect={w.setSelected}
-                lang={w.lang}
-              />
-            )}
-          </>
-        ) : (
+        ),
+      },
+      viewPage,
+    ],
+    flow: [
+      {
+        id: "primary",
+        label: b("Fields and paths", "Campos y rutas"),
+        content: (
           <>
             {mode === "flow" && (
               <label>
@@ -1061,7 +1352,20 @@ function WorkspaceMode({
                 </p>
               </>
             ) : null}
-            <OperatingInputs w={w} />
+          </>
+        ),
+      },
+      conditionsPage,
+      equipmentPage,
+      inspectPage,
+      viewPage,
+    ],
+    operations: [
+      {
+        id: "primary",
+        label: b("Operating question", "Pregunta operativa"),
+        content: (
+          <>
             {mode === "operations" && (
               <>
                 <label>
@@ -1185,9 +1489,48 @@ function WorkspaceMode({
                     </button>
                   </>
                 )}
-                <EnergySummary w={w} />
               </>
             )}
+          </>
+        ),
+      },
+      conditionsPage,
+      equipmentPage,
+      {
+        id: "energy",
+        label: b("Energy and baseline", "Energía y referencia"),
+        content: (
+          <>
+            <EnergySummary w={w} />
+          </>
+        ),
+      },
+      {
+        id: "inspect",
+        label: b("Analysis result", "Resultado del análisis"),
+        content: (
+          <>
+            <div className="av-pane-readout">
+              <EngineeringReadout
+                w={w}
+                result={displayResult}
+                approximation={mode === "models" ? predictionMethod : null}
+                mode={mode}
+                analysis={analysis}
+                route={routing?.path?.edgeIds ?? []}
+              />
+            </div>
+          </>
+        ),
+      },
+      viewPage,
+    ],
+    risk: [
+      {
+        id: "primary",
+        label: b("Ensemble evidence", "Evidencia del conjunto"),
+        content: (
+          <>
             {mode === "risk" && (
               <>
                 <h3>
@@ -1275,7 +1618,82 @@ function WorkspaceMode({
               </>
             )}
           </>
-        )}
+        ),
+      },
+      conditionsPage,
+      equipmentPage,
+      inspectPage,
+      viewPage,
+    ],
+    models: [
+      {
+        id: "primary",
+        label: b("Learned comparison", "Comparación aprendida"),
+        content: (
+          <>
+            {w.valid && w.result && (
+              <LearnedComparison
+                network={n}
+                options={w.options}
+                reference={w.result}
+                selected={predictionMethod}
+                onSelect={(result, method) => {
+                  setPredictedField(
+                    result && method
+                      ? { network: n, options: w.options, result, method }
+                      : null,
+                  );
+                }}
+                onAirwaySelect={w.setSelected}
+                lang={w.lang}
+              />
+            )}
+          </>
+        ),
+      },
+      conditionsPage,
+      equipmentPage,
+      inspectPage,
+      viewPage,
+    ],
+  }[mode];
+  return (
+    <div className={`av-mode av-mode-${mode}${panel ? " av-panel-open" : ""}`}>
+      <aside
+        className="av-controls"
+        aria-label={b("Tool parameters", "Parámetros de la herramienta")}
+      >
+        <div className="av-control-title">
+          <h2>
+            {mode === "design"
+              ? b("Build the mine", "Construir la mina")
+              : mode === "flow"
+                ? b("Trace the airflow", "Seguir el flujo")
+                : mode === "transport"
+                  ? b("Release & response", "Emisión y respuesta")
+                  : mode === "operations"
+                    ? b("Operating strategy", "Estrategia operativa")
+                    : mode === "models"
+                      ? b(
+                          "Compare learned models",
+                          "Comparar modelos aprendidos",
+                        )
+                      : b("Test the margin", "Evaluar el margen")}
+          </h2>
+          <button
+            className="av-panel-close icon-btn"
+            aria-label={b("Hide tool parameters", "Ocultar parámetros")}
+            onClick={() => setPanel(false)}
+          >
+            ×
+          </button>
+        </div>
+        <ToolPages
+          label={b("Tool section", "Sección de herramientas")}
+          value={toolPage}
+          onChange={setToolPage}
+          pages={pages}
+        />
       </aside>
       <section
         className="av-instrument"
@@ -1300,6 +1718,28 @@ function WorkspaceMode({
             </span>
           </div>
           <div className="av-scene-actions">
+            <button
+              onClick={() => {
+                setToolPage("view");
+                setPanel(true);
+              }}
+              aria-label={b("Display settings", "Opciones de visualización")}
+            >
+              {b("View", "Vista")}
+            </button>
+            <button
+              onClick={() => {
+                setToolPage(mode === "transport" ? "monitor" : "inspect");
+                setPanel(true);
+              }}
+              aria-label={b(
+                "Inspect calculated results",
+                "Inspeccionar resultados calculados",
+              )}
+            >
+              {b("Results", "Resultados")}
+            </button>
+
             <select
               aria-label={b("Camera view", "Vista de cámara")}
               value={view}
@@ -1334,10 +1774,17 @@ function WorkspaceMode({
               selectedNode={nodeId}
               tool={mode === "design" ? tool : "select"}
               onEdge={(id) => {
+                if (mode === "design" && tool === "select")
+                  setToolPage("airway");
                 w.setSelected(id);
                 setNodeId(null);
               }}
-              onNode={mode === "design" ? connect : (id) => setNodeId(id)}
+              onNode={(id) => {
+                if (mode === "design") {
+                  connect(id);
+                  if (tool !== "connect") setToolPage("node");
+                } else setNodeId(id);
+              }}
               onDraw={draw}
               onMove={move}
               editElevation={elevation}
@@ -1438,203 +1885,6 @@ function WorkspaceMode({
             )}
           </div>
         </div>
-        <div className="av-display-controls">
-          {mode !== "transport" && (
-            <select
-              aria-label={b("Spatial metric", "Métrica espacial")}
-              value={metric}
-              onChange={(e) => {
-                setMetric(e.target.value as Metric);
-                setFlowTool("field");
-              }}
-            >
-              {[
-                ["flow", b("Flow", "Caudal")],
-                ["velocity", b("Velocity", "Velocidad")],
-                ["target", b("Target deficit", "Déficit")],
-                ["route", b("Airway types", "Tipos de galería")],
-                ["pressure", b("Pressure", "Presión")],
-                ["change", b("Baseline delta", "Cambio con referencia")],
-              ].map(([v, l]) => (
-                <option value={v} key={v}>
-                  {l}
-                </option>
-              ))}
-            </select>
-          )}
-          <label>
-            {b("Tunnel width", "Ancho visual")}{" "}
-            <input
-              type="range"
-              min="1"
-              max="5"
-              step=".25"
-              value={widthScale}
-              onChange={(e) => setWidthScale(+e.target.value)}
-            />
-            <output>{widthScale}×</output>
-          </label>
-          <label>
-            {b("Separate levels", "Separar niveles")}
-            <input
-              type="range"
-              min="0"
-              max="2"
-              step=".1"
-              value={separation}
-              onChange={(e) => setSeparation(+e.target.value)}
-            />
-          </label>
-          <label>
-            {b("Level", "Nivel")}
-            <select
-              value={w.level ?? "all"}
-              onChange={(e) =>
-                w.setLevel(e.target.value === "all" ? null : +e.target.value)
-              }
-            >
-              <option value="all">
-                {b("All levels", "Todos los niveles")}
-              </option>
-              {w.levels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="av-check">
-            <input
-              type="checkbox"
-              checked={labels}
-              onChange={(e) => setLabels(e.target.checked)}
-            />
-            {b("Labels", "Etiquetas")}
-          </label>
-          <label className="av-check">
-            <input
-              type="checkbox"
-              checked={cut}
-              onChange={(e) => setCut(e.target.checked)}
-            />
-            {b("Cut", "Corte")}
-          </label>
-          {cut && (
-            <input
-              aria-label={b("Cut elevation", "Elevación de corte")}
-              type="range"
-              min={Math.min(...n.nodes.map((n) => n.z)) - 1}
-              max={Math.max(...n.nodes.map((n) => n.z)) + 1}
-              value={cutZ}
-              onChange={(e) => setCutZ(+e.target.value)}
-            />
-          )}
-        </div>
-        {mode === "transport" ? (
-          <div className="av-analysis-dock av-transport-dock">
-            <div className="av-timeline">
-              <button
-                onClick={t.play}
-                disabled={!t.result?.frames.length}
-                aria-label={b(
-                  t.playing ? "Pause transport" : "Play transport",
-                  t.playing ? "Pausar transporte" : "Reproducir transporte",
-                )}
-              >
-                {t.playing ? <Pause size={17} /> : <Play size={17} />}
-              </button>
-              <input
-                aria-label={b("Simulation time", "Tiempo de simulación")}
-                type="range"
-                min="0"
-                max={Math.max(1, (t.result?.frames.length ?? 2) - 1)}
-                value={t.frame}
-                onChange={(e) => t.scrub(+e.target.value)}
-                disabled={!t.result}
-              />
-              <output>{fmt(transportFrame?.timeSeconds, 1)} s</output>
-              <select
-                aria-label={b("Playback speed", "Velocidad de reproducción")}
-                value={t.rate}
-                onChange={(e) => t.setRate(+e.target.value)}
-              >
-                {[1, 5, 10, 30, 60].map((r) => (
-                  <option key={r} value={r}>
-                    {r}×
-                  </option>
-                ))}
-              </select>
-            </div>
-            {t.result && selectedIndex >= 0 ? (
-              <Plot
-                title={`${b("Monitor", "Monitor")}: ${edge?.name[w.lang]}`}
-                xlabel="s"
-                ylabel="mg/m³"
-                onSelect={(time) => {
-                  const index = t.result!.frames.reduce(
-                    (best, f, i) =>
-                      Math.abs(f.timeSeconds - time) <
-                      Math.abs(t.result!.frames[best].timeSeconds - time)
-                        ? i
-                        : best,
-                    0,
-                  );
-                  t.scrub(index);
-                }}
-                series={[
-                  {
-                    label: b("Airway mean", "Media de galería"),
-                    color: "#e5a94f",
-                    values: t.result.frames.map((f) => ({
-                      x: f.timeSeconds,
-                      y: f.concentrations[selectedIndex],
-                    })),
-                  },
-                ]}
-                markers={
-                  transportFrame
-                    ? [
-                        {
-                          x: transportFrame.timeSeconds,
-                          y: transportFrame.concentrations[selectedIndex],
-                          label: b("Now", "Ahora"),
-                          color: "#df816c",
-                        },
-                      ]
-                    : []
-                }
-              />
-            ) : (
-              <div className="av-empty-instrument">
-                <strong>
-                  {b(
-                    "Follow arrival, dilution and clearance",
-                    "Siga la llegada, dilución y limpieza",
-                  )}
-                </strong>
-                <span>
-                  {b(
-                    "Select a release airway and run the transport model. Then pick any tunnel to compare its time history with the concentration field.",
-                    "Seleccione una galería de emisión y ejecute el modelo. Luego elija cualquier galería para comparar su historia temporal con el campo de concentración.",
-                  )}
-                </span>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div
-            className={`av-analysis-dock${mode === "operations" || mode === "risk" ? " av-chart-dock" : ""}`}
-          >
-            <EngineeringReadout
-              w={w}
-              result={displayResult}
-              approximation={mode === "models" ? predictionMethod : null}
-              mode={mode}
-              analysis={analysis}
-              route={routing?.path?.edgeIds ?? []}
-            />
-          </div>
-        )}
       </section>
     </div>
   );
@@ -1711,75 +1961,88 @@ function EnergySummary({ w }: { w: WorkbenchState }) {
   );
 }
 
-function OperatingInputs({ w }: { w: WorkbenchState }) {
+function OperatingInputs({
+  w,
+  scope = "global",
+}: {
+  w: WorkbenchState;
+  scope?: "global" | "edge";
+}) {
   const b = w.b,
     edge = w.edge;
   return (
     <section className="av-field-group">
-      <label>
-        {b("Operating regime", "Régimen operativo")}
-        <select
-          aria-label={b("Operating regime", "Régimen operativo")}
-          value="custom"
-          onChange={(e) => {
-            const regime = e.target.value,
-              canonical = w.chosenCase?.network ?? w.network!;
-            const options: Options = structuredClone(DEFAULT_OPTIONS);
-            if (regime === "turndown") options.speed = 0.65;
-            if (regime === "boost") options.speed = 1.25;
-            if (regime === "roughness") options.resistanceScale = 1.5;
-            if (
-              regime === "working-restriction" ||
-              regime === "return-restriction"
-            )
-              for (const edge of canonical.edges)
+      {scope === "global" && (
+        <>
+          <label>
+            {b("Operating regime", "Régimen operativo")}
+            <select
+              aria-label={b("Operating regime", "Régimen operativo")}
+              value="custom"
+              onChange={(e) => {
+                const regime = e.target.value,
+                  canonical = w.chosenCase?.network ?? w.network!;
+                const options: Options = structuredClone(DEFAULT_OPTIONS);
+                if (regime === "turndown") options.speed = 0.65;
+                if (regime === "boost") options.speed = 1.25;
+                if (regime === "roughness") options.resistanceScale = 1.5;
                 if (
-                  edge.kind ===
-                  (regime === "working-restriction" ? "working" : "return")
+                  regime === "working-restriction" ||
+                  regime === "return-restriction"
                 )
-                  options.overrides[edge.id] = {
-                    resistance: edge.resistance * 3,
-                  };
-            w.change(structuredClone(canonical), options);
-          }}
-        >
-          <option value="custom" disabled>
-            {b("Choose a comparison state", "Elegir estado de comparación")}
-          </option>
-          {regimeDefinitions.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name[w.lang === "en" ? 0 : 1]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="av-range-label">
-        {b("Fan speed", "Velocidad del ventilador")}
-        <output>{fmt(w.options.speed * 100, 0)}%</output>
-        <input
-          aria-label={b("Fan speed", "Velocidad del ventilador")}
-          type="range"
-          min="0"
-          max="1.5"
-          step=".01"
-          value={w.options.speed}
-          onChange={(e) =>
-            w.change(w.network!, { ...w.options, speed: +e.target.value })
-          }
-        />
-      </label>
-      <Numeric
-        label={b("Global resistance factor", "Factor global de resistencia")}
-        value={w.options.resistanceScale}
-        min={0.2}
-        max={5}
-        step={0.05}
-        change={(v) =>
-          w.change(w.network!, { ...w.options, resistanceScale: v })
-        }
-        unit="×"
-      />
-      {edge && (
+                  for (const edge of canonical.edges)
+                    if (
+                      edge.kind ===
+                      (regime === "working-restriction" ? "working" : "return")
+                    )
+                      options.overrides[edge.id] = {
+                        resistance: edge.resistance * 3,
+                      };
+                w.change(structuredClone(canonical), options);
+              }}
+            >
+              <option value="custom" disabled>
+                {b("Choose a comparison state", "Elegir estado de comparación")}
+              </option>
+              {regimeDefinitions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name[w.lang === "en" ? 0 : 1]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="av-range-label">
+            {b("Fan speed", "Velocidad del ventilador")}
+            <output>{fmt(w.options.speed * 100, 0)}%</output>
+            <input
+              aria-label={b("Fan speed", "Velocidad del ventilador")}
+              type="range"
+              min="0"
+              max="1.5"
+              step=".01"
+              value={w.options.speed}
+              onChange={(e) =>
+                w.change(w.network!, { ...w.options, speed: +e.target.value })
+              }
+            />
+          </label>
+          <Numeric
+            label={b(
+              "Global resistance factor",
+              "Factor global de resistencia",
+            )}
+            value={w.options.resistanceScale}
+            min={0.2}
+            max={5}
+            step={0.05}
+            change={(v) =>
+              w.change(w.network!, { ...w.options, resistanceScale: v })
+            }
+            unit="×"
+          />
+        </>
+      )}
+      {scope === "edge" && edge && (
         <>
           <h3>{edge.name[w.lang]}</h3>
           <label className="av-check">
@@ -1816,6 +2079,7 @@ function OperatingInputs({ w }: { w: WorkbenchState }) {
                 value={edge.fan.coefficient}
                 min={0}
                 max={1e4}
+                unit="Pa·s²/m⁶"
                 change={(v) => w.updateFan("coefficient", v)}
               />
               <Numeric

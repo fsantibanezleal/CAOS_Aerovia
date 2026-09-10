@@ -69,6 +69,9 @@
   overflow: hidden;
   min-width: 0;
 }
+.app-shell.fixed .page-body.av-workbench {
+  padding: 0.6rem 0.75rem;
+}
 .av-workbench button,
 .av-dialog button {
   display: inline-flex;
@@ -182,7 +185,7 @@
 .av-controls {
   min-width: 0;
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
   padding: 0.7rem;
   border: 1px solid var(--color-border);
   border-radius: 9px;
@@ -191,6 +194,65 @@
   flex-direction: column;
   gap: 0.65rem;
   scrollbar-width: thin;
+}
+.av-pane-readout {
+  min-width: 0;
+  height: 385px;
+}
+.av-pane-readout .av-selected-readout,
+.av-pane-readout .av-interval-readout {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.9rem;
+}
+.av-pane-readout .av-selected-readout > div,
+.av-pane-readout .av-interval-readout > div {
+  display: flex;
+  flex-direction: column;
+  flex-basis: auto;
+}
+.av-pane-readout .av-selected-readout span,
+.av-pane-readout .av-selected-readout small {
+  display: block;
+}
+.av-pane-readout .av-risk-chart {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 220px auto;
+  gap: 0.65rem;
+}
+.av-pane-readout .av-risk-chart .av-interval-readout {
+  display: flex;
+  gap: 0.4rem;
+}
+.av-pane-readout .av-risk-chart .av-interval-readout > div:last-child {
+  display: none;
+}
+.av-pane-readout .av-sensitivity-bars {
+  grid-template-columns: minmax(0, 1fr);
+}
+.av-controls .av-display-controls {
+  padding: 0;
+  border: 0;
+  gap: 1rem;
+  overflow: visible;
+}
+.av-controls .av-display-controls select {
+  max-width: 100%;
+}
+.av-controls .av-display-controls > select {
+  width: 100%;
+}
+.av-controls .av-transport-dock {
+  height: 350px;
+  border: 0;
+}
+.av-controls .av-timeline {
+  flex-wrap: wrap;
+  margin-bottom: 0.7rem;
+}
+.av-controls .av-timeline input {
+  min-width: 80px;
 }
 .av-control-title {
   display: flex;
@@ -303,7 +365,7 @@
   align-items: center;
   gap: 0.5rem;
   justify-content: space-between;
-  padding: 0.5rem 0.75rem;
+  padding: 0.22rem 0.55rem;
   min-width: 0;
   background: var(--color-surface);
 }
@@ -449,7 +511,8 @@
 .av-display-controls {
   flex: 0 0 auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  flex-direction: column;
   gap: 0.65rem;
   border-top: 1px solid var(--color-border);
   padding: 0.4rem 0.6rem;
@@ -461,10 +524,11 @@
   gap: 0.3rem;
   min-width: 0;
   font-size: 0.65rem;
-  white-space: nowrap;
+  white-space: normal;
+  justify-content: space-between;
 }
 .av-display-controls label:not(.av-check) {
-  flex: 1;
+  flex: 0 0 auto;
 }
 .av-display-controls input[type="range"] {
   max-width: 90px;
@@ -476,10 +540,8 @@
 .av-analysis-dock {
   flex: 0 0 auto;
   min-width: 0;
-  border-top: 1px solid var(--color-border);
-  padding: 0.6rem 0.75rem;
-  height: 114px;
-  overflow: auto;
+  padding: 0;
+  height: 350px;
 }
 .av-selected-readout,
 .av-interval-readout {
@@ -517,7 +579,7 @@
   color: var(--color-fg-subtle);
 }
 .av-transport-dock {
-  height: 180px;
+  height: 350px;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -625,6 +687,20 @@
 }
 .av-focus .av-mode {
   grid-template-columns: minmax(0, 1fr);
+}
+.av-focus {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 0.6rem;
+  background: var(--color-bg);
+}
+.app-shell.fixed .page-body.av-workbench.av-focus {
+  padding: 0.15rem 0.35rem;
+  gap: 0.25rem;
+}
+.av-focus > .tabs > .tablist {
+  margin-bottom: 0.25rem;
 }
 .av-focus .av-controls {
   display: none;
