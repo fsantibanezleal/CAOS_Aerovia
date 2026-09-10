@@ -401,10 +401,65 @@ test("learned fields are labeled approximations and reject a changed topology wi
   await expect(
     page.getByRole("img", { name: /^Where the approximation differs,/ }),
   ).toBeVisible();
+  await page
+    .getByRole("combobox", { name: "Inspect", exact: true })
+    .selectOption("flow");
+  const comparison = page.getByRole("img", { name: /^Airway flow,/ });
+  await comparison.press("ArrowRight");
+  await comparison.press("ArrowRight");
+  await comparison.press("Enter");
+  await expect(page.locator(".av-selected-readout h3")).toHaveText(
+    "Main exhaust fan",
+  );
+  async function assertDisplayedPrediction() {
+    const lower = page.locator(".av-selected-readout");
+    await expect(lower).toContainText("Selected airway · approximation");
+    const currentIntake = uiNumber(
+      await page.locator(".av-viz-readout > strong").innerText(),
+    );
+    const currentFlow = uiNumber(
+      await lower
+        .locator("div")
+        .filter({ has: page.getByText("Signed flow", { exact: true }) })
+        .locator("strong")
+        .innerText(),
+    );
+    // This case has one exhaust fan. Its predicted delivery agrees with net
+    // boundary supply at displayed precision.
+    expect(currentFlow).toBeCloseTo(currentIntake, 1);
+    const residualText = await lower
+      .locator("div")
+      .filter({
+        has: page.getByText("Mass / pressure residual", { exact: true }),
+      })
+      .locator("strong")
+      .innerText();
+    const [mass, pressure] = residualText.split("/").map(uiNumber);
+    const cards = page.locator(".av-learned-metrics");
+    const cardMass = uiNumber(
+      await cards
+        .locator("div")
+        .filter({ has: page.getByText("Nodal imbalance", { exact: true }) })
+        .locator("strong")
+        .innerText(),
+    );
+    const cardPressure = uiNumber(
+      await cards
+        .locator("div")
+        .filter({ has: page.getByText("Pressure closure", { exact: true }) })
+        .locator("strong")
+        .innerText(),
+    );
+    expect(mass).toBe(Number(cardMass.toPrecision(2)));
+    expect(Math.abs(pressure - cardPressure)).toBeLessThanOrEqual(
+      Math.abs(cardPressure) * 0.06 + 0.005,
+    );
+  }
   await predicted.click();
   await expect(page.locator(".av-viz-readout")).toContainText(
     "topology-mlp · approximation",
   );
+  await assertDisplayedPrediction();
   await page
     .getByRole("button", { name: "Numerical field", exact: true })
     .click();
@@ -414,6 +469,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
   await expect(page.locator(".av-viz-readout")).toContainText(
     "graph-surrogate · approximation",
   );
+  await assertDisplayedPrediction();
   await importProject(page, analyticalNetwork());
   await mode(page, "Learned screening");
   await page
@@ -427,6 +483,84 @@ test("learned fields are labeled approximations and reject a changed topology wi
     page.getByRole("img", { name: /^Where the approximation differs,/ }),
   ).toHaveCount(0);
   await balanced(page);
+});
+
+test("mobile uncertainty exposes selected quantiles and target probability from the actual recorded ensemble in both languages", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const catalog = JSON.parse(
+    await readFile(
+      new URL("../../data/artifacts/catalog.json", import.meta.url),
+      "utf8",
+    ),
+  ) as {
+    cases: Array<{
+      network: Network;
+      ensemble: {
+        flowP05: number[];
+        flowP50: number[];
+        flowP95: number[];
+        targetProbability: number[];
+        powerP05: number;
+        powerP95: number;
+      };
+    }>;
+  };
+  await openWorkbench(page);
+  const current = await project(page),
+    item = catalog.cases.find(
+      (item) => item.network.id === current.network.id,
+    )!;
+  const index = item.network.edges.reduce(
+      (last, edge, index) => (edge.target > 0 ? index : last),
+      -1,
+    ),
+    edge = item.network.edges[index];
+  await mode(page, "Uncertainty");
+  const plot = page.getByRole("img", { name: /^Working-airway uncertainty/ });
+  const box = (await plot.boundingBox())!;
+  await plot.click({ position: { x: box.width - 14, y: box.height / 2 } });
+  for (const lang of ["en", "es"] as const) {
+    if (lang === "es")
+      await page
+        .getByRole("button", { name: "Switch language", exact: true })
+        .click();
+    await parameters(page);
+    const summary = page.getByRole("region", {
+      name:
+        lang === "es"
+          ? "Incertidumbre de galería seleccionada"
+          : "Selected airway uncertainty",
+      exact: true,
+    });
+    await summary.scrollIntoViewIfNeeded();
+    await expect(summary).toBeInViewport({ ratio: 0.8 });
+    await expect(summary.getByRole("heading")).toHaveText(edge.name[lang]);
+    const format = (value: number) =>
+      value.toLocaleString(lang, { maximumFractionDigits: 2 });
+    await expect(summary.locator("p").nth(0).locator("strong")).toHaveText(
+      `${format(item.ensemble.flowP05[index])} -- ${format(item.ensemble.flowP95[index])} m³/s`,
+    );
+    await expect(summary.locator("p").nth(1).locator("strong")).toHaveText(
+      `${format(item.ensemble.flowP50[index])} m³/s`,
+    );
+    await expect(summary.locator("p").nth(2).locator("strong")).toHaveText(
+      `${format(item.ensemble.targetProbability[index] * 100)}%`,
+    );
+    const power = page.locator(".av-controls .av-ledger > div").filter({
+      has: page.getByText(
+        lang === "es" ? "Potencia P05–P95" : "Fan power P05–P95",
+        { exact: true },
+      ),
+    });
+    await power.scrollIntoViewIfNeeded();
+    await expect(power).toBeInViewport();
+    await expect(power.locator("strong")).toHaveText(
+      `${format(item.ensemble.powerP05)} -- ${format(item.ensemble.powerP95)} kW`,
+    );
+    await page.locator(".av-controls .av-panel-close").click();
+  }
 });
 
 test("energy and cost use actual solved fan power and preserve the captured comparison baseline", async ({
