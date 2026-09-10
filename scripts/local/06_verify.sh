@@ -12,9 +12,10 @@ cd "$AEROVIA_ROOT"
 "$python_executable" -m pytest tests/python -q
 "$python_executable" scripts/pipeline.py validate --input data/cases.json
 "$python_executable" scripts/pipeline.py verify --artifacts data/artifacts --input data/cases.json
+"$python_executable" scripts/surrogates.py validate --models-output data/models --science-output data/artifacts/science.json
 cd frontend
 npm run typecheck
 npm test
 npm run build
-if $browser; then npx playwright install chromium; npm run test:e2e; fi
+if $browser; then npx playwright install chromium; npm run test:e2e; node verify-learned-browser.mjs; fi
 printf 'Verification passed. Next: bash scripts/local/04_preview.sh or review scripts/local/09_deploy.sh.\n'

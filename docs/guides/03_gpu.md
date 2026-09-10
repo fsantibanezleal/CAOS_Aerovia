@@ -3,8 +3,9 @@
 ## What the GPU computes
 
 The GPU lane evaluates many resistance realizations of the same ventilation graph using PyTorch tensor
-operations in double precision. Its useful parallelism is across independent realizations. It is not a
-trained surrogate, and the repository does not claim that a model checkpoint or training phase exists.
+operations in double precision. Its useful parallelism is across independent realizations. These
+numerical ensembles are separate from the actual MLP/GNN training, checkpoints and ONNX inference
+documented in [learned screening](../methods/surrogates.md).
 The browser's interactive result remains a separate live solve; a GPU band represents the exact saved
 network, seed and parameter distribution identified by its artifact provenance.
 
@@ -57,6 +58,11 @@ For a release, add `-Release` or `--release` to `05_gpu`. This explicitly replac
 the complete authored catalog. Keep the same seed and sample count when reproducing a published bake.
 Expect small hardware/library floating-point differences rather than promising byte-identical arrays
 across different CUDA devices. Manifest hashes verify the bytes of a particular saved release.
+
+The numerical release bake replaces its artifact directory. Before building the complete website,
+export and validate the matching learned scientific artifacts again with `scripts/surrogates.py export`
+and `validate` using the explicit release paths in the [training guide](../methods/surrogates.md).
+`prepare-data.mjs` requires both numerical and learned evidence; it will reject a partial release.
 
 ## Independent agreement and failure accounting
 

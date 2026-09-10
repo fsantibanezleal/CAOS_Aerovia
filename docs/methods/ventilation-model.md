@@ -14,7 +14,7 @@ Pressure is Pa, flow Q is m³/s, speed s is a fraction of the supplied fan curve
 
 The signed quadratic fan extension is used in the solver equations. A fan solution with Q < −1e−7 m³/s or delivered H < −1e−6 Pa is outside the supported fan regime and reports `converged=false`. It is not presented as an accepted reverse-running or stalled-fan operating point.
 
-Area and resistance are independent entered quantities. Editing area changes velocity Q/area; it does not recompute R. To model an excavation or obstruction, enter the measured/estimated changed R explicitly. Coordinates describe the visualization; they do not establish airway length or measured resistance. A geometry-based Atkinson resistance requires a chosen friction factor, perimeter, length and operating density outside this release's direct inputs.
+Area and resistance are independent entered quantities. Editing area changes velocity Q/area; it does not recompute R. To model an excavation or obstruction, enter the measured/estimated changed R explicitly. Coordinates define the displayed centerline and its straight-segment length, used by tracer transport and routing for represented volume and nominal travel time. They do not establish measured airway length or calibrate resistance; a curved passage needs intermediate junctions or an explicitly supplied transport length. A geometry-based Atkinson resistance requires a chosen friction factor, perimeter, length and operating density outside this release's direct inputs. See [transport](transport.md) and [routing](routing.md) for their separate assumptions.
 
 ## Independent algorithms
 
@@ -22,7 +22,7 @@ The browser implements nodal-pressure Newton iteration with smooth continuation,
 
 The reference unknowns are Q/Qscale and p/Pscale. Pscale is at least 100 Pa and tracks the largest forcing magnitude. Qscale is at least 10 m³/s and is based on Pscale and the median effective resistance. A least-squares solution of a linear resistance approximation initializes the trust-region solve. SciPy tolerances are 1e−13, with at most 1500 function evaluations. Physical release acceptance is maximum absolute internal mass residual ≤1e−6 m³/s and maximum absolute branch pressure residual ≤1e−5 Pa. These are absolute SI tolerances, not percentages of plotted quantities.
 
-GPU uncertainty uses batched mixed-variable damped Newton equations in PyTorch float64 on CUDA. Its independent CPU verification uses the SciPy reference on eight identical saved resistance draws per case. No learned model is trained or substituted for the network equations. A CPU-only batch path uses NumPy with the same Newton equations; it requires no PyTorch installation.
+GPU uncertainty uses batched mixed-variable damped Newton equations in PyTorch float64 on CUDA. Its independent CPU verification uses the SciPy reference on eight identical saved resistance draws per case. In this uncertainty stage, no learned model is trained or substituted for the network equations. The separately documented [surrogate pipeline](surrogates.md) trains and evaluates approximations against numerical reference outputs; it does not replace the uncertainty solver or its reference checks. A CPU-only uncertainty batch path uses NumPy with the same Newton equations; it requires no PyTorch installation.
 
 ## Quantities and operations
 

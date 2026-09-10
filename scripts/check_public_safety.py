@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 import re
 import subprocess
+from vendor_notices import scanned_bytes
 
 ROOT = Path(__file__).resolve().parents[1]
 RULES = {
@@ -33,6 +34,10 @@ def git(*arguments: str, allow_failure: bool = False) -> bytes:
 
 def inspect(path: str, data: bytes) -> list[tuple[str, str]]:
     findings = []
+    try:
+        data = scanned_bytes(path, data)
+    except ValueError as error:
+        findings.append((path, str(error)))
     if Path(path).name in FORBIDDEN_NAMES or Path(path).suffix.lower() in {".pem", ".pfx", ".p12"}:
         findings.append((path, "credential-file"))
     if b"\x00" in data[:8192]:

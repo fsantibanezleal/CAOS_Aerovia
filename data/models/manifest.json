@@ -1,0 +1,170 @@
+{
+  "schema": "aerovia.model-manifest/v1",
+  "sourceSha256": "a8113786ae34930ada58dcb7cc5a97277f9490c7019b256ca579064c801722c8",
+  "files": {
+    "parity-fixtures.json": {
+      "sha256": "89316a2a9fbc828e259eb1f9b069fd71698cb97ff680d6a4b5940f2b3251ef25",
+      "bytes": 302816
+    },
+    "registry.json": {
+      "sha256": "bf2b0ea278fad3f96894811bce849d49c6287f73bdfc1e7eb0b97bcbd03cbe4f",
+      "bytes": 287206
+    },
+    "diagnostics/room-pillar-holdout.pt": {
+      "sha256": "37c4a4673c4d4599f8f9cbe13ecd494f2ee77d09e78b4a41ade2125b8bd499e2",
+      "bytes": 65389
+    },
+    "graph-surrogate/deep-booster.onnx": {
+      "sha256": "f9355534e8635a4f47ea01d21fccbbb73d80379b30abe174b455becec2bea6b0",
+      "bytes": 263983
+    },
+    "graph-surrogate/deep-five-level.onnx": {
+      "sha256": "26ee863bed0346ab1ef85e1be7a42e355352109ed860c7daaa7a1401e37020ab",
+      "bytes": 263983
+    },
+    "graph-surrogate/development-headings.onnx": {
+      "sha256": "7393672c385b2eafe21ab3307dda87e77b29ffc254447b78b9a0b04c947d6e40",
+      "bytes": 185739
+    },
+    "graph-surrogate/district-regulation.onnx": {
+      "sha256": "ceee4197b7b5ce8ed7f1706c7ef5ecf30ff14550d114befef30b2a4835f703da",
+      "bytes": 184558
+    },
+    "graph-surrogate/hard-rock.onnx": {
+      "sha256": "0d76a20122f3c8a3ff15f26504d720df7a66435f9b183e8f46c7b45c08b8792a",
+      "bytes": 215879
+    },
+    "graph-surrogate/leakage-open.onnx": {
+      "sha256": "c54e2326bde3d958fb033efc9bafe3818a7536c4402bcb707d88f5ea1b37b0fa",
+      "bytes": 220187
+    },
+    "graph-surrogate/leakage-sealed.onnx": {
+      "sha256": "8bfdd828ededabce24732f883c3a687b85bc38e501945dec13fe7728139ddeaa",
+      "bytes": 220187
+    },
+    "graph-surrogate/narrow-incline.onnx": {
+      "sha256": "89a2c1aceb3fa79ee1cff31dada9ca69475afbe4b4c371a1f5f755c7c10f3fcd",
+      "bytes": 190115
+    },
+    "graph-surrogate/return-restriction.onnx": {
+      "sha256": "3dad7de9024177f380d27855a9ca0dfdc609325c09e1a68f88776d8d60aba11a",
+      "bytes": 215879
+    },
+    "graph-surrogate/room-pillar.onnx": {
+      "sha256": "c6d44fe1687c84a4fa2ea24c16d9008682ffb038d30818d3b7c13198b2ed6e47",
+      "bytes": 177995
+    },
+    "graph-surrogate/shared.pt": {
+      "sha256": "169220c9d8a9172fa6e71232cee961ea2db13d8fe2548fa3e49715a84cb2dbbb",
+      "bytes": 65051
+    },
+    "graph-surrogate/split-intake.onnx": {
+      "sha256": "b541347ea9c9be35808bfe529b625288a4f72f92f7c9ef6a249ad75ec0c40ce5",
+      "bytes": 221359
+    },
+    "graph-surrogate/twin-district.onnx": {
+      "sha256": "816599b80f125ccb50bc4f585e745d651f6f91a8bb5f407293be52ee7a763cc3",
+      "bytes": 184558
+    },
+    "topology-mlp/deep-booster.onnx": {
+      "sha256": "e65fff30895671708aad63500b7a796fd8139898c07aa37fee1b03f975fbdbb7",
+      "bytes": 189380
+    },
+    "topology-mlp/deep-booster.pt": {
+      "sha256": "22773d9d01c40ed04e1664593dfefb79d2ac7f705c0ccd82a578fe5cc096913e",
+      "bytes": 147253
+    },
+    "topology-mlp/deep-five-level.onnx": {
+      "sha256": "f10c72523513e041814ad94c854089aae5ba39e235746b82f372944f5c068e1b",
+      "bytes": 189380
+    },
+    "topology-mlp/deep-five-level.pt": {
+      "sha256": "17353953312fa4021d23dc3c85ecd35e779a13035a3350e97045be800896d2f7",
+      "bytes": 147289
+    },
+    "topology-mlp/development-headings.onnx": {
+      "sha256": "5f39b6c2f8b402662aaa512b2a3ee96f0c0fe5d968a651e36093e7c00c17cdda",
+      "bytes": 127828
+    },
+    "topology-mlp/development-headings.pt": {
+      "sha256": "d93ce2058f69736a50018bd94929c0f435470c6180313e26a43a4750b907a776",
+      "bytes": 113493
+    },
+    "topology-mlp/district-regulation.onnx": {
+      "sha256": "ba6c82b49b45d986da4852dd8be13bb9b3fecb806158468aec880a973201d0bc",
+      "bytes": 127447
+    },
+    "topology-mlp/district-regulation.pt": {
+      "sha256": "4ac8f6619475b2d5c4e4cb485b37130530301c34a487ce6f40e04ad5c7b166dc",
+      "bytes": 113481
+    },
+    "topology-mlp/hard-rock.onnx": {
+      "sha256": "184d6ef7011cb581ca5513ae2b2e1641da73c5661706678a852483dc767712d3",
+      "bytes": 153868
+    },
+    "topology-mlp/hard-rock.pt": {
+      "sha256": "5b25bf2f2a4eacefe2977b1d89a6f286c5814a1c6bec509a86fe773d2c4cad5c",
+      "bytes": 128721
+    },
+    "topology-mlp/leakage-open.onnx": {
+      "sha256": "750a52576ac9f1307c998a79ed4abfca6bfc92fd40733652b9622ba0222d2471",
+      "bytes": 158956
+    },
+    "topology-mlp/leakage-open.pt": {
+      "sha256": "a12e370521b863eea2e967cb291b7f15d59a9ca3b3741e3c963d0e49e2ddfc67",
+      "bytes": 131829
+    },
+    "topology-mlp/leakage-sealed.onnx": {
+      "sha256": "7718fed428b2bef7286eb3d4831212fc516b847a9f956b6aae29f9984580ba7d",
+      "bytes": 158956
+    },
+    "topology-mlp/leakage-sealed.pt": {
+      "sha256": "b59ebb1726e0962a7446fdcf217e6b0b885c299d7b3047249589394cef3cb0a6",
+      "bytes": 131853
+    },
+    "topology-mlp/narrow-incline.onnx": {
+      "sha256": "df626b2dae80b97fcf728d6b0dffaa53a486b44208b73ad41894af69364c576b",
+      "bytes": 132616
+    },
+    "topology-mlp/narrow-incline.pt": {
+      "sha256": "e188069bf27642d2ff326ae1649b56455740fb3f96d2142c12328ffcd120ba47",
+      "bytes": 116429
+    },
+    "topology-mlp/return-restriction.onnx": {
+      "sha256": "49a10c2d45cd4d998d62c1c0f0e06ea6c7b6d70d122c55cbfc660a3f3b4207b9",
+      "bytes": 153868
+    },
+    "topology-mlp/return-restriction.pt": {
+      "sha256": "d43c05258cd9077b8a7087607a12e04df3e5e478ed3cf8ab08a34a353a705eed",
+      "bytes": 128829
+    },
+    "topology-mlp/room-pillar.onnx": {
+      "sha256": "ecbe313a1c677f0e5bae16e4258d46f278f72fef946ec479acba0824d038d819",
+      "bytes": 126484
+    },
+    "topology-mlp/room-pillar.pt": {
+      "sha256": "1244d3ee94d3bbe5a6668436c6f872401beee66f247da216da5beb4a323ecba8",
+      "bytes": 113321
+    },
+    "topology-mlp/split-intake.onnx": {
+      "sha256": "5adf7e602d69a2ff6841afe21674857dfcf9aceecc18e691ed4ae044c9947ede",
+      "bytes": 157724
+    },
+    "topology-mlp/split-intake.pt": {
+      "sha256": "f6971ad75a423b5899d00d1562275486587e3702d28bdf54531a2eae36fc2105",
+      "bytes": 130805
+    },
+    "topology-mlp/twin-district.onnx": {
+      "sha256": "7ddbd52b2291a8071a469366b5d300522c87350098a9ebae9af1485755d36c63",
+      "bytes": 127447
+    },
+    "topology-mlp/twin-district.pt": {
+      "sha256": "49610a293f136bb09b679604d55017f9996e01603ec5403c64c5b97701afd7e1",
+      "bytes": 113345
+    },
+    "browser-evidence.json": {
+      "sha256": "f94fafb363c255eb4cbe421a164e0c1c6d43d3381ce934a87e35bda47ab67fd8",
+      "bytes": 23448
+    }
+  }
+}

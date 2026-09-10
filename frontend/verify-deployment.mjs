@@ -68,8 +68,8 @@ for (const [path, record] of files) {
     throw new Error("Invalid release file entry.");
   total += record.bytes;
 }
-if (total > 25_000_000)
-  throw new Error("Release exceeds the documented 25 MB budget.");
+if (total > 32_000_000)
+  throw new Error("Release exceeds the documented 32 MB total budget.");
 for (let index = 0; index < files.length; index += 4) {
   await Promise.all(
     files.slice(index, index + 4).map(async ([path, record]) => {

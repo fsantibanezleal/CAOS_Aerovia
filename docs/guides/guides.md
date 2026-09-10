@@ -11,6 +11,8 @@ explicit provenance; it is not a collection of confidential mine surveys.
 | Create, download, validate and process a network | [02 Processing your data](02_processing.md) |
 | Compute reproducible GPU resistance ensembles | [03 GPU processing](03_gpu.md) |
 | Publish and verify the static app on its custom domain | [04 Deployment](04_deployment.md) |
+| Draw/import a design, compare operations and reproduce tracer histories | [05 Spatial and transport workflow](05_spatial-and-transport.md) |
+| Train, evaluate, calibrate and export both learned models | [Complete learned pipeline](../methods/surrogates.md) |
 | Understand what the public repository and browser store | [Public data boundary](../security/security.md) |
 
 The paired scripts are indexed in [scripts/local/README.md](../../scripts/local/README.md).

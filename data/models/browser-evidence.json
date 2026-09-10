@@ -1,0 +1,712 @@
+{
+  "schema": "aerovia.browser-model-evidence/v1",
+  "createdAt": "2026-09-10T03:49:16.570Z",
+  "sourceSha256": "a8113786ae34930ada58dcb7cc5a97277f9490c7019b256ca579064c801722c8",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+  "rows": [
+    {
+      "methodId": "topology-mlp",
+      "networkId": "hard-rock",
+      "modelSha256": "184d6ef7011cb581ca5513ae2b2e1641da73c5661706678a852483dc767712d3",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 5.200000002980232,
+      "totalMs": 672.8999999985099
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "hard-rock",
+      "modelSha256": "184d6ef7011cb581ca5513ae2b2e1641da73c5661706678a852483dc767712d3",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00006103515625,
+      "pressureMaxAbs": 0.0010986328125,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 0.5
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "hard-rock",
+      "modelSha256": "0d76a20122f3c8a3ff15f26504d720df7a66435f9b183e8f46c7b45c08b8792a",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 2.5,
+      "totalMs": 33.80000000074506
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "hard-rock",
+      "modelSha256": "0d76a20122f3c8a3ff15f26504d720df7a66435f9b183e8f46c7b45c08b8792a",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.5999999977648258,
+      "totalMs": 0.8000000007450581
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-five-level",
+      "modelSha256": "f10c72523513e041814ad94c854089aae5ba39e235746b82f372944f5c068e1b",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 25.900000002235174
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-five-level",
+      "modelSha256": "f10c72523513e041814ad94c854089aae5ba39e235746b82f372944f5c068e1b",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00003814697265625,
+      "pressureMaxAbs": 0.0010986328125,
+      "inferenceMs": 0.5,
+      "totalMs": 0.8999999985098839
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-five-level",
+      "modelSha256": "26ee863bed0346ab1ef85e1be7a42e355352109ed860c7daaa7a1401e37020ab",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0010986328125,
+      "inferenceMs": 0.8000000007450581,
+      "totalMs": 31.600000001490116
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-five-level",
+      "modelSha256": "26ee863bed0346ab1ef85e1be7a42e355352109ed860c7daaa7a1401e37020ab",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.6999999992549419,
+      "totalMs": 1
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "modelSha256": "ecbe313a1c677f0e5bae16e4258d46f278f72fef946ec479acba0824d038d819",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.00000762939453125,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 23.899999998509884
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "modelSha256": "ecbe313a1c677f0e5bae16e4258d46f278f72fef946ec479acba0824d038d819",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.000011444091796875,
+      "pressureMaxAbs": 0.00054931640625,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.30000000074505806
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "room-pillar",
+      "modelSha256": "c6d44fe1687c84a4fa2ea24c16d9008682ffb038d30818d3b7c13198b2ed6e47",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00054931640625,
+      "inferenceMs": 0.5,
+      "totalMs": 29.899999998509884
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "room-pillar",
+      "modelSha256": "c6d44fe1687c84a4fa2ea24c16d9008682ffb038d30818d3b7c13198b2ed6e47",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000057220458984375,
+      "flowMaxAbs": 0.00000667572021484375,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.5,
+      "totalMs": 0.6000000014901161
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "twin-district",
+      "modelSha256": "7ddbd52b2291a8071a469366b5d300522c87350098a9ebae9af1485755d36c63",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.00006103515625,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 25.600000001490116
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "twin-district",
+      "modelSha256": "7ddbd52b2291a8071a469366b5d300522c87350098a9ebae9af1485755d36c63",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00048828125,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 0.30000000074505806
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "twin-district",
+      "modelSha256": "816599b80f125ccb50bc4f585e745d651f6f91a8bb5f407293be52ee7a763cc3",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000019073486328125,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00048828125,
+      "inferenceMs": 0.5,
+      "totalMs": 31.099999997764826
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "twin-district",
+      "modelSha256": "816599b80f125ccb50bc4f585e745d651f6f91a8bb5f407293be52ee7a763cc3",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000152587890625,
+      "pressureMaxAbs": 0.00048828125,
+      "inferenceMs": 0.5,
+      "totalMs": 0.6000000014901161
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-open",
+      "modelSha256": "750a52576ac9f1307c998a79ed4abfca6bfc92fd40733652b9622ba0222d2471",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 0.20000000298023224,
+      "totalMs": 22.100000001490116
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-open",
+      "modelSha256": "750a52576ac9f1307c998a79ed4abfca6bfc92fd40733652b9622ba0222d2471",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.000091552734375,
+      "pressureMaxAbs": 0.001220703125,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.30000000074505806
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-open",
+      "modelSha256": "c54e2326bde3d958fb033efc9bafe3818a7536c4402bcb707d88f5ea1b37b0fa",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.00003814697265625,
+      "pressureMaxAbs": 0.00030517578125,
+      "inferenceMs": 0.6000000014901161,
+      "totalMs": 27.899999998509884
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-open",
+      "modelSha256": "c54e2326bde3d958fb033efc9bafe3818a7536c4402bcb707d88f5ea1b37b0fa",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000030517578125,
+      "flowMaxAbs": 0.00006103515625,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 0.6999999992549419,
+      "totalMs": 0.8000000007450581
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-sealed",
+      "modelSha256": "7718fed428b2bef7286eb3d4831212fc516b847a9f956b6aae29f9984580ba7d",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000152587890625,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 0.30000000074505806,
+      "totalMs": 25.200000002980232
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-sealed",
+      "modelSha256": "7718fed428b2bef7286eb3d4831212fc516b847a9f956b6aae29f9984580ba7d",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00003814697265625,
+      "pressureMaxAbs": 0.002685546875,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.3999999985098839
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-sealed",
+      "modelSha256": "8bfdd828ededabce24732f883c3a687b85bc38e501945dec13fe7728139ddeaa",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.001953125,
+      "inferenceMs": 0.5,
+      "totalMs": 31
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-sealed",
+      "modelSha256": "8bfdd828ededabce24732f883c3a687b85bc38e501945dec13fe7728139ddeaa",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000762939453125,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.6000000014901161,
+      "totalMs": 0.8000000007450581
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "district-regulation",
+      "modelSha256": "ba6c82b49b45d986da4852dd8be13bb9b3fecb806158468aec880a973201d0bc",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 25.899999998509884
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "district-regulation",
+      "modelSha256": "ba6c82b49b45d986da4852dd8be13bb9b3fecb806158468aec880a973201d0bc",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000011444091796875,
+      "flowMaxAbs": 0.0000152587890625,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.3999999985098839
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "district-regulation",
+      "modelSha256": "ceee4197b7b5ce8ed7f1706c7ef5ecf30ff14550d114befef30b2a4835f703da",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0003662109375,
+      "inferenceMs": 0.3999999985098839,
+      "totalMs": 26.600000001490116
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "district-regulation",
+      "modelSha256": "ceee4197b7b5ce8ed7f1706c7ef5ecf30ff14550d114befef30b2a4835f703da",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.001220703125,
+      "inferenceMs": 0.30000000074505806,
+      "totalMs": 0.4000000022351742
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "development-headings",
+      "modelSha256": "5f39b6c2f8b402662aaa512b2a3ee96f0c0fe5d968a651e36093e7c00c17cdda",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00146484375,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 24.800000000745058
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "development-headings",
+      "modelSha256": "5f39b6c2f8b402662aaa512b2a3ee96f0c0fe5d968a651e36093e7c00c17cdda",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.19999999925494194
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "development-headings",
+      "modelSha256": "7393672c385b2eafe21ab3307dda87e77b29ffc254447b78b9a0b04c947d6e40",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 0.5,
+      "totalMs": 28.399999998509884
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "development-headings",
+      "modelSha256": "7393672c385b2eafe21ab3307dda87e77b29ffc254447b78b9a0b04c947d6e40",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.30000000074505806,
+      "totalMs": 0.6000000014901161
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "return-restriction",
+      "modelSha256": "49a10c2d45cd4d998d62c1c0f0e06ea6c7b6d70d122c55cbfc660a3f3b4207b9",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.000011444091796875,
+      "pressureMaxAbs": 0.00030517578125,
+      "inferenceMs": 0.30000000074505806,
+      "totalMs": 30.399999998509884
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "return-restriction",
+      "modelSha256": "49a10c2d45cd4d998d62c1c0f0e06ea6c7b6d70d122c55cbfc660a3f3b4207b9",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.0000152587890625,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0,
+      "totalMs": 0.20000000298023224
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "return-restriction",
+      "modelSha256": "3dad7de9024177f380d27855a9ca0dfdc609325c09e1a68f88776d8d60aba11a",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.00103759765625,
+      "inferenceMs": 0.5,
+      "totalMs": 28.699999999254942
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "return-restriction",
+      "modelSha256": "3dad7de9024177f380d27855a9ca0dfdc609325c09e1a68f88776d8d60aba11a",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00002288818359375,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 0.5,
+      "totalMs": 0.8000000007450581
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-booster",
+      "modelSha256": "e65fff30895671708aad63500b7a796fd8139898c07aa37fee1b03f975fbdbb7",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000030517578125,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 26.800000000745058
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-booster",
+      "modelSha256": "e65fff30895671708aad63500b7a796fd8139898c07aa37fee1b03f975fbdbb7",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000003814697265625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 0.30000000074505806
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-booster",
+      "modelSha256": "f9355534e8635a4f47ea01d21fccbbb73d80379b30abe174b455becec2bea6b0",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.000030517578125,
+      "flowMaxAbs": 0.00006103515625,
+      "pressureMaxAbs": 0.0009765625,
+      "inferenceMs": 0.6000000014901161,
+      "totalMs": 29.5
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-booster",
+      "modelSha256": "f9355534e8635a4f47ea01d21fccbbb73d80379b30abe174b455becec2bea6b0",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00006103515625,
+      "pressureMaxAbs": 0.0010986328125,
+      "inferenceMs": 0.6999999992549419,
+      "totalMs": 0.8000000007450581
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "split-intake",
+      "modelSha256": "5adf7e602d69a2ff6841afe21674857dfcf9aceecc18e691ed4ae044c9947ede",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00048828125,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 25.5
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "split-intake",
+      "modelSha256": "5adf7e602d69a2ff6841afe21674857dfcf9aceecc18e691ed4ae044c9947ede",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.00048828125,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.19999999925494194
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "split-intake",
+      "modelSha256": "b541347ea9c9be35808bfe529b625288a4f72f92f7c9ef6a249ad75ec0c40ce5",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000457763671875,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 0.5,
+      "totalMs": 26.899999998509884
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "split-intake",
+      "modelSha256": "b541347ea9c9be35808bfe529b625288a4f72f92f7c9ef6a249ad75ec0c40ce5",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.000030517578125,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.5,
+      "totalMs": 0.6000000014901161
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "narrow-incline",
+      "modelSha256": "df626b2dae80b97fcf728d6b0dffaa53a486b44208b73ad41894af69364c576b",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.00000762939453125,
+      "flowMaxAbs": 0.000030517578125,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 0.09999999776482582,
+      "totalMs": 25.899999998509884
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "narrow-incline",
+      "modelSha256": "df626b2dae80b97fcf728d6b0dffaa53a486b44208b73ad41894af69364c576b",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000457763671875,
+      "pressureMaxAbs": 0.0008544921875,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.4000000022351742
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "narrow-incline",
+      "modelSha256": "89a2c1aceb3fa79ee1cff31dada9ca69475afbe4b4c371a1f5f755c7c10f3fcd",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.00003814697265625,
+      "pressureMaxAbs": 0.000732421875,
+      "inferenceMs": 0.3999999985098839,
+      "totalMs": 27.599999997764826
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "narrow-incline",
+      "modelSha256": "89a2c1aceb3fa79ee1cff31dada9ca69475afbe4b4c371a1f5f755c7c10f3fcd",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0000152587890625,
+      "flowMaxAbs": 0.0000152587890625,
+      "pressureMaxAbs": 0.0006103515625,
+      "inferenceMs": 0.29999999701976776,
+      "totalMs": 0.6000000014901161
+    }
+  ],
+  "controls": [
+    {
+      "methodId": "topology-mlp",
+      "networkId": "hard-rock",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "hard-rock",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-five-level",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-five-level",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "room-pillar",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "twin-district",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "twin-district",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-open",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-open",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "leakage-sealed",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "leakage-sealed",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "district-regulation",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "district-regulation",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "development-headings",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "development-headings",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "return-restriction",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "return-restriction",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "deep-booster",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "deep-booster",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "split-intake",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "split-intake",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "narrow-incline",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    },
+    {
+      "methodId": "graph-surrogate",
+      "networkId": "narrow-incline",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    }
+  ],
+  "modelCount": 24,
+  "flowTolerance": 0.001,
+  "pressureTolerance": 0.05,
+  "maxFlowAbs": 0.000091552734375,
+  "maxPressureAbs": 0.002685546875,
+  "runtime": "actual browser ONNX Runtime Web WASM; identical exported float32 fixtures; no nonlinear solver inside inference"
+}

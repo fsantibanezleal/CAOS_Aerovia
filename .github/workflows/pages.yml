@@ -59,6 +59,8 @@ jobs:
         run: python scripts/pipeline.py validate --input data/cases.json
       - name: Verify committed artifact hashes and numerical evidence
         run: python scripts/pipeline.py verify --artifacts data/artifacts --input data/cases.json
+      - name: Verify trained models, held-out evidence and export checksums
+        run: python scripts/surrogates.py validate --models-output data/models --science-output data/artifacts/science.json
       - name: Install browser dependencies
         working-directory: frontend
         run: npm ci
@@ -77,6 +79,9 @@ jobs:
       - name: Exercise rendered user journeys
         working-directory: frontend
         run: npm run test:e2e
+      - name: Verify every learned export in actual browser WASM
+        working-directory: frontend
+        run: node verify-learned-browser.mjs
       - name: Preserve browser verification evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -85,6 +90,7 @@ jobs:
           path: |
             frontend/test-results/
             frontend/playwright-report/
+            build/qa/learned-browser.json
           if-no-files-found: ignore
           retention-days: 14
       - name: Confirm validation did not rewrite canonical scientific data
