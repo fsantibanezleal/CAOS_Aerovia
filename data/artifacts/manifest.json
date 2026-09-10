@@ -1,0 +1,66 @@
+{
+  "schema": "aerovia.manifest/v1",
+  "createdAt": "2026-09-10T01:48:50Z",
+  "files": {
+    "catalog.json": {
+      "sha256": "b715067e5ca1050c42e4048b1b3077d5233c97df42e27d843e0993177507af2d",
+      "bytes": 485927
+    },
+    "csv/deep-booster.csv": {
+      "sha256": "e25ebb95e5c14a525436d2bfdc9010546bea312080b4ea925c7a2bfd6ab5665e",
+      "bytes": 12275
+    },
+    "csv/deep-five-level.csv": {
+      "sha256": "765f8e21cd78093d28d4016b196559a01f70d9a0d2f84fe1c56717ef14f916ee",
+      "bytes": 12219
+    },
+    "csv/development-headings.csv": {
+      "sha256": "3b05b9419e7f20da34eb4bd4af6f03b4ac14901fda4f46a5c12a503480d29456",
+      "bytes": 6808
+    },
+    "csv/district-regulation.csv": {
+      "sha256": "55d12116e3821bc758bd1e0ecf7a3aa4af23ffce91e8bd5cefe24c5c53b04462",
+      "bytes": 7142
+    },
+    "csv/hard-rock.csv": {
+      "sha256": "f37b24499adddcdf5343fa715db03dc24648c1926b7c04fe9f26144792b50dbc",
+      "bytes": 9368
+    },
+    "csv/leakage-open.csv": {
+      "sha256": "6fadd77cbac2c16c0d1c5d3ba1dadc2703e4b8f4ff1e5cc2b6f72a5731e6dfb8",
+      "bytes": 9873
+    },
+    "csv/leakage-sealed.csv": {
+      "sha256": "5e0cb572d346b3e9f33ab55f37a4a252e6b55d05fbd9772d74c1a8abad880de2",
+      "bytes": 9818
+    },
+    "csv/narrow-incline.csv": {
+      "sha256": "89e24426fce2576d5b3ce77f6f1ed64d40c3267eb5dbe98547d717479411fc4c",
+      "bytes": 7364
+    },
+    "csv/return-restriction.csv": {
+      "sha256": "b0cc0bc6dc715a9248993cecc007f2df164a6b8049ed6955847313e872c71cda",
+      "bytes": 9399
+    },
+    "csv/room-pillar.csv": {
+      "sha256": "4aeea7174beb9e4c38c464ae80cf5b842d8744f006ca80b4b28715f5d6b6534a",
+      "bytes": 6353
+    },
+    "csv/split-intake.csv": {
+      "sha256": "2ef947fc8a1ca7a1344d64823e60969aa512731f725c9bd58f3d34758ce9e54f",
+      "bytes": 9726
+    },
+    "csv/twin-district.csv": {
+      "sha256": "bc23292f0c1690e31e85f099d324ed7d51a96853a341f379884cbeaf39337966",
+      "bytes": 7119
+    },
+    "reference-checks.json": {
+      "sha256": "4c26100fc197bcb156cfb7e5958d6f53a326f62504a012f0017f26659e6c0b59",
+      "bytes": 1052074
+    }
+  },
+  "engineVersion": "0.1.0",
+  "sourceSha256": "a8113786ae34930ada58dcb7cc5a97277f9490c7019b256ca579064c801722c8",
+  "device": "cuda",
+  "caseCount": 12
+}

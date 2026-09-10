@@ -1,0 +1,54 @@
+name: Verify live Aerovia
+
+on:
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aerovia-live-monitor
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Read published source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Use Node.js 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.14.1'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install verification tools
+        working-directory: frontend
+        run: npm ci
+      - name: Verify HTTPS and every published asset against main
+        working-directory: frontend
+        run: npm run verify:deployment -- https://aerovia.fasl-work.com/ "$(git rev-parse HEAD)"
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Verify live engineering workflows
+        working-directory: frontend
+        env:
+          AEROVIA_TEST_URL: https://aerovia.fasl-work.com/
+        run: npm run test:e2e
+      - name: Preserve failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: live-browser-failure-evidence
+          path: |
+            frontend/test-results/
+            frontend/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
