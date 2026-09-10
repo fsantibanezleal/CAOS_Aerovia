@@ -1,6 +1,6 @@
 # ADR-002: verified network computation and static hosting
 
-Status: accepted, 2026-09-09.
+Status: accepted, 2026-09-09; expanded by [ADR-003](ADR-003-shared-spatial-workspace.md) on 2026-09-10 for actual tracer transport and learned screening. The original no-training scope below is historical; the static hosting and independent-reference decisions remain current.
 
 Use a constant-density, isothermal pressure network. The live browser method is damped nodal Newton; SciPy least-squares is the independent offline reference; PyTorch CUDA batches resistance uncertainty. No learned model is promised, so there is no nominal training stage. Full input validation, scientific evaluation, artifact export and checksums remain required. Do not label numerical agreement as field validation.
 

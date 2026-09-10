@@ -1,23 +1,25 @@
 {
   "name": "aerovia-web",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=24 <25"
   },
   "scripts": {
+    "predev": "node prepare-data.mjs",
     "dev": "vite --host 127.0.0.1 --port 5908 --strictPort",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p e2e/tsconfig.json",
     "test": "vitest run",
     "build": "npm run typecheck && node prepare-data.mjs && vite build",
     "postbuild": "node generate-manifest.mjs",
     "verify:deployment": "node verify-deployment.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4908 --strictPort",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "transport": "tsx ../scripts/transport.mts"
   },
   "dependencies": {
-    "@fasl-work/caos-app-shell": "0.6.6",
+    "@fasl-work/caos-app-shell": "0.6.8",
     "katex": "0.16.47",
     "lucide-react": "1.43.0",
     "onnxruntime-web": "1.29.0",
@@ -37,6 +39,7 @@
     "@types/three": "0.185.4",
     "@vitejs/plugin-react": "6.1.1",
     "prettier": "3.9.6",
+    "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vite": "8.2.2",
     "vitest": "5.0.0"

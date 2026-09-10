@@ -1,0 +1,61 @@
+.av-plot {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+  height: 260px;
+  gap: 0.3rem;
+}
+.av-plot .plot-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.av-plot h3 {
+  margin: 0;
+  font-size: 0.82rem;
+}
+.av-plot .plot-heading span {
+  font-size: 0.7rem;
+  color: var(--color-fg-subtle);
+}
+.av-plot svg {
+  width: 100%;
+  min-height: 75px;
+  flex: 1;
+  display: block;
+}
+.av-plot text {
+  font: 10px var(--font-mono);
+  fill: var(--color-fg-subtle);
+}
+.av-plot .plot-grid {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+.av-plot .cursor-line {
+  stroke: var(--color-fg-subtle);
+  stroke-dasharray: 3 3;
+}
+.av-plot .plot-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem 0.9rem;
+  flex-wrap: wrap;
+  font-size: 0.67rem;
+  min-height: 1rem;
+}
+.av-plot .plot-legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.av-plot .plot-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.av-plot .plot-legend strong {
+  font: 10px var(--font-mono);
+}
