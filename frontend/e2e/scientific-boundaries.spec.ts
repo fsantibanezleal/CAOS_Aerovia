@@ -7,6 +7,8 @@ import {
   downloaded,
   importProject,
   mode,
+  toolSection,
+  modelSection,
   numeric,
   openWorkbench,
   project,
@@ -21,6 +23,10 @@ import type { Network, Options } from "../src/contracts";
 
 test.use({ locale: "en-US", actionTimeout: 10000 });
 async function transportExport(page: import("@playwright/test").Page) {
+  await toolSection(page, "ledger");
+  await expect(
+    page.getByRole("heading", { name: "Mass balance", exact: true }),
+  ).toBeVisible();
   const record = await downloaded<{
     schema: string;
     network: Network;
@@ -38,6 +44,7 @@ async function transportExport(page: import("@playwright/test").Page) {
     record.request,
   );
   expect(replay.frames).toEqual(record.result.frames);
+  await toolSection(page, "monitor");
   return record.result;
 }
 async function prepareTracer(page: import("@playwright/test").Page) {
@@ -67,12 +74,13 @@ test("a real worker pulse evolves, scrubs and exports a conservative spatial con
   page,
 }) => {
   await prepareTracer(page);
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Simulate transport", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Mass balance", exact: true }),
-  ).toBeVisible();
+    page.getByRole("slider", { name: "Simulation time", exact: true }),
+  ).toBeEnabled();
   const result = await transportExport(page);
   ledger(result);
   expect(result.flowStates[0].result.flows[0]).toBeCloseTo(10, 8);
@@ -82,6 +90,7 @@ test("a real worker pulse evolves, scrubs and exports a conservative spatial con
     .getByRole("slider", { name: "Simulation time", exact: true })
     .fill("75");
   await expect(page.locator(".av-timeline output")).toHaveText("10 s");
+  await toolSection(page, "ledger");
   const stored = page
     .locator(".av-ledger > div")
     .filter({ has: page.getByText("In mine", { exact: true }) })
@@ -90,6 +99,7 @@ test("a real worker pulse evolves, scrubs and exports a conservative spatial con
     result.frames[75].storedMassMg,
     3,
   );
+  await toolSection(page, "monitor");
   await expect(
     page.getByRole("img", { name: /Monitor: Analytical fan airway/ }),
   ).toBeVisible();
@@ -118,19 +128,22 @@ test("a real worker pulse evolves, scrubs and exports a conservative spatial con
   await expect(
     page.getByRole("slider", { name: "Simulation time", exact: true }),
   ).toHaveValue(stopped);
+  await toolSection(page, "primary");
   await numeric(page, "Total tracer", 2000);
+  await toolSection(page, "monitor");
   await expect(
     page.getByRole("slider", { name: "Simulation time", exact: true }),
   ).toBeDisabled();
   await expect(
     page.getByRole("button", { name: "Export time series", exact: true }),
   ).toHaveCount(0);
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Simulate transport", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Mass balance", exact: true }),
-  ).toBeVisible();
+    page.getByRole("slider", { name: "Simulation time", exact: true }),
+  ).toBeEnabled();
   const doubled = await transportExport(page);
   expect(doubled.frames[75].storedMassMg).toBeCloseTo(
     2 * result.frames[75].storedMassMg,
@@ -142,6 +155,7 @@ test("a scheduled fan stop preserves the trapped field and the displayed flow be
   page,
 }) => {
   await prepareTracer(page);
+  await toolSection(page, "schedule");
   await page
     .getByRole("checkbox", {
       name: "Schedule a ventilation change",
@@ -150,12 +164,13 @@ test("a scheduled fan stop preserves the trapped field and the displayed flow be
     .check();
   await numeric(page, "Change at", 2);
   await numeric(page, "New fan speed", 0);
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Simulate transport", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Mass balance", exact: true }),
-  ).toBeVisible();
+    page.getByRole("slider", { name: "Simulation time", exact: true }),
+  ).toBeEnabled();
   const result = await transportExport(page);
   ledger(result);
   expect(result.flowStates.map((state) => state.timeSeconds)).toEqual([0, 2]);
@@ -184,18 +199,21 @@ test("a continuous source has its exact finite mass and an impossible release in
     .selectOption("continuous");
   await numeric(page, "Release duration", 10);
   await numeric(page, "Start time", 2);
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Simulate transport", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Mass balance", exact: true }),
-  ).toBeVisible();
+    page.getByRole("slider", { name: "Simulation time", exact: true }),
+  ).toBeEnabled();
   const result = await transportExport(page);
   ledger(result);
   expect(result.frames[0].injectedMassMg).toBe(0);
   expect(result.frames.at(-1)!.injectedMassMg).toBeCloseTo(1000, 7);
   const original = await project(page);
+  await toolSection(page, "primary");
   await numeric(page, "Start time", 18);
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Simulate transport", exact: true })
     .click();

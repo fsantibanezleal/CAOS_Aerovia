@@ -7,6 +7,8 @@ import {
   defaults,
   importProject,
   mode,
+  toolSection,
+  modelSection,
   numeric,
   openWorkbench,
   parameters,
@@ -60,11 +62,13 @@ test("draw, connect, move, add a fan, split, undo and recover the actual edited 
   await page
     .getByRole("combobox", { name: /^Junction/ })
     .selectOption("junction-2");
+  await toolSection(page, "node");
   await numeric(page, "X · m", created.x + 10);
   const moved = await project(page);
   expect(moved.network.nodes.find((node) => node.id === "junction-2")!.x).toBe(
     created.x + 10,
   );
+  await toolSection(page, "airway");
   await page.getByRole("button", { name: "Fan", exact: true }).click();
   await balanced(page);
   expect(
@@ -99,6 +103,7 @@ test("pointer orbit changes the projection and an axis drag commits a real node 
   network.nodes[1].x = 100;
   network.edges[0].area = 1;
   await importProject(page, network);
+  await toolSection(page, "view");
   await page.getByRole("checkbox", { name: "Labels", exact: true }).check();
   const canvas = page.locator("canvas"),
     box = (await canvas.boundingBox())!;
@@ -125,6 +130,7 @@ test("pointer orbit changes the projection and an axis drag commits a real node 
   await page
     .getByRole("combobox", { name: "Camera view", exact: true })
     .selectOption("plan");
+  await toolSection(page, "primary");
   await page.getByRole("button", { name: "Move", exact: true }).click();
   await page.getByRole("combobox", { name: /^Junction/ }).selectOption("b");
   const point = await node.evaluate((element) => ({
@@ -151,16 +157,19 @@ test("flow controls change actual flow and power and closure has a recoverable m
   const intake = () =>
     page.locator(".av-viz-readout > strong").innerText().then(uiNumber);
   expect(await intake()).toBeCloseTo(10, 2);
+  await toolSection(page, "conditions");
   await page
     .getByRole("slider", { name: "Fan speed", exact: true })
     .fill("0.5");
   await expect.poll(intake).toBeCloseTo(5, 2);
   await expect(page.locator(".av-viz-readout")).toContainText("0.16 kW");
+  await toolSection(page, "equipment");
   await page
     .getByRole("checkbox", { name: "Close this airway", exact: true })
     .check();
   await expect.poll(intake).toBe(0);
   expect((await project(page)).options.overrides.ab.closed).toBe(true);
+  await toolSection(page, "equipment");
   await page
     .getByRole("checkbox", { name: "Close this airway", exact: true })
     .uncheck();
@@ -172,6 +181,7 @@ test("JSON imports preserve current inputs on failure and round-trip an edited o
 }) => {
   await openWorkbench(page);
   await mode(page, "Airflow & paths");
+  await toolSection(page, "conditions");
   await page
     .getByRole("slider", { name: "Fan speed", exact: true })
     .fill("0.83");
@@ -286,20 +296,24 @@ test("optimization, operating curve and sensitivity are calculated and applied t
   await page
     .getByRole("button", { name: "Sweep the fan speed", exact: true })
     .click();
+  await toolSection(page, "inspect");
   await expect(
     page.getByRole("img", { name: /Fan speed sweep/ }),
   ).toBeVisible();
+  await toolSection(page, "primary");
   await page
     .getByRole("combobox", { name: /^Operating question/ })
     .selectOption("sensitivity");
   await page
     .getByRole("button", { name: "Rank resistance interventions", exact: true })
     .click();
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-sensitivity-bars button")).toHaveCount(8);
   const intervention = page.locator(".av-sensitivity-bars button").first();
   const selectedName = await intervention.locator("span").innerText();
   await intervention.click();
   await mode(page, "Airflow & paths");
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     selectedName,
   );
@@ -352,6 +366,7 @@ test("recorded uncertainty selects an airway and disappears when the operating i
   );
   const last = item.network.edges[lastIndex];
   await mode(page, "Uncertainty");
+  await toolSection(page, "inspect");
   const plot = page.getByRole("img", { name: /^Working-airway uncertainty/ });
   await expect(plot).toBeVisible();
   await expect(plot.locator("path")).toHaveCount(4);
@@ -369,12 +384,14 @@ test("recorded uncertainty selects an airway and disappears when the operating i
     2,
   );
   await mode(page, "Airflow & paths");
+  await toolSection(page, "conditions");
   await page
     .getByRole("slider", { name: "Fan speed", exact: true })
     .fill("0.8");
   await balanced(page);
   await mode(page, "Uncertainty");
   await expect(plot).toHaveCount(0);
+  await toolSection(page, "primary");
   await expect(page.locator(".av-controls")).toContainText(
     "This edited state has no baked ensemble",
   );
@@ -382,6 +399,7 @@ test("recorded uncertainty selects an airway and disappears when the operating i
     .getByRole("button", { name: "Reset canonical case", exact: true })
     .click();
   await balanced(page);
+  await toolSection(page, "inspect");
   await expect(plot).toBeVisible();
 });
 
@@ -390,6 +408,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
 }) => {
   await openWorkbench(page);
   await mode(page, "Learned screening");
+  await modelSection(page, "run");
   await page
     .getByRole("button", { name: "Run both models", exact: true })
     .click();
@@ -398,6 +417,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
     exact: true,
   });
   await expect(predicted).toBeVisible({ timeout: 60000 });
+  await modelSection(page, "comparison");
   await expect(
     page.getByRole("img", { name: /^Where the approximation differs,/ }),
   ).toBeVisible();
@@ -408,12 +428,14 @@ test("learned fields are labeled approximations and reject a changed topology wi
   await comparison.press("ArrowRight");
   await comparison.press("ArrowRight");
   await comparison.press("Enter");
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     "Main exhaust fan",
   );
   async function assertDisplayedPrediction() {
+    await toolSection(page, "inspect");
     const lower = page.locator(".av-selected-readout");
-    await expect(lower).toContainText("Selected airway · approximation");
+    await expect(lower).toContainText("Selected airway \u00b7 approximation");
     const currentIntake = uiNumber(
       await page.locator(".av-viz-readout > strong").innerText(),
     );
@@ -424,8 +446,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
         .locator("strong")
         .innerText(),
     );
-    // This case has one exhaust fan. Its predicted delivery agrees with net
-    // boundary supply at displayed precision.
+    // This case has one exhaust fan: predicted delivery and boundary supply agree.
     expect(currentFlow).toBeCloseTo(currentIntake, 1);
     const residualText = await lower
       .locator("div")
@@ -435,6 +456,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
       .locator("strong")
       .innerText();
     const [mass, pressure] = residualText.split("/").map(uiNumber);
+    await modelSection(page, "accuracy");
     const cards = page.locator(".av-learned-metrics");
     const cardMass = uiNumber(
       await cards
@@ -455,9 +477,10 @@ test("learned fields are labeled approximations and reject a changed topology wi
       Math.abs(cardPressure) * 0.06 + 0.005,
     );
   }
+  await modelSection(page, "accuracy");
   await predicted.click();
   await expect(page.locator(".av-viz-readout")).toContainText(
-    "topology-mlp · approximation",
+    "topology-mlp \u00b7 approximation",
   );
   await assertDisplayedPrediction();
   await page
@@ -467,11 +490,12 @@ test("learned fields are labeled approximations and reject a changed topology wi
   await page.getByRole("tab", { name: /^Graph surrogate/ }).click();
   await predicted.click();
   await expect(page.locator(".av-viz-readout")).toContainText(
-    "graph-surrogate · approximation",
+    "graph-surrogate \u00b7 approximation",
   );
   await assertDisplayedPrediction();
   await importProject(page, analyticalNetwork());
   await mode(page, "Learned screening");
+  await modelSection(page, "run");
   await page
     .getByRole("button", { name: "Run both models", exact: true })
     .click();
@@ -479,6 +503,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
     "Outside training domain",
   );
   await expect(predicted).toHaveCount(0);
+  await modelSection(page, "comparison");
   await expect(
     page.getByRole("img", { name: /^Where the approximation differs,/ }),
   ).toHaveCount(0);
@@ -518,6 +543,7 @@ test("mobile uncertainty exposes selected quantiles and target probability from 
     ),
     edge = item.network.edges[index];
   await mode(page, "Uncertainty");
+  await toolSection(page, "inspect");
   const plot = page.getByRole("img", { name: /^Working-airway uncertainty/ });
   const box = (await plot.boundingBox())!;
   await plot.click({ position: { x: box.width - 14, y: box.height / 2 } });
@@ -526,7 +552,7 @@ test("mobile uncertainty exposes selected quantiles and target probability from 
       await page
         .getByRole("button", { name: "Switch language", exact: true })
         .click();
-    await parameters(page);
+    await toolSection(page, "primary");
     const summary = page.getByRole("region", {
       name:
         lang === "es"
@@ -569,6 +595,7 @@ test("energy and cost use actual solved fan power and preserve the captured comp
   await openWorkbench(page);
   await importProject(page, analyticalNetwork());
   await mode(page, "Fan operations");
+  await toolSection(page, "energy");
   await numeric(page, "Operating hours", 8000);
   await numeric(page, "Electricity tariff", 0.2);
   const energy = page.getByRole("region", {
@@ -582,27 +609,32 @@ test("energy and cost use actual solved fan power and preserve the captured comp
       .locator("strong");
   expect(uiNumber(await value("Annual energy").innerText())).toBe(10);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(2000);
+  await toolSection(page, "primary");
   await page
     .getByRole("combobox", { name: "Operating question", exact: true })
     .selectOption("baseline");
   await page
     .getByRole("button", { name: "Capture current baseline", exact: true })
     .click();
+  await toolSection(page, "conditions");
   await page
     .getByRole("slider", { name: "Fan speed", exact: true })
     .fill("0.5");
   await balanced(page);
+  await toolSection(page, "energy");
   expect(uiNumber(await value("Annual energy").innerText())).toBe(1.25);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(250);
   expect(uiNumber(await value("Cost change from baseline").innerText())).toBe(
     -1750,
   );
+  await toolSection(page, "primary");
   await page
     .getByRole("button", { name: "Show spatial flow differences", exact: true })
     .click();
   await expect(page.locator(".av-legend")).toContainText(
     "Flow difference from baseline",
   );
+  await toolSection(page, "energy");
   await numeric(page, "Operating hours", 0);
   expect(uiNumber(await value("Annual energy").innerText())).toBe(0);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(0);
@@ -637,6 +669,7 @@ test("isolating a working level changes actual scene hit testing without alterin
   await openWorkbench(page);
   await importProject(page, network);
   await mode(page, "Airflow & paths");
+  await toolSection(page, "view");
   await page.getByRole("checkbox", { name: "Labels", exact: true }).check();
   await page
     .getByRole("combobox", { name: "Camera view", exact: true })
@@ -660,22 +693,27 @@ test("isolating a working level changes actual scene hit testing without alterin
     });
   };
   await selectPassage("c", "d");
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     "Lower working passage",
   );
   const before = await project(page),
     flow = await page.locator(".av-viz-readout").innerText();
+  await toolSection(page, "view");
   await page
     .getByRole("combobox", { name: "Level", exact: true })
     .selectOption("1");
   await selectPassage("a", "b");
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     "Lower working passage",
   );
+  await toolSection(page, "view");
   await page
     .getByRole("combobox", { name: "Level", exact: true })
     .selectOption("all");
   await selectPassage("a", "b");
+  await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     "Upper working passage",
   );

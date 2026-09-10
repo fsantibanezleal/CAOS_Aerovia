@@ -1,1 +1,122 @@
-.av-learned{display:grid;gap:1rem;min-width:0;max-width:100%;font-size:.86rem}.av-learned-heading{display:flex;gap:.65rem;align-items:flex-start}.av-learned-heading svg{flex:0 0 auto;color:var(--color-accent,#0b9cbb);margin-top:.15rem}.av-learned-heading h3{margin:0 0 .3rem}.av-learned-heading p{margin:0;line-height:1.5;opacity:.76}.av-learned-actions,.av-learned-tabs{display:flex;gap:.5rem;flex-wrap:wrap}.av-learned-actions button{display:inline-flex;align-items:center;gap:.35rem}.av-learned-tabs{border-bottom:1px solid var(--color-border,#53677855);padding-bottom:.5rem}.av-learned-tabs button{flex:1;min-width:100px;font-size:.78rem}.av-learned-tabs button[aria-selected=true]{border-color:var(--color-accent,#0b9cbb);box-shadow:inset 0 -2px var(--color-accent,#0b9cbb)}.av-learned-tabs span{display:block;font:600 .58rem monospace;letter-spacing:.09em;margin-top:.15rem;opacity:.7}.av-learned-metrics{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.av-learned-metrics>div{padding:.65rem;border:1px solid var(--color-border,#53677855);border-radius:.5rem;min-width:0}.av-learned-metrics span{display:block;font-size:.7rem;opacity:.75;margin-bottom:.4rem}.av-learned-metrics strong{font-size:1.03rem;overflow-wrap:anywhere}.av-learned-metrics small{font-weight:400;font-size:.7rem;opacity:.75}.av-learned label{display:grid;gap:.35rem}.av-learned select{max-width:100%;width:100%;min-width:0}.av-learned .plot{min-width:0;max-width:100%}.av-learned .plot svg{max-width:100%;height:auto}.av-learned-domain{padding:.8rem;border-left:3px solid #ba7624;line-height:1.55;overflow-wrap:anywhere}.av-learned-show{width:100%;padding:.6rem}.av-learned .av-hint{margin:0;line-height:1.55}@media(max-width:430px){.av-learned-metrics{gap:.4rem}.av-learned-metrics strong{font-size:.94rem}}
+.av-learned {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 0.86rem;
+}
+.av-learned-heading {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+.av-learned-heading svg {
+  flex: 0 0 auto;
+  color: var(--color-accent, #0b9cbb);
+  margin-top: 0.15rem;
+}
+.av-learned-heading h3 {
+  margin: 0 0 0.3rem;
+}
+.av-learned-heading p {
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0.76;
+}
+.av-learned-actions,
+.av-learned-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.av-learned-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.av-learned-tabs {
+  border-bottom: 1px solid var(--color-border, #53677855);
+  padding-bottom: 0.5rem;
+}
+.av-learned-tabs button {
+  flex: 1;
+  min-width: 100px;
+  font-size: 0.78rem;
+}
+.av-learned-tabs button[aria-selected="true"] {
+  border-color: var(--color-accent, #0b9cbb);
+  box-shadow: inset 0 -2px var(--color-accent, #0b9cbb);
+}
+.av-learned-tabs span {
+  display: block;
+  font: 600 0.58rem monospace;
+  letter-spacing: 0.09em;
+  margin-top: 0.15rem;
+  opacity: 0.7;
+}
+.av-learned-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+.av-learned-metrics > div {
+  padding: 0.65rem;
+  border: 1px solid var(--color-border, #53677855);
+  border-radius: 0.5rem;
+  min-width: 0;
+}
+.av-learned-metrics span {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.75;
+  margin-bottom: 0.4rem;
+}
+.av-learned-metrics strong {
+  font-size: 1.03rem;
+  overflow-wrap: anywhere;
+}
+.av-learned-metrics small {
+  font-weight: 400;
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+.av-learned label {
+  display: grid;
+  gap: 0.35rem;
+}
+.av-learned select {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+}
+.av-learned .plot {
+  min-width: 0;
+  max-width: 100%;
+}
+.av-learned .plot svg {
+  max-width: 100%;
+  height: auto;
+}
+.av-learned-domain {
+  padding: 0.8rem;
+  border-left: 3px solid #ba7624;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.av-learned-show {
+  width: 100%;
+  padding: 0.6rem;
+}
+.av-learned .av-hint {
+  margin: 0;
+  line-height: 1.55;
+}
+@media (max-width: 430px) {
+  .av-learned-metrics {
+    gap: 0.4rem;
+  }
+  .av-learned-metrics strong {
+    font-size: 0.94rem;
+  }
+}

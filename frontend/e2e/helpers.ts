@@ -72,6 +72,25 @@ export async function openWorkbench(page: Page) {
 }
 export async function mode(page: Page, name: string) {
   await page.getByRole("tab", { name, exact: true }).click();
+  await toolSection(page, "primary");
+}
+export async function toolSection(page: Page, section: string) {
+  await parameters(page);
+  await page
+    .getByRole("combobox", {
+      name: /^(Tool section|Sección de herramientas)$/,
+      exact: true,
+    })
+    .selectOption(section);
+}
+export async function modelSection(page: Page, section: string) {
+  await toolSection(page, "primary");
+  await page
+    .getByRole("combobox", {
+      name: /^(Model section|Sección del modelo)$/,
+      exact: true,
+    })
+    .selectOption(section);
 }
 export async function parameters(page: Page) {
   const controls = page.locator(".av-controls");

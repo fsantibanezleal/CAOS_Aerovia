@@ -3,6 +3,8 @@ import { expect } from "@playwright/test";
 import {
   balanced,
   mode,
+  toolSection,
+  modelSection,
   noDocumentOverflow,
   numeric,
   openWorkbench,
@@ -269,6 +271,7 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
   await noDocumentOverflow(page);
   await mode(page, "Airflow & paths");
   await parameters(page);
+  await toolSection(page, "conditions");
   await page
     .getByRole("slider", { name: "Fan speed", exact: true })
     .fill("0.7");
@@ -324,3 +327,121 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
   await balanced(page);
   expect((await project(page)).options).toEqual(before.options);
 });
+
+for (const viewport of [
+  { width: 1280, height: 800 },
+  { width: 1600, height: 900 },
+  { width: 2560, height: 1440 },
+  { width: 390, height: 844 },
+])
+  for (const theme of ["dark", "light"] as const) {
+    test(`task sections fit and preserve the primary canvas at ${viewport.width}x${viewport.height}/${theme}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      await openWorkbench(page);
+      if (theme === "light")
+        await page
+          .getByRole("button", { name: "Toggle light / dark", exact: true })
+          .click();
+      async function fits(focus = false) {
+        await noDocumentOverflow(page);
+        const layout = await page.evaluate(() => {
+          const panel = document.querySelector<HTMLElement>(".av-controls")!;
+          const canvas = document
+            .querySelector("canvas")!
+            .getBoundingClientRect();
+          const rows = [
+            ...document.querySelectorAll(".main-nav,.tablist,.av-learned-tabs"),
+          ]
+            .filter((element) => element.getBoundingClientRect().height > 0)
+            .map(
+              (element) =>
+                new Set(
+                  [...element.children]
+                    .filter((child) => child.getBoundingClientRect().height > 0)
+                    .map((child) =>
+                      Math.round(child.getBoundingClientRect().top),
+                    ),
+                ).size,
+            );
+          return {
+            panelHeight: panel.clientHeight,
+            panelContent: panel.scrollHeight,
+            ratio: (canvas.width * canvas.height) / (innerWidth * innerHeight),
+            rows,
+          };
+        });
+        expect(
+          layout.panelContent,
+          "The chosen task page must show all of its controls without scrolling",
+        ).toBeLessThanOrEqual(layout.panelHeight + 1);
+        expect(
+          layout.rows.every((rows) => rows === 1),
+          "Navigation and tabs remain a single row",
+        ).toBe(true);
+        if (focus || viewport.width > 600)
+          expect(
+            layout.ratio,
+            "Measure the actual canvas, not its surrounding panel",
+          ).toBeGreaterThanOrEqual(focus ? 0.8 : 0.5);
+      }
+      for (const lang of ["en", "es"] as const) {
+        if (lang === "es")
+          await page
+            .getByRole("button", { name: "Switch language", exact: true })
+            .click();
+        const b = (en: string, es: string) => (lang === "es" ? es : en);
+        for (const name of [
+          b("Design", "Diseño"),
+          b("Airflow & paths", "Flujo y rutas"),
+          b("Tracer transport", "Transporte"),
+          b("Fan operations", "Operación"),
+          b("Uncertainty", "Incertidumbre"),
+          b("Learned screening", "Modelos aprendidos"),
+        ]) {
+          await mode(page, name);
+          if (name === b("Learned screening", "Modelos aprendidos")) {
+            await modelSection(page, "run");
+            await page
+              .getByRole("button", {
+                name: b("Run both models", "Ejecutar ambos modelos"),
+                exact: true,
+              })
+              .click();
+            await expect(
+              page.locator(".av-learned-show:visible"),
+            ).toBeVisible();
+            for (const section of ["run", "accuracy", "comparison"]) {
+              await modelSection(page, section);
+              await fits();
+            }
+          }
+          const picker = page.getByRole("combobox", {
+            name: b("Tool section", "Sección de herramientas"),
+            exact: true,
+          });
+          const sections = await picker
+            .locator("option")
+            .evaluateAll((options) =>
+              options.map((option) => (option as HTMLOptionElement).value),
+            );
+          expect(sections.length).toBeLessThanOrEqual(6);
+          for (const section of sections) {
+            await toolSection(page, section);
+            await fits();
+          }
+        }
+        await page
+          .getByRole("button", {
+            name: b("Toggle focus view", "Alternar vista enfocada"),
+            exact: true,
+          })
+          .click();
+        await expect(page.locator(".av-workbench")).toHaveClass(/av-focus/);
+        await fits(true);
+        await page.keyboard.press("Escape");
+        await expect(page.locator(".av-workbench")).not.toHaveClass(/av-focus/);
+      }
+    });
+  }
