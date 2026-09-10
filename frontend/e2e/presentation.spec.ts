@@ -344,7 +344,28 @@ for (const viewport of [
         await page
           .getByRole("button", { name: "Toggle light / dark", exact: true })
           .click();
-      async function fits(focus = false) {
+      async function fits(context: string, focus = false) {
+        await page.evaluate(() => document.fonts.ready);
+        // Three.js observes its container resize asynchronously. Measure the
+        // canvas only after it occupies the space the layout actually assigned.
+        await expect
+          .poll(
+            async () =>
+              page.evaluate(() => {
+                const canvas = document
+                  .querySelector("canvas")!
+                  .getBoundingClientRect();
+                const stage = document
+                  .querySelector(".av-visual-stage")!
+                  .getBoundingClientRect();
+                return Math.max(
+                  Math.abs(canvas.width - stage.width),
+                  Math.abs(canvas.height - stage.height),
+                );
+              }),
+            `${context}: the canvas must finish resizing to its scene container`,
+          )
+          .toBeLessThanOrEqual(1);
         await noDocumentOverflow(page);
         const layout = await page.evaluate(() => {
           const panel = document.querySelector<HTMLElement>(".av-controls")!;
@@ -374,16 +395,16 @@ for (const viewport of [
         });
         expect(
           layout.panelContent,
-          "The chosen task page must show all of its controls without scrolling",
+          `${context}: the chosen task page must show all of its controls without scrolling`,
         ).toBeLessThanOrEqual(layout.panelHeight + 1);
         expect(
           layout.rows.every((rows) => rows === 1),
-          "Navigation and tabs remain a single row",
+          `${context}: navigation and tabs remain a single row`,
         ).toBe(true);
         if (focus || viewport.width > 600)
           expect(
             layout.ratio,
-            "Measure the actual canvas, not its surrounding panel",
+            `${context}: measure the actual canvas, not its surrounding panel`,
           ).toBeGreaterThanOrEqual(focus ? 0.8 : 0.5);
       }
       for (const lang of ["en", "es"] as const) {
@@ -414,7 +435,7 @@ for (const viewport of [
             ).toBeVisible();
             for (const section of ["run", "accuracy", "comparison"]) {
               await modelSection(page, section);
-              await fits();
+              await fits(`${lang}/${theme}/${name}/model-${section}`);
             }
           }
           const picker = page.getByRole("combobox", {
@@ -429,7 +450,7 @@ for (const viewport of [
           expect(sections.length).toBeLessThanOrEqual(6);
           for (const section of sections) {
             await toolSection(page, section);
-            await fits();
+            await fits(`${lang}/${theme}/${name}/${section}`);
           }
         }
         await page
@@ -439,7 +460,7 @@ for (const viewport of [
           })
           .click();
         await expect(page.locator(".av-workbench")).toHaveClass(/av-focus/);
-        await fits(true);
+        await fits(`${lang}/${theme}/focus`, true);
         await page.keyboard.press("Escape");
         await expect(page.locator(".av-workbench")).not.toHaveClass(/av-focus/);
       }

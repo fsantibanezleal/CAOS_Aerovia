@@ -177,8 +177,8 @@ export default function LearnedComparison({
                     </h3>
                     <p>
                       {b(
-                        "Evaluate two trained approximations against the current numerical solution.",
-                        "Evalúe dos aproximaciones entrenadas contra la solución numérica actual.",
+                        "Two approximations to the numerical solution. Successful inference does not certify physical balance.",
+                        "Dos aproximaciones de la solución numérica. La inferencia exitosa no certifica el balance físico.",
                       )}
                     </p>
                   </div>
@@ -288,28 +288,8 @@ export default function LearnedComparison({
                     </div>
                     <p className="av-hint">
                       {b("Inference completed", "Inferencia completada")} ·{" "}
-                      {fmt(response.diagnostics.inferenceMs ?? 0, 2)} ms ·{" "}
-                      {b(
-                        "physical residuals are separate from execution success",
-                        "los residuos físicos son independientes del éxito de ejecución",
-                      )}
-                      .
+                      {fmt(response.diagnostics.inferenceMs ?? 0, 2)} ms
                     </p>
-                    <button
-                      className="av-learned-show"
-                      onClick={() => onSelect(prediction.result, active)}
-                      aria-pressed={selected === active}
-                    >
-                      {selected === active
-                        ? b(
-                            "Predicted field is visible",
-                            "Campo predicho visible",
-                          )
-                        : b(
-                            "Show predicted field in the mine",
-                            "Mostrar campo predicho en la mina",
-                          )}
-                    </button>
                   </>
                 ) : (
                   !response && (
@@ -321,13 +301,37 @@ export default function LearnedComparison({
                     </p>
                   )
                 )}
-                <button
-                  onClick={() => onSelect(null, null)}
-                  disabled={!selected}
-                >
-                  <RotateCcw size={14} />
-                  {b("Numerical field", "Campo num\u00e9rico")}
-                </button>
+                <div className="av-learned-field-actions">
+                  {prediction && (
+                    <button
+                      className="av-learned-show"
+                      onClick={() => onSelect(prediction.result, active)}
+                      aria-pressed={selected === active}
+                      aria-label={
+                        selected === active
+                          ? b(
+                              "Predicted field is visible",
+                              "Campo predicho visible",
+                            )
+                          : b(
+                              "Show predicted field in the mine",
+                              "Mostrar campo predicho en la mina",
+                            )
+                      }
+                    >
+                      {selected === active
+                        ? b("Prediction visible", "Predicci\u00f3n visible")
+                        : b("Show prediction", "Mostrar predicci\u00f3n")}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => onSelect(null, null)}
+                    disabled={!selected}
+                  >
+                    <RotateCcw size={14} />
+                    {b("Numerical field", "Campo num\u00e9rico")}
+                  </button>
+                </div>
               </>
             ),
           },
