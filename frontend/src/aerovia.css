@@ -404,6 +404,38 @@
   inset: 0;
   overflow: hidden;
 }
+.av-stream-status {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.42rem 0.62rem;
+  border: 1px solid color-mix(in srgb, #59d7d0 48%, var(--color-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, #061522 82%, transparent);
+  color: #d5ffff;
+  font: 600 0.68rem var(--font-mono);
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 18px color-mix(in srgb, #2fd5cc 24%, transparent);
+  pointer-events: none;
+}
+.av-stream-status i {
+  display: block;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 50%;
+  background: #55f3cc;
+  box-shadow: 0 0 0 0 rgba(85, 243, 204, 0.65);
+  animation: av-stream-pulse 1.35s ease-out infinite;
+}
+@keyframes av-stream-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(85, 243, 204, 0.65); opacity: 1; }
+  70% { box-shadow: 0 0 0 0.56rem rgba(85, 243, 204, 0); opacity: 0.78; }
+  100% { box-shadow: 0 0 0 0 rgba(85, 243, 204, 0); opacity: 1; }
+}
 .av-mine-scene canvas {
   display: block;
   width: 100%;

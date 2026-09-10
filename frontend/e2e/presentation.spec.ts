@@ -128,6 +128,18 @@ test("the benchmark reruns exact calculations and exposes same-input numerical a
   expect(uiNumber(await difference.innerText())).toBeLessThan(1e-5);
 });
 
+test("the solved instrument exposes a continuously animated airflow stream", async ({ page }) => {
+  await openWorkbench(page);
+  await expect(page.getByText("LIVE AIRFLOW", { exact: true })).toBeVisible();
+  const scene = page.getByTestId("mine-scene");
+  await expect(scene).toHaveAttribute("data-stream-tick", /\d+/, { timeout: 12000 });
+  const first = await scene.getAttribute("data-stream-tick");
+  await page.waitForTimeout(180);
+  const second = await scene.getAttribute("data-stream-tick");
+  expect(first).not.toBeNull();
+  expect(second).not.toBe(first);
+});
+
 test("held-out browser inference runs both exported models and renders actual comparison errors", async ({
   page,
 }) => {
