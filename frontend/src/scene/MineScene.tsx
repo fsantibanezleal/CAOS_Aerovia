@@ -270,18 +270,17 @@ export default function MineScene(props: MineSceneProps) {
     function animate(now: number) {
       animationFrame = requestAnimationFrame(animate);
       animationTick += 1;
-      // The stream is deliberately sampled at 10 Hz. This leaves the browser
+      // The stream is deliberately sampled at roughly 7 Hz. This leaves the browser
       // worker and interaction budget available for transport and editing while
       // keeping the motion unmistakable.
-      if (now - lastAnimation < 100) return;
-      if (animationTick % 8 === 0) element.dataset.streamTick = String(animationTick);
+      if (now - lastAnimation < 150) return;
+      element.dataset.streamTick = String(animationTick);
       // Transport frames are repainted by the selected timeline frame. Avoid
       // a second continuous WebGL loop while the worker and slider are moving.
       // The live flow field resumes as soon as the scene leaves transport mode.
       if (latest.current.frame) return;
       updateStreamField(now);
       renderer.render(scene, camera);
-      if (animationTick % 8 === 0) drawLabels();
     }
     function disposeGroup() {
       gizmo.detach();
