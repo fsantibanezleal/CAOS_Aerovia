@@ -1,6 +1,6 @@
 {
   "schema": "aerovia.catalog/v1",
-  "createdAt": "2026-09-10T01:08:50Z",
+  "createdAt": "2026-09-10T01:14:31Z",
   "sourceSha256": "9077acc86f1f99072276d0fa16b61ce8edad07cddaf415e38354ff71c003cbf3",
   "cases": [
     {
@@ -1340,7 +1340,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 22.117599997727666
+        "elapsedMs": 20.917000001645647
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -1353,8 +1353,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 1253.914500000974,
+        "elapsedMs": 1235.5520999990404,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           213.68503333417388,
           213.68503333417388,
@@ -3338,7 +3339,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 36.73800000251504
+        "elapsedMs": 35.10620000088238
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -3351,8 +3352,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 45.443700000760145,
+        "elapsedMs": 45.296100000996375,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           217.3312793943041,
           217.33127939430412,
@@ -4630,7 +4632,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 11.203599999134894
+        "elapsedMs": 10.588100001768908
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -4643,8 +4645,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 11.50690000213217,
+        "elapsedMs": 11.302799997793045,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           83.55369746933613,
           83.55369746933613,
@@ -5839,7 +5842,7 @@
           10.184006142497788,
           0.0
         ],
-        "elapsedMs": 14.844100001937477
+        "elapsedMs": 12.773799997376045
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -5852,8 +5855,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 12.814900001103524,
+        "elapsedMs": 12.408800001139753,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           169.18780921414557,
           169.18780921414557,
@@ -7431,7 +7435,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 28.382299999066163
+        "elapsedMs": 42.022800000268035
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -7444,8 +7448,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 18.76310000079684,
+        "elapsedMs": 18.17519999895012,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           249.31890352238963,
           249.31890352238963,
@@ -9095,7 +9100,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 26.208300001599127
+        "elapsedMs": 24.767399998381734
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -9108,8 +9113,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 23.772799999278504,
+        "elapsedMs": 22.965100000874372,
         "iterations": 6,
+        "batchSize": 256,
         "flowP05": [
           220.67114742674576,
           220.67114742674573,
@@ -10376,7 +10382,7 @@
           9.071403970574375,
           0.0
         ],
-        "elapsedMs": 13.218299998698058
+        "elapsedMs": 13.076300001557684
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -10389,8 +10395,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 12.083599998732097,
+        "elapsedMs": 11.638700001640245,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           145.37653069373425,
           145.37653069373425,
@@ -11592,7 +11599,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 11.98139999905834
+        "elapsedMs": 11.233000001084292
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -11605,8 +11612,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 12.093100001948187,
+        "elapsedMs": 11.843600001157029,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           187.52658662364544,
           187.52658662364544,
@@ -13133,7 +13141,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 33.94819999812171
+        "elapsedMs": 33.43949999907636
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -13146,8 +13154,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 17.544900001666974,
+        "elapsedMs": 17.654300001595402,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           131.04231955019512,
           131.04231955019512,
@@ -15136,7 +15145,7 @@
           0.0,
           21.032504227537828
         ],
-        "elapsedMs": 29.886500000429805
+        "elapsedMs": 32.2946000014781
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -15149,8 +15158,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 31.450099999347003,
+        "elapsedMs": 30.747999997402076,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           218.8706595134622,
           218.87065951346221,
@@ -16858,7 +16868,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 25.264900003094226
+        "elapsedMs": 25.717600001371466
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -16871,8 +16881,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 18.560600001364946,
+        "elapsedMs": 18.79969999936293,
         "iterations": 5,
+        "batchSize": 256,
         "flowP05": [
           227.95447728487193,
           181.05155502822447,
@@ -18200,7 +18211,7 @@
           0.0,
           0.0
         ],
-        "elapsedMs": 17.672500001935987
+        "elapsedMs": 17.199199999595294
       },
       "ensemble": {
         "schema": "aerovia.ensemble/v1",
@@ -18213,8 +18224,9 @@
         "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
         "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
         "dtype": "float64",
-        "elapsedMs": 16.327600002114195,
+        "elapsedMs": 14.638299999205628,
         "iterations": 6,
+        "batchSize": 256,
         "flowP05": [
           177.61665152352433,
           177.61665152352433,
@@ -18423,8 +18435,8 @@
     "scipy": "1.18.1",
     "engineVersion": "0.1.0",
     "referenceMethod": "SciPy least_squares trust-region reflective, analytical mixed flow/pressure Jacobian, float64",
-    "referenceElapsedMs": 271.4657000033185,
-    "totalElapsedMs": 3956.4662000011595,
+    "referenceElapsedMs": 279.13550000448595,
+    "totalElapsedMs": 3873.8319000003685,
     "caseCount": 12,
     "nodeCount": 509,
     "edgeCount": 656,
@@ -18435,7 +18447,7 @@
     "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
     "samplesPerCase": 256,
     "ensembleSamples": 3072,
-    "ensembleElapsedMs": 1474.2758000102185,
+    "ensembleElapsedMs": 1451.0226999991573,
     "ensembleFailures": 0,
     "parityMaxAbsFlow": 1.1802114840975264e-11,
     "paritySamples": 96

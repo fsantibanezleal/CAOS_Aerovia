@@ -30,7 +30,7 @@ Electrical fan power is `max(H,0) × max(Q,0) / (efficiency × 1000)` kW, summed
 
 `totalIntake` is the sum of positive net boundary supply. A pressure boundary's net outgoing signed branch flow is clamped at zero before summing; this avoids double-counting internal intake galleries. `targetRatio` is the minimum signed Q/target among all positive targets, with 1 for no targets. `shortfalls[e] = max(0,target[e] − Q[e])`. A reversed branch does not satisfy a positive forward-flow target. A closed target branch retains its deficit and has zero flow and velocity.
 
-The browser's speed search is bounded to [0,1.5] and changes every fan by the same scalar. It finds the least feasible common speed for the entered targets; it does not optimize independent fans, regulator topology or excavation. Resistance sensitivity holds other inputs fixed. These operations should be compared using the same imported network, baseline, target assumptions and electrical tariff.
+The browser's speed search is bounded to [0,1.5] and changes every fan by the same scalar. It requires equal fixed boundary pressures, which preserves homogeneous flow scaling with common speed. Unequal imposed pressures can make target delivery non-monotone; that search is rejected with an explicit explanation, while the general network solver and speed-curve inspection remain available within their supported fan regime. The search finds the least feasible common speed for the entered targets; it does not optimize independent fans, regulator topology or excavation. Resistance sensitivity holds other inputs fixed. These operations should be compared using the same imported network, baseline, target assumptions and electrical tariff.
 
 ## Verification evidence
 

@@ -1,6 +1,6 @@
 # Aerovia network and artifact contracts
 
-All public inputs are UTF-8 JSON, finite SI values and explicit provenance. An input is one network, an array of networks, or an exported object containing `network`. Network files are limited to 5 MiB; arrays to 100 cases. The public browser graph limit is 120 nodes and 240 edges. The offline importer enforces the same per-network limits.
+All inputs use UTF-8 JSON, finite SI values and explicit provenance. The browser accepts one network or one exported project, with a 2,000,000-byte file limit. The offline pipeline accepts one network, an array of networks, or an exported object containing `network`, with a 5 MiB file limit and at most 100 cases. Both enforce the same network schema and per-network graph limits: 120 nodes and 240 edges.
 
 Browser project exports use `aerovia.project/v1` with `{network,options,baseline?,savedAt}`. The CLI preserves imported speed, resistance scale, edited values and closed edges for solve/bake. Optional saved baselines are comparison state and do not change the current solve. Explicit `--speed` or `--resistance-scale` flags take precedence; `--options` JSON takes final precedence. Raw network imports use default options.
 
@@ -46,7 +46,9 @@ The [JSON Schema](network.schema.json) describes structural constraints. Executa
 
 `flows`, `velocities` and `shortfalls` have exactly the network's edge order; `pressures` has node order. Units are m³/s, m/s, m³/s and Pa respectively. `converged` requires both physical residual acceptance and a supported fan operating regime. `iterations`, `massResidual`, `pressureResidual`, `elapsedMs` and optional `message` expose numerical acceptance. `fanPowerKW`, `totalIntake` and `targetRatio` follow the [method definitions](../methods/ventilation-model.md).
 
-The Python API raises `NetworkError` for malformed input or disconnected closures. The CLI exits 2 and prints an actionable message. A valid but unsupported numerical/fan state returns `converged=false`; the CLI saves a failure record and exits 2. The browser preserves valid current work when it rejects an import. A zero-flow accepted network is possible for zero forcing; it is not used as a substitute for a failed calculation.
+The Python API raises `NetworkError` for malformed input or disconnected closures. The CLI exits 2 and prints an actionable message. A valid but unsupported numerical/fan state returns `converged=false`; the CLI reports failure and retains any previous accepted output. The browser preserves valid current work when it rejects an import. A zero-flow accepted network is possible for zero forcing; it is not used as a substitute for a failed calculation.
+
+Solve and bake write to a temporary sibling directory, verify the complete catalog, then promote the accepted directory. A late failure leaves the previous output byte-for-byte unchanged. Replacement refuses nonempty directories without a matching Aerovia manifest, unowned extra files and symbolic links. This protects unrelated local work and prevents partial release catalogs.
 
 ## Published catalog and reproducibility
 
@@ -56,4 +58,6 @@ The Python API raises `NetworkError` for malformed input or disconnected closure
 
 `manifest.json` uses `aerovia.manifest/v1` and records SHA-256 and bytes per artifact, engine version, source identity and actual device. Artifact paths are relative and cannot escape the directory. Verification checks bytes, hashes, contracts, conservation recomputed from the exported arrays, derived scalar quantities, dimensions, quantile ordering, probability ranges and the no-failure/parity acceptance gate.
 
-CSV exports contain edge identity, effective edited area/resistance/target, signed flow, velocity, shortfall, closure state and available uncertainty summaries. They use unit-bearing headers. Browser imports stay local; offline processing has no telemetry. Download receipts record bytes and content identity without persisting potentially private URL query strings. The authored public data contains no names, surveyed coordinates, credentials or operating-mine information.
+`verify --artifacts data/artifacts --input data/cases.json` additionally confirms that the separate canonical input array matches the networks embedded in the catalog. Catalog and manifest aggregate source identities are checked even without `--input`. Release processing authors a staged source file first, bakes and verifies against it, and then updates the canonical source.
+
+Offline CSV exports contain edge identity, effective edited area/resistance/target, signed flow, velocity, shortfall, closure state and available uncertainty summaries. Browser result CSVs include identity, signed flow, velocity, effective resistance, target, shortfall and convergence residuals; use project JSON to preserve complete current settings and closures. Both use unit-bearing headers. Browser imports stay local; offline processing has no telemetry. Download receipts record bytes and content identity without persisting potentially private URL query strings. The authored public data contains no names, surveyed coordinates, credentials or operating-mine information.

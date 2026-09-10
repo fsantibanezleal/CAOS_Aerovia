@@ -5,6 +5,7 @@ from pathlib import Path
 import csv
 import json
 import os
+import shutil
 import tempfile
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -27,7 +28,7 @@ def write_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     content = json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
-    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, prefix=".aerovia-", suffix=".tmp", delete=False) as handle:
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n", dir=path.parent, prefix=".aerovia-", suffix=".tmp", delete=False) as handle:
         handle.write(content)
         temporary = Path(handle.name)
     try:
@@ -44,6 +45,11 @@ def load_networks(path):
         payload = json.loads(path.read_text(encoding="utf-8-sig"), parse_constant=lambda value: (_ for _ in ()).throw(NetworkError(f"Non-finite JSON value {value}")))
     except (json.JSONDecodeError, UnicodeError) as exc:
         raise NetworkError(f"Input must be valid UTF-8 JSON: {exc}") from exc
+    if isinstance(payload,dict) and payload.get("schema")=="aerovia.project/v1":
+        options=payload.get("options",{})
+        if not isinstance(options,dict):
+            raise NetworkError("Project options must be an object")
+        validate_network(payload.get("network"),options)
     if isinstance(payload, dict) and "network" in payload:
         payload = payload["network"]
     networks = payload if isinstance(payload, list) else [payload]
@@ -104,7 +110,7 @@ def export_csv(path, network, result, ensemble=None, options=None):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle,lineterminator="\n")
         writer.writerow(["edge_id", "kind", "from_node", "to_node", "area_m2", "resistance_Pa_s2_m6", "target_m3_s", "flow_m3_s", "velocity_m_s", "shortfall_m3_s", "closed", "flow_p05_m3_s", "flow_p50_m3_s", "flow_p95_m3_s", "target_probability"])
         for i, edge in enumerate(network["edges"]):
             option = (options or {}).get("overrides",{}).get(edge["id"],{})
@@ -123,11 +129,13 @@ def write_manifest(directory, metadata):
     return manifest
 
 
-def verify_artifacts(directory):
+def verify_artifacts(directory,input_path=None):
     directory = Path(directory).resolve()
     manifest = json.loads((directory/"manifest.json").read_text(encoding="utf-8"))
     if manifest.get("schema") != "aerovia.manifest/v1" or not manifest.get("files"):
         raise NetworkError("Missing versioned artifact manifest")
+    if "catalog.json" not in manifest["files"]:
+        raise NetworkError("Artifact manifest must cover catalog.json")
     for filename, spec in manifest["files"].items():
         path = (directory/filename).resolve()
         if not path.is_relative_to(directory) or not path.is_file():
@@ -137,6 +145,11 @@ def verify_artifacts(directory):
     catalog = json.loads((directory/"catalog.json").read_text(encoding="utf-8"))
     if catalog.get("schema") != "aerovia.catalog/v1" or not catalog.get("cases"):
         raise NetworkError("Invalid catalog schema or empty case list")
+    source_hash=digest([case["network"] for case in catalog["cases"]])
+    if catalog.get("sourceSha256")!=source_hash or manifest.get("sourceSha256")!=source_hash:
+        raise NetworkError("Catalog/manifest aggregate source identity does not match embedded networks")
+    if input_path is not None and digest(load_networks(input_path))!=source_hash:
+        raise NetworkError("External network input does not match catalog source identity")
     for case in catalog["cases"]:
         network,result,options = case["network"],case["result"],case.get("options",{})
         validate_network(network,options)
@@ -168,3 +181,47 @@ def verify_artifacts(directory):
             if any(not 0 <= x <= 1 for x in ensemble["targetProbability"]):
                 raise NetworkError("Invalid target probability")
     return {"verifiedFiles":len(manifest["files"]),"verifiedCases":len(catalog["cases"]),"schema":catalog["schema"]}
+
+
+def promote_artifacts(staging,destination):
+    """Publish a verified sibling directory; retain a previous output on failure.
+
+    A nonempty existing destination must contain exactly manifest-owned files.
+    This prevents an output typo from moving/deleting an unrelated directory.
+    """
+    staging,destination=Path(staging).resolve(),Path(destination).absolute()
+    if destination.is_symlink():
+        raise NetworkError("Artifact output must not be a symbolic link")
+    destination=destination.resolve()
+    if staging.parent!=destination.parent or not staging.name.startswith(".aerovia-stage-"):
+        raise NetworkError("Artifact staging must be a reserved sibling directory")
+    backup=None
+    if destination.exists():
+        if not destination.is_dir():
+            raise NetworkError("Artifact output must be a directory")
+        contents=list(destination.rglob("*"))
+        if any(path.is_symlink() for path in contents):
+            raise NetworkError("Refusing to replace output containing symbolic links")
+        files={path.relative_to(destination).as_posix() for path in contents if path.is_file()}
+        if files:
+            manifest_path=destination/"manifest.json"
+            if not manifest_path.is_file():
+                raise NetworkError("Refusing to replace a nonempty directory without an Aerovia artifact manifest")
+            manifest=json.loads(manifest_path.read_text(encoding="utf-8"))
+            if manifest.get("schema")!="aerovia.manifest/v1" or files!=set(manifest.get("files",{}))|{"manifest.json"}:
+                raise NetworkError("Refusing to replace a directory with files not owned by its Aerovia manifest")
+        backup=Path(tempfile.mkdtemp(prefix=".aerovia-backup-",dir=destination.parent))
+        backup.rmdir()
+        os.replace(destination,backup)
+    try:
+        os.replace(staging,destination)
+    except OSError:
+        if backup is not None and backup.exists() and not destination.exists():
+            os.replace(backup,destination)
+        raise
+    if backup is not None:
+        # Verify the final absolute deletion boundary, never a string-built path.
+        resolved=backup.resolve()
+        if resolved.parent!=destination.parent or not resolved.name.startswith(".aerovia-backup-"):
+            raise NetworkError("Refusing cleanup outside the reserved output backup boundary")
+        shutil.rmtree(resolved)

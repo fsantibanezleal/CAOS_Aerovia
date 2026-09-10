@@ -4,6 +4,7 @@ import json
 import platform
 from pathlib import Path
 import sys
+import tempfile
 from time import perf_counter
 
 import numpy as np
@@ -12,7 +13,7 @@ import scipy
 from . import __version__
 from .cases import create_cases
 from .ensemble import run_ensemble
-from .io import digest, export_csv, fetch_network, load_networks, project_options, utc_now, verify_artifacts, write_json, write_manifest
+from .io import digest, export_csv, fetch_network, load_networks, project_options, promote_artifacts, utc_now, verify_artifacts, write_json, write_manifest
 from .model import NetworkError, solve, validate_network
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,11 +44,13 @@ def parser():
             command.add_argument("--cv",type=float,default=.15)
     verify=sub.add_parser("verify",help="Verify checksums, contracts, conservation and parity acceptance")
     verify.add_argument("--artifacts",type=Path,default=ROOT/"data/artifacts")
+    verify.add_argument("--input",type=Path,help="Also require catalog source identity to match this canonical network input")
     return p
 
 
 def main(argv=None):
     args=parser().parse_args(argv)
+    temporary=None
     try:
         if args.command=="create":
             cases=create_cases()
@@ -64,8 +67,12 @@ def main(argv=None):
             print(json.dumps(fetch_network(args.url,args.sha256,args.output)))
             return 0
         if args.command=="verify":
-            print(json.dumps(verify_artifacts(args.artifacts)))
+            print(json.dumps(verify_artifacts(args.artifacts,args.input)))
             return 0
+        destination=args.output.absolute()
+        destination.parent.mkdir(parents=True,exist_ok=True)
+        temporary=tempfile.TemporaryDirectory(prefix=".aerovia-stage-",dir=destination.parent)
+        args.output=Path(temporary.name)
         started=perf_counter()
         cases=load_networks(args.input)
         options={"speed":1,"resistanceScale":1,"overrides":{},**project_options(args.input)}
@@ -109,8 +116,13 @@ def main(argv=None):
         if parity:
             write_json(args.output/"reference-checks.json",{"schema":"aerovia.reference-checks/v1","fixtures":parity})
         write_manifest(args.output,{"engineVersion":__version__,"sourceSha256":digest(cases),"device":getattr(args,"device","cpu-reference"),"caseCount":len(cases)})
-        print(json.dumps(verify_artifacts(args.output)))
+        verified=verify_artifacts(args.output)
+        promote_artifacts(args.output,destination)
+        print(json.dumps(verified))
         return 0
     except (NetworkError,OSError,ValueError,KeyError,ImportError) as exc:
         print(f"Aerovia pipeline: {exc}",file=sys.stderr)
         return 2
+    finally:
+        if temporary is not None:
+            temporary.cleanup()
