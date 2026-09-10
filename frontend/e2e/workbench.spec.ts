@@ -156,6 +156,9 @@ test("JSON project export roundtrips exact edited inputs, malformed imports pres
 test("all cases solve and all view/theme/language combinations fit the viewport", async ({
   page,
 }, testInfo) => {
+  // This complete matrix saves 24 WebGL screenshots; software rendering on CI
+  // needs a larger total capture budget. Individual state assertions keep their limit.
+  testInfo.setTimeout(120_000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await load(page);
