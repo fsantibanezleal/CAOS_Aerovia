@@ -307,4 +307,20 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
     .getByRole("button", { name: "Cambiar idioma", exact: true })
     .click();
   expect((await project(page)).options).toEqual(before.options);
+  const navigation = page.locator(".main-nav");
+  await expect(navigation).toBeVisible();
+  expect(
+    (await page.locator(".site-header").boundingBox())!.height,
+  ).toBeLessThan(100);
+  for (const route of routes.filter((route) => route.path !== "/")) {
+    await navigation.getByRole("link", { name: route.en, exact: true }).click();
+    await expect.poll(() => new URL(page.url()).pathname).toBe(route.path);
+    await expect(
+      page.getByRole("heading", { name: route.en, exact: true }).first(),
+    ).toBeVisible();
+    await noDocumentOverflow(page);
+  }
+  await navigation.getByRole("link", { name: "App", exact: true }).click();
+  await balanced(page);
+  expect((await project(page)).options).toEqual(before.options);
 });
