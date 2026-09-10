@@ -22,6 +22,7 @@ from __future__ import annotations
 import subprocess
 import sys
 from pathlib import Path
+from vendor_notices import scanned_bytes
 
 ROOT = Path(__file__).resolve().parent.parent
 SELF = "scripts/check_content_standards.py"
@@ -47,22 +48,36 @@ def tracked_files() -> list[str]:
     return [ln.strip() for ln in out.stdout.splitlines() if ln.strip()]
 
 
+def inspect(rel: str, data: bytes) -> list[str]:
+    hits = []
+    try:
+        data = scanned_bytes(rel, data)
+    except ValueError as error:
+        hits.append(f"  {rel}: {error}")
+    try:
+        lines = data.decode("utf-8").splitlines()
+    except UnicodeDecodeError:
+        return hits
+    for lineno, line in enumerate(lines, 1):
+        for col, ch in enumerate(line, 1):
+            cp = ord(ch)
+            if cp in BANNED_DASHES:
+                hits.append(f"  {rel}:{lineno}:{col}  em-dash (U+{cp:04X})")
+            elif is_emoji(cp):
+                hits.append(f"  {rel}:{lineno}:{col}  emoji (U+{cp:04X} {ch!r})")
+    return hits
+
+
 def main() -> int:
     hits: list[str] = []
     for rel in tracked_files():
         if rel == SELF or Path(rel).suffix.lower() not in TEXT_SUFFIXES:
             continue
         try:
-            lines = (ROOT / rel).read_text(encoding="utf-8").splitlines()
-        except (OSError, UnicodeDecodeError):
+            data = (ROOT / rel).read_bytes()
+        except OSError:
             continue
-        for lineno, line in enumerate(lines, 1):
-            for col, ch in enumerate(line, 1):
-                cp = ord(ch)
-                if cp in BANNED_DASHES:
-                    hits.append(f"  {rel}:{lineno}:{col}  em-dash (U+{cp:04X})")
-                elif is_emoji(cp):
-                    hits.append(f"  {rel}:{lineno}:{col}  emoji (U+{cp:04X} {ch!r})")
+        hits.extend(inspect(rel, data))
 
     if not hits:
         print("check_content_standards: OK, no em-dash or emoji in tracked content.")

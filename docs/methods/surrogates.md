@@ -166,6 +166,8 @@ Chromium executed all 24 ONNX exports on 48 held-out fixtures. Maximum differenc
 
 ## Public artifacts
 
+The deployed `/THIRD_PARTY_NOTICES.txt` accompanies the first-party hosted ONNX runtime and KaTeX font assets. It preserves the complete tagged ONNX Runtime 1.29.0 upstream notices, the runtime MIT license, the browser dependencies' licenses, and the fonts' embedded copyright and SIL OFL 1.1 terms. The upstream collection describes distribution attribution, not application capabilities. Both public guards verify the exact pinned upstream block before exempting its unchanged attribution text; edits, alternate paths, duplicate blocks, and surrounding application text remain subject to the release rules.
+
 - `data/models/registry.json`: method × topology registry, calibration signature, trained cases, input bounds, checkpoint and ONNX hashes, measured export parity.
 - `data/models/manifest.json`: exact model/registry/fixture bytes; local machine paths and user information are excluded.
 - `data/models/parity-fixtures.json`: original held-out feature vectors and actual PyTorch outputs for independent browser comparison.
