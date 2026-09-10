@@ -280,7 +280,7 @@ export default function MineScene(props: MineSceneProps) {
       // a second continuous WebGL loop while the worker and slider are moving.
       // The live flow field resumes as soon as the scene leaves transport mode.
       if (latest.current.frame) return;
-      if (document.querySelector(".av-dialog[open]")) return;
+      if (document.querySelector(".av-dialog[open], [role=\"dialog\"]")) return;
       updateStreamField(now);
       renderer.render(scene, camera);
     }
