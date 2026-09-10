@@ -1,0 +1,12 @@
+import {chromium} from '@playwright/test';
+import {mkdir,writeFile} from 'node:fs/promises';
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000},colorScheme:'dark'});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto(process.env.AEROVIA_URL||'http://127.0.0.1:5908/',{waitUntil:'networkidle'});
+await page.getByTestId('solver-status').filter({hasText:'Network balanced'}).waitFor();
+await page.waitForTimeout(1400);
+await mkdir('test-results',{recursive:true});await page.screenshot({path:'test-results/workspace-dark.png'});
+await page.getByRole('button',{name:'Toggle theme',exact:true}).click();await page.waitForTimeout(300);await page.screenshot({path:'test-results/workspace-light.png'});
+console.log(JSON.stringify({errors,body:await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,viewport:[innerWidth,innerHeight]})),status:await page.getByTestId('solver-status').innerText()}));
+await browser.close();

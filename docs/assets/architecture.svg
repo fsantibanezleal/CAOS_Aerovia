@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="930" viewBox="0 0 1200 930" role="img" aria-labelledby="title description">
+  <title id="title">Aerovia: independent computation and local interaction</title>
+  <desc id="description">The offline lane creates or imports networks, solves independent SciPy references and CUDA resistance ensembles, verifies them and exports artifacts. The browser lane validates local inputs, sends identified requests to a Web Worker, and coordinates the spatial scene, analysis and local project storage. GitHub Pages publishes only the verified catalog and static frontend.</desc>
+  <style>
+    svg{--d-bg:#edf1ed;--d-panel:#f7f8f4;--d-card:#fffefa;--d-ink:#1d3438;--d-muted:#52696a;--d-line:#c6d6ce;--d-accent:#176e60;--d-soft:#dceee5;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    @media(prefers-color-scheme:dark){svg{--d-bg:#0b171c;--d-panel:#101f25;--d-card:#14272d;--d-ink:#e3ece5;--d-muted:#a0b7b8;--d-line:#304a4d;--d-accent:#62d2b2;--d-soft:#1d3935}}
+    .background{fill:var(--bg,var(--d-bg))}.panel{fill:var(--panel,var(--d-panel));stroke:var(--line,var(--d-line));stroke-width:1.5}.card{fill:var(--raised,var(--d-card));stroke:var(--line,var(--d-line));stroke-width:1.5}.accent-card{fill:var(--accent-soft,var(--d-soft));stroke:var(--accent,var(--d-accent));stroke-width:1.5}.ink{fill:var(--ink,var(--d-ink))}.muted{fill:var(--muted,var(--d-muted))}.accent{fill:var(--accent,var(--d-accent))}.title{font-size:29px;font-weight:650}.heading{font-size:18px;font-weight:650}.body{font-size:15px}.small{font-size:13px}.mono{font-family:ui-monospace,"Cascadia Code",monospace;font-size:12px}.lane{font-size:13px;letter-spacing:1.7px;font-weight:700}.arrow{fill:none;stroke:var(--accent,var(--d-accent));stroke-width:2;marker-end:url(#arrow)}.return{fill:none;stroke:var(--muted,var(--d-muted));stroke-width:1.5;marker-end:url(#return)}
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="var(--accent,var(--d-accent))"/></marker>
+    <marker id="return" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--muted,var(--d-muted))"/></marker>
+  </defs>
+  <rect class="background" width="1200" height="930" rx="18"/>
+  <text x="40" y="55" class="title ink">One network. Independent evidence. Local interaction.</text>
+  <text x="40" y="86" class="body muted">AEROVIA / execution boundaries and source modules</text>
+  <text x="40" y="129" class="lane accent">OFFLINE · YOUR PROCESSING MACHINE</text>
+  <text x="635" y="129" class="lane accent">LIVE · THE VISITOR'S BROWSER</text>
+  <rect x="30" y="148" width="550" height="646" rx="14" class="panel"/>
+  <rect x="620" y="148" width="550" height="646" rx="14" class="panel"/>
+
+  <rect x="55" y="177" width="500" height="97" rx="10" class="card"/>
+  <text x="76" y="208" class="heading ink">Create or import a network</text>
+  <text x="76" y="233" class="body muted">Authored cases or validated practitioner JSON</text>
+  <text x="76" y="257" class="mono accent">cases.py · cli.py · aerovia.network/v1</text>
+  <path d="M185 274V308" class="arrow"/><path d="M425 274V308" class="arrow"/>
+
+  <rect x="55" y="313" width="237" height="116" rx="10" class="card"/>
+  <text x="76" y="345" class="heading ink">Independent CPU</text>
+  <text x="76" y="370" class="body muted">SciPy least-squares</text>
+  <text x="76" y="394" class="body muted">Flow + pressure unknowns</text>
+  <text x="76" y="414" class="mono accent">model.py</text>
+  <rect x="317" y="313" width="238" height="116" rx="10" class="card"/>
+  <text x="338" y="345" class="heading ink">Resistance ensemble</text>
+  <text x="338" y="370" class="body muted">PyTorch CUDA · float64</text>
+  <text x="338" y="394" class="body muted">Shared seeded draws</text>
+  <text x="338" y="414" class="mono accent">ensemble.py</text>
+  <path d="M185 429V465" class="arrow"/><path d="M425 429V465" class="arrow"/>
+
+  <rect x="55" y="470" width="500" height="120" rx="10" class="accent-card"/>
+  <text x="76" y="501" class="heading ink">Verify physics and identity</text>
+  <text x="76" y="527" class="body muted">Mass / pressure closure · supported fan regime</text>
+  <text x="76" y="551" class="body muted">Matched SciPy draws · source and option identity</text>
+  <text x="76" y="575" class="mono accent">io.py · explicit failures · transactional promotion</text>
+  <path d="M305 590V626" class="arrow"/>
+
+  <rect x="55" y="631" width="500" height="125" rx="10" class="card"/>
+  <text x="76" y="664" class="heading ink">Accepted scientific artifacts</text>
+  <text x="76" y="691" class="body muted">Catalog · CSV · matched reference fixtures</text>
+  <text x="76" y="716" class="body muted">Exact input, device, seed, residuals and SHA-256</text>
+  <text x="76" y="741" class="mono accent">data/artifacts/ · canonical release or local output</text>
+
+  <rect x="645" y="177" width="500" height="97" rx="10" class="card"/>
+  <text x="666" y="208" class="heading ink">Select a case or import a project</text>
+  <text x="666" y="233" class="body muted">Private imports stay on this device</text>
+  <text x="666" y="257" class="mono accent">validation.ts · storage.ts · project/v1</text>
+  <path d="M895 274V308" class="arrow"/>
+
+  <rect x="645" y="313" width="500" height="116" rx="10" class="card"/>
+  <text x="666" y="345" class="heading ink">One coordinated application state</text>
+  <text x="666" y="370" class="body muted">Network · options · selection · baseline · history</text>
+  <text x="666" y="394" class="body muted">New inputs invalidate stale result interpretation</text>
+  <text x="666" y="414" class="mono accent">App.tsx · useEngine.ts</text>
+  <path d="M820 429V465" class="arrow"/>
+  <path d="M1020 470V434" class="return"/>
+  <text x="668" y="454" class="small muted">request ID</text>
+  <text x="1040" y="454" class="small muted">result</text>
+
+  <rect x="645" y="470" width="500" height="120" rx="10" class="accent-card"/>
+  <text x="666" y="501" class="heading ink">Live calculation · Web Worker</text>
+  <text x="666" y="527" class="body muted">Nodal Newton · exact physical residual checks</text>
+  <text x="666" y="551" class="body muted">Solve · speed curve · sensitivity · bounded search</text>
+  <text x="666" y="575" class="mono accent">engine/worker.ts · solver.ts · analysis.ts</text>
+  <path d="M770 590V626" class="arrow"/><path d="M1030 590V626" class="arrow"/>
+
+  <rect x="645" y="631" width="238" height="125" rx="10" class="card"/>
+  <text x="666" y="664" class="heading ink">Inspect and intervene</text>
+  <text x="666" y="691" class="body muted">Three.js scene + charts</text>
+  <text x="666" y="716" class="body muted">Signed values + targets</text>
+  <text x="666" y="741" class="mono accent">NetworkScene.tsx</text>
+  <rect x="907" y="631" width="238" height="125" rx="10" class="card"/>
+  <text x="928" y="664" class="heading ink">Retain and exchange</text>
+  <text x="928" y="691" class="body muted">Device storage · JSON</text>
+  <text x="928" y="716" class="body muted">Recomputed baselines</text>
+  <text x="928" y="741" class="mono accent">storage.ts · CSV</text>
+
+  <path d="M305 756V824" class="arrow"/>
+  <text x="335" y="812" class="small muted">verified release only</text>
+  <rect x="55" y="830" width="1090" height="72" rx="12" class="accent-card"/>
+  <text x="77" y="860" class="heading ink">PUBLISH / REPLAY</text>
+  <text x="310" y="859" class="body ink">Verified catalog + Vite bundle → GitHub Pages → browser</text>
+  <text x="310" y="884" class="body muted">No scientific bake during deploy. No backend. Baked intervals require an exact case match.</text>
+</svg>
