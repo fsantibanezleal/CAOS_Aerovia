@@ -231,6 +231,7 @@ export default function MineScene(props: MineSceneProps) {
       animationTime += dt;
       const byId = new Map(p.network.nodes.map((n) => [n.id, n]));
       const dark = p.theme === "dark";
+      const color = new T.Color();
       streamParticles.forEach((particle, index) => {
         const edge = p.network.edges[particle.edge];
         if (!edge) return;
@@ -252,9 +253,9 @@ export default function MineScene(props: MineSceneProps) {
           Math.min(particle.cellCount - 1, Math.floor(u * particle.cellCount))
         ] ?? 0;
         const normalized = Math.min(1, Math.log1p(100 * concentration) / Math.log(101));
-        const color = p.metric === "tracer"
-          ? new T.Color().setHSL(0.58 - normalized * 0.58, 0.95, dark ? 0.58 : 0.42)
-          : new T.Color().setHSL(0.53 - Math.min(1, Math.abs(signed) / 40) * 0.18, 0.9, dark ? 0.64 : 0.42);
+        p.metric === "tracer"
+          ? color.setHSL(0.58 - normalized * 0.58, 0.95, dark ? 0.58 : 0.42)
+          : color.setHSL(0.53 - Math.min(1, Math.abs(signed) / 40) * 0.18, 0.9, dark ? 0.64 : 0.42);
         colors.setXYZ(index, color.r, color.g, color.b);
       });
       positions.needsUpdate = true;
@@ -279,6 +280,7 @@ export default function MineScene(props: MineSceneProps) {
       // a second continuous WebGL loop while the worker and slider are moving.
       // The live flow field resumes as soon as the scene leaves transport mode.
       if (latest.current.frame) return;
+      if (document.querySelector(".av-dialog[open]")) return;
       updateStreamField(now);
       renderer.render(scene, camera);
     }
@@ -402,7 +404,7 @@ export default function MineScene(props: MineSceneProps) {
         });
       }
       const cellCount = p.frame?.cellConcentrations[0]?.length ?? 8;
-      const pointCapacity = p.network.edges.length * 9;
+      const pointCapacity = p.network.edges.length * 6;
       const pointGeometry = new T.BufferGeometry();
       streamPositions = new T.Float32BufferAttribute(new Float32Array(pointCapacity * 3), 3);
       streamColors = new T.Float32BufferAttribute(new Float32Array(pointCapacity * 3), 3);
@@ -423,10 +425,10 @@ export default function MineScene(props: MineSceneProps) {
       streamParticles = [];
       p.network.edges.forEach((edge, edgeIndex) => {
         const flow = Math.abs(p.result?.flows[edgeIndex] ?? 0);
-        for (let particle = 0; particle < 9; particle++)
+        for (let particle = 0; particle < 6; particle++)
           streamParticles.push({
             edge: edgeIndex,
-            phase: (particle / 9 + edgeIndex * 0.071) % 1,
+            phase: (particle / 6 + edgeIndex * 0.071) % 1,
             speed: 0.12 + Math.min(0.72, flow / 85),
             cellCount,
           });
