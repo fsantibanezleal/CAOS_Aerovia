@@ -1,0 +1,158 @@
+/* Companion widgets only. Shared page, prose, equation and tab primitives stay owned by the shell. */
+.av-doc-scroll table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-block: 1rem;
+  font-size: 0.82rem;
+  text-align: left;
+  scrollbar-gutter: stable;
+}
+.av-doc-scroll th,
+.av-doc-scroll td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.av-doc-scroll thead {
+  background: var(--color-surface-2, var(--color-surface));
+}
+.av-doc-scroll th {
+  font-weight: 600;
+}
+.av-doc-scroll tbody tr:hover {
+  background: var(--color-accent-soft);
+}
+.av-doc-scroll label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin: 0.4rem 0.7rem 0.4rem 0;
+  font-size: 0.86rem;
+}
+.av-doc-scroll select,
+.av-doc-scroll button:not(.subtab):not(.tab) {
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-fg);
+  font: inherit;
+  padding: 0.45rem 0.65rem;
+}
+.av-doc-scroll button:not(.subtab):not(.tab) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+.av-doc-scroll button:not(.subtab):not(.tab):hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+.av-doc-scroll button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.av-doc-scroll details {
+  border-block: 1px solid var(--color-border);
+  padding-block: 0.8rem;
+  margin-block: 1rem;
+  min-width: 0;
+}
+.av-doc-scroll summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.av-doc-scroll figure figcaption {
+  color: var(--color-fg-subtle);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+.av-doc-scroll .av-plot {
+  min-height: 270px;
+}
+.av-doc-scroll .av-diagram-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.78rem;
+  color: var(--color-fg-subtle);
+}
+.av-doc-scroll .av-diagram-viewport {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-gutter: stable;
+}
+.av-doc-scroll .av-matrix td {
+  padding: 0.2rem;
+}
+.av-doc-scroll .av-matrix table {
+  max-height: min(65vh, 720px);
+  isolation: isolate;
+}
+.av-doc-scroll .av-matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
+}
+.av-doc-scroll .av-matrix tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--color-surface);
+}
+.av-doc-scroll .av-matrix thead th:first-child {
+  left: 0;
+  z-index: 3;
+}
+.av-doc-scroll .av-matrix td button {
+  width: 100%;
+  min-width: 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  border-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.av-doc-scroll .av-matrix td button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+.av-doc-scroll .av-matrix td small {
+  font-size: 0.66rem;
+  white-space: nowrap;
+  color: var(--color-fg-subtle);
+}
+.av-doc-scroll .av-matrix-scale {
+  color: var(--color-fg-subtle);
+  font-size: 0.82rem;
+}
+.av-doc-scroll .av-source-hash {
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+.av-doc-scroll :focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .av-doc-scroll th,
+  .av-doc-scroll td {
+    padding: 0.5rem;
+  }
+  .av-doc-scroll label {
+    display: flex;
+  }
+  .av-doc-scroll label select {
+    width: 100%;
+  }
+}
