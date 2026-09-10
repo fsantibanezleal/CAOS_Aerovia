@@ -1,5 +1,7 @@
 # Release acceptance: 0.01.000
 
+Historical v0.01.000 verification. The user rejected that interface; this record does not establish acceptance of the rebuilt product. Current rebuild evidence is recorded in [the 0.02.000 review](../verification/rebuild-0.02.000.md).
+
 This record distinguishes implemented engineering workflows, numerical verification, rendered inspection
 and public deployment identity. The model and case provenance remain explicit in the workbench and
 [physical model](../methods/ventilation-model.md).

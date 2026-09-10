@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.02.000: 2026-09-10
+
+Complete rebuild after the initial interface was rejected. The numerical foundation remains, while the product now supports direct design authoring and calculated time-dependent analysis through the actual shared CAOS shell.
+
+- Draw, connect, move and split junctions/airways, edit boundaries and fans, import mapped node/airway CSV, and retain undo, project recovery and portable exports.
+- Conservative passive-tracer finite volumes with pulses, continuous sources, scheduled operating changes, pause/scrub/playback, linked spatial histories, complete mass ledgers and reproducible local CLI output.
+- Directed advective paths and recirculation inspection; linked flow/pressure/target/baseline fields, sensitivity, fan duty and annual energy/cost comparisons.
+- Actual CUDA-trained topology MLP and graph models: complete data/split/train/infer/evaluate/diagnostic/export pipeline, checkpoints, 24 ONNX exports and a 216-cell benchmark with explicit approximation/domain/coverage limits.
+- Six researched bilingual routes, shared equations/citations, five themed architecture diagrams, a dominant instrument, focus mode and accessible mobile tools. Published shell 0.6.8 includes keyboard-contained full-size diagrams and all mobile companion routes.
+- Explicit task sections retain every control and linked analysis without long scrolling panels or a permanent lower dock. The actual canvas allocation and every conditional section are measured at desktop/mobile sizes; focus fills the viewport and exits with Escape.
+- Current-input result guards prevent stale calculations or predictions from attaching to a changed design. Actual pointer-move, import, scientific-failure and linked-selection regressions are retained.
+- Fresh-clone startup verifies/stages complete scientific assets. Static route entry files support Pages deep links. A single first-party WASM runtime avoids duplicate payload; complete site budget is 32 MB with 25 MB per-file limits.
+- Release gates validate numerical and model artifacts, application/E2E types, analytical and input tests, complete Chromium user journeys and every exported model in actual browser WASM.
+
+Scope remains explicit: authored planning inputs, an isothermal pressure network, passive mixed-cell transport and calibrated learned approximations. This release does not add field calibration, fire/heat/toxicology, emergency response, fan transients or equipment control.
+
 ## v0.01.000: 2026-09-09
 
 Initial release of the underground ventilation workbench and reproducible local processing system.

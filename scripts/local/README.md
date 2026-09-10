@@ -12,7 +12,7 @@ propagate failing native exit codes and require no secrets.
 | 03 | `03_dev.ps1` / `.sh` | Start development on loopback port 5908. Runs setup if frontend packages are missing. `-Port 5910` / positional `5910` selects another strict port. |
 | 04 | `04_preview.ps1` / `.sh` | Build and run production preview on loopback port 4908; same port override. |
 | 05 | `05_gpu.ps1` / `.sh` | Require real CUDA availability, then run the full ensemble bake. Options follow 02 except device is always CUDA. |
-| 06 | `06_verify.ps1` / `.sh` | Public-source/history audit, numerical tests, artifact checks, typecheck, frontend tests and build. `-Browser` / `--browser` adds Chromium journeys. |
+| 06 | `06_verify.ps1` / `.sh` | Public-source/history audit, numerical tests, numerical/model artifact checks, application/E2E typecheck, frontend tests and build. `-Browser` / `--browser` adds Chromium journeys and all-model WASM parity. |
 | 09 | `09_deploy.ps1` / `.sh` | Check clean verified main, run release gates, inspect Pages. `-ConfigurePages -Dispatch` / `--configure-pages --dispatch` explicitly sets up Pages and requests publication. |
 
 For 02 and 05, PowerShell flags `-Samples 256 -Seed 20260909 -Cv 0.15` correspond to POSIX
@@ -28,3 +28,10 @@ The `common.ps1` and `common.sh` helpers centralize path/runtime resolution. The
 numbered scripts, not additional user workflow stages. POSIX scripts are stored with executable Git
 mode; CI checks their mode and Bash syntax. Normal bakes write to ignored `build/local/`, while
 deployment only verifies committed artifacts. The full guides are under [docs/guides](../../docs/guides/guides.md).
+
+
+Additional complete workflows:
+
+- `npm --prefix frontend run transport -- --help` runs the same conservative transport and directed-route engine locally. File arguments are relative to `frontend/`. See [design and transport](../../docs/guides/05_spatial-and-transport.md) for full replay and custom schedules.
+- `scripts/train-surrogates.ps1` / `.sh` run the actual learned pipeline in an explicit CPU/CUDA environment. `scripts/surrogates.py` exposes ingest, preprocess, dataset, features, train, infer, evaluate, diagnostics, export and validate stages. See [learned methods](../../docs/methods/surrogates.md).
+- Development's `predev` step verifies and stages the complete committed numerical/scientific/model assets. A fresh clone needs no training to run; missing or corrupt artifacts stop startup with a concrete error.

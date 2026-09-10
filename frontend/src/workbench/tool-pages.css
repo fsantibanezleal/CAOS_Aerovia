@@ -1,0 +1,27 @@
+.av-tool-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  min-height: 0;
+}
+.av-tool-page-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.av-tool-page-picker select {
+  width: 100%;
+  min-width: 0;
+}
+.av-tool-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  min-height: 0;
+}
+.av-tool-page[hidden] {
+  display: none;
+}

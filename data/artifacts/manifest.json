@@ -57,6 +57,10 @@
     "reference-checks.json": {
       "sha256": "4c26100fc197bcb156cfb7e5958d6f53a326f62504a012f0017f26659e6c0b59",
       "bytes": 1052074
+    },
+    "science.json": {
+      "sha256": "5a0ab804b168601a80401659043ce3af1e59287f59617f6cba2af8fe5938d91c",
+      "bytes": 3041233
     }
   },
   "engineVersion": "0.1.0",

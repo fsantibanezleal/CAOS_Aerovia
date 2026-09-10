@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" viewBox="0 0 880 590" class="arch-svg" role="img" aria-labelledby="app-title">
+<title id="app-title">Aerovia application architecture</title>
+<style>svg .l-es{display:none}.lane{fill:var(--color-surface);stroke:var(--color-border)}.bx{fill:var(--color-surface-2,var(--color-surface));stroke:var(--color-border);stroke-width:1.3}.bx-hi{stroke:var(--color-accent)}.bx-eng{stroke:var(--color-good)}.bx-gate{stroke:var(--color-warn)}.ttl{font:600 13px sans-serif;fill:var(--color-fg)}.sub{font:11px sans-serif;fill:var(--color-fg-subtle)}.it{font:11px sans-serif;fill:var(--color-fg)}.cd{font:10px monospace;fill:var(--color-accent)}.mu{font:10px sans-serif;fill:var(--color-fg-subtle)}.flow{fill:none;stroke:var(--color-fg-subtle);stroke-width:1.5}.lbl{font:10px sans-serif;fill:var(--color-fg-subtle)}</style>
+<defs><marker id="app-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--color-fg-subtle)"/></marker></defs>
+<text x="24" y="28" class="ttl l-en">One physical network connects design, computation and evidence</text><text x="24" y="28" class="ttl l-es">Una red física conecta diseño, cálculo y evidencia</text>
+<rect x="16" y="48" width="848" height="218" rx="8" class="lane"/>
+<text x="30" y="72" class="sub l-en">USER WORKSPACE · browser-local data</text><text x="30" y="72" class="sub l-es">ESPACIO DE TRABAJO · datos locales</text>
+<rect x="30" y="88" width="245" height="153" rx="6" class="bx bx-hi"/>
+<text x="45" y="111" class="ttl l-en">Build or import a design</text><text x="45" y="111" class="ttl l-es">Construir o importar diseño</text>
+<text x="45" y="134" class="cd l-neutral">contracts.ts · storage.ts</text>
+<text x="45" y="158" class="it l-en">Junctions, airways, fans, boundaries</text><text x="45" y="158" class="it l-es">Uniones, galerías, equipos, bordes</text>
+<text x="45" y="179" class="it l-en">SI units + complete operating options</text><text x="45" y="179" class="it l-es">Unidades SI y opciones completas</text>
+<text x="45" y="220" class="mu l-en">Imported input stays on the device</text><text x="45" y="220" class="mu l-es">La entrada permanece en el equipo</text>
+<path d="M276 169H310" class="flow" marker-end="url(#app-arr)"/><text x="281" y="158" class="lbl l-en">edit</text><text x="281" y="158" class="lbl l-es">editar</text>
+<rect x="316" y="88" width="248" height="153" rx="6" class="bx bx-gate"/>
+<text x="331" y="111" class="ttl l-en">Validate the active state</text><text x="331" y="111" class="ttl l-es">Validar el estado activo</text>
+<text x="331" y="134" class="cd l-neutral">engine/validation.ts</text>
+<text x="331" y="158" class="it l-en">Finite values + unique identities</text><text x="331" y="158" class="it l-es">Valores finitos e identidades únicas</text>
+<text x="331" y="179" class="it l-en">Open paths to pressure boundaries</text><text x="331" y="179" class="it l-es">Caminos abiertos a presión de borde</text>
+<text x="331" y="220" class="mu l-en">Reject before replacing valid work</text><text x="331" y="220" class="mu l-es">Rechazar antes de reemplazar trabajo</text>
+<path d="M565 169H598" class="flow" marker-end="url(#app-arr)"/><text x="569" y="158" class="lbl l-neutral">SI</text>
+<rect x="604" y="88" width="245" height="153" rx="6" class="bx bx-eng"/>
+<text x="619" y="111" class="ttl l-en">Compute the full response</text><text x="619" y="111" class="ttl l-es">Calcular respuesta completa</text>
+<text x="619" y="134" class="cd l-neutral">engine/worker.ts · useEngine.ts</text>
+<text x="619" y="158" class="it l-en">Flow, pressure, power, target deficit</text><text x="619" y="158" class="it l-es">Caudal, presión, potencia y déficit</text>
+<text x="619" y="179" class="it l-en">Transport + directed airflow routes</text><text x="619" y="179" class="it l-es">Transporte y rutas dirigidas del aire</text>
+<text x="619" y="220" class="mu l-en">Approximation has a separate status</text><text x="619" y="220" class="mu l-es">Aproximación tiene estado separado</text>
+<path d="M726 242V291" class="flow" marker-end="url(#app-arr)"/><text x="734" y="281" class="lbl l-en">accepted state</text><text x="734" y="281" class="lbl l-es">estado aceptado</text>
+<rect x="30" y="302" width="245" height="152" rx="6" class="bx bx-eng"/>
+<text x="45" y="326" class="ttl l-en">Reproduce the evidence</text><text x="45" y="326" class="ttl l-es">Reproducir la evidencia</text>
+<text x="45" y="350" class="cd l-neutral">scripts/pipeline.py</text>
+<text x="45" y="375" class="it l-en">Independent SciPy + CUDA batches</text><text x="45" y="375" class="it l-es">SciPy independiente y lotes CUDA</text>
+<text x="45" y="396" class="it l-en">Train, evaluate and export models</text><text x="45" y="396" class="it l-es">Entrenar, evaluar y exportar modelos</text>
+<text x="45" y="434" class="mu l-en">Actual run metadata + artifact hashes</text><text x="45" y="434" class="mu l-es">Ejecución real y hashes de artefactos</text>
+<path d="M276 379H310" class="flow" marker-end="url(#app-arr)"/><text x="281" y="365" class="lbl l-en">read</text><text x="281" y="365" class="lbl l-es">leer</text>
+<rect x="316" y="302" width="248" height="152" rx="6" class="bx"/>
+<text x="331" y="326" class="ttl l-en">Explain and compare</text><text x="331" y="326" class="ttl l-es">Explicar y comparar</text>
+<text x="331" y="350" class="cd l-neutral">pages/Benchmark.tsx · content/</text>
+<text x="331" y="375" class="it l-en">Same-input error and residual metrics</text><text x="331" y="375" class="it l-es">Errores y residuos de misma entrada</text>
+<text x="331" y="396" class="it l-en">Theory, assumptions, source citations</text><text x="331" y="396" class="it l-es">Teoría, supuestos y fuentes</text>
+<text x="331" y="434" class="mu l-en">Authored cases are not mine surveys</text><text x="331" y="434" class="mu l-es">Casos creados no son levantamientos</text>
+<path d="M599 379H570" class="flow" marker-end="url(#app-arr)"/><text x="569" y="365" class="lbl l-en">inspect</text><text x="569" y="365" class="lbl l-es">revisar</text>
+<rect x="604" y="302" width="245" height="152" rx="6" class="bx bx-hi"/>
+<text x="619" y="326" class="ttl l-en">Explore linked quantities</text><text x="619" y="326" class="ttl l-es">Explorar magnitudes vinculadas</text>
+<text x="619" y="350" class="cd l-neutral">scene/ · workbench/</text>
+<text x="619" y="375" class="it l-en">Spatial selection, timeline, charts</text><text x="619" y="375" class="it l-es">Selección, tiempo y gráficos</text>
+<text x="619" y="396" class="it l-en">Compare changes to a saved baseline</text><text x="619" y="396" class="it l-es">Comparar con referencia guardada</text>
+<text x="619" y="434" class="mu l-en">Camera movement is not a calculation</text><text x="619" y="434" class="mu l-es">Mover cámara no es calcular</text>
+<rect x="30" y="487" width="819" height="74" rx="6" class="bx bx-gate"/>
+<text x="45" y="513" class="ttl l-en">Shared CAOS shell · one viewport · EN / ES · light / dark · keyboard access</text><text x="45" y="513" class="ttl l-es">Shell CAOS compartido · una ventana · EN / ES · claro / oscuro · teclado</text>
+<text x="45" y="539" class="cd l-en">main.tsx → @fasl-work/caos-app-shell → six routes</text><text x="45" y="539" class="cd l-es">main.tsx → @fasl-work/caos-app-shell → seis rutas</text>
+</svg>

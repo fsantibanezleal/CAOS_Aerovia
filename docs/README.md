@@ -22,7 +22,7 @@ steps needed to run the tools on another engineering network.
 
 - [System architecture](architecture.md): browser state, worker requests, independent processing,
   contracts, verified artifacts and publication.
-- [ADR-001: Original workbench](architecture/ADR-001-original-workbench.md): task-led composition and
+- [ADR-001: Original workbench, superseded](architecture/ADR-001-original-workbench.md): task-led composition and
   retained bilingual, theme, accessibility and documentation requirements.
 - [ADR-002: Computation and hosting](architecture/ADR-002-numerical-and-hosting-scope.md): live,
   offline and replay boundaries; the GitHub Pages decision.
@@ -31,8 +31,13 @@ steps needed to run the tools on another engineering network.
 - [Rendered UI review](engine/ui-review.md): exercised browser workflows, numerical interpretation
   corrections and observed behavior across the supported presentation states.
 
+- [ADR-003: Shared spatial workspace](architecture/ADR-003-shared-spatial-workspace.md): direct authoring, conservative transport, actual learned screening and the rebuilt shared CAOS interface.
+
 ## Methods, data and evidence
 
+- [Design and transport workflow](guides/05_spatial-and-transport.md): draw, connect, move, import, operate and reproduce.
+- [Transport](methods/transport.md) and [routing](methods/routing.md): conservative cell histories, scheduled equilibrium changes, mass ledgers and directed paths.
+- [Learned methods](methods/surrogates.md) and [model contracts](data-contract/learned-models.md): actual generation, splits, training, checkpoints, calibration, independent evaluation, ONNX export and browser inference.
 - [Ventilation model](methods/ventilation-model.md): units, signs, constraints, algorithms, electrical
   power and target interpretation.
 - [Resistance uncertainty](methods/uncertainty.md): distribution, seeds, chunking, quantiles, reference

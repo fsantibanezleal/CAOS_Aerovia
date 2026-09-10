@@ -9,7 +9,7 @@ reviewable together. The default public deployment is an open engineering tool, 
 commercial transaction flow.
 
 GitHub currently limits a published Pages site to 1 GB and documents a soft bandwidth limit of 100 GB per
-month. Aerovia's release target is below 25 MB, providing substantial payload headroom; measure the actual
+month. Aerovia's complete scientific release budget is 32 MB (each file below 25 MB), providing substantial payload headroom; measure the actual
 `frontend/dist/` for each release. Large raw surveys, full sample arrays and CUDA environments are local
 processing material and do not belong in the deployed bundle.
 Source: [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).
@@ -22,8 +22,8 @@ contract/hash validation, TypeScript checks, browser unit tests, a production bu
 journeys. Actions are pinned to reviewed immutable commit SHAs. The verification job has read-only
 repository permission; only the deployment job receives `pages: write` and `id-token: write`.
 
-No workflow downloads a confidential dataset, installs CUDA, runs a scientific bake, uploads visitor
-networks or uses a third-party token. The browser build stages an already verified catalog. Failed
+No workflow downloads a confidential dataset, installs CUDA, runs training or a scientific bake, uploads visitor
+networks or uses a third-party token. The browser build stages the verified catalog, learned evidence and all 24 ONNX exports. The workflow checks model/checkpoint hashes and runs actual Chromium WASM parity for every export. Failed
 verification stops publication. Concurrent development checks may cancel an older check on the same
 branch; main releases are allowed to finish rather than being cancelled during publication.
 
@@ -84,7 +84,7 @@ Replace `RUN_ID` with the run for the exact intended main revision. Check that `
 revision with `gh run view RUN_ID --json headSha,conclusion,url`.
 
 The production build writes `/release.json` containing `version`, `commit`, `workingTreeDirty` and
-`catalogSha256`.
+`catalogSha256` and `scienceSha256`.
 `frontend/prepare-data.mjs` reads `VERSION`, obtains the current Git HEAD and verifies the catalog bytes
 against its manifest before producing that record. Check the source, version and catalog against the
 intended clean checkout, and require a clean build:
@@ -118,7 +118,7 @@ npm run verify:deployment -- https://aerovia.fasl-work.com/ FULL_GIT_SHA
 
 The verifier fetches the manifest and every listed file over HTTPS, checks exact bytes and SHA-256,
 and fails on an unexpected commit, a dirty build, a redirect to another origin or a total payload over
-25 MB. Successful output records the URL, version, commit, verified file/byte counts and catalog hash.
+32 MB. Successful output records the URL, version, commit, verified file/byte counts and catalog hash.
 Retain this output with the matching workflow run and browser observations. These checks establish
 that the published files match the release manifest; fresh browser QA below establishes behavior and
 rendering. Neither substitutes for the other.
@@ -138,7 +138,7 @@ Source: [GitHub custom-domain HTTPS setup](https://docs.github.com/en/pages/conf
 Check DNS with `Resolve-DnsName aerovia.fasl-work.com -Type CNAME` on PowerShell or
 `dig aerovia.fasl-work.com CNAME` on systems with dig. Then open a fresh unauthenticated browser session
 at the HTTPS address and exercise a case change, fan-speed edit, airway selection, baseline comparison,
-JSON import/export, theme and language change. Inspect desktop and mobile layouts and the console.
+direct drawing/moving, separate CSV and JSON import/export, tracer playback and replay, both learned models, theme and language change. Inspect desktop and mobile layouts and the console.
 An HTTP 200 or a green workflow alone does not establish correct interaction or rendering.
 
 ## Rollback and maintain
