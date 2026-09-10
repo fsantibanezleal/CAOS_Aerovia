@@ -1,10 +1,10 @@
 {
   "schema": "aerovia.manifest/v1",
-  "createdAt": "2026-09-10T01:14:31Z",
+  "createdAt": "2026-09-10T01:48:50Z",
   "files": {
     "catalog.json": {
-      "sha256": "8270bb4688592720c0b0208514916ebe0889236872b0f40d77788d4d8f304a85",
-      "bytes": 476993
+      "sha256": "b715067e5ca1050c42e4048b1b3077d5233c97df42e27d843e0993177507af2d",
+      "bytes": 485927
     },
     "csv/deep-booster.csv": {
       "sha256": "e25ebb95e5c14a525436d2bfdc9010546bea312080b4ea925c7a2bfd6ab5665e",
@@ -55,12 +55,12 @@
       "bytes": 7119
     },
     "reference-checks.json": {
-      "sha256": "f5b43bf654ce0bea675ccd1f24bcd26e64dc0ae837a4c6eaa367ccbdb634b3e2",
-      "bytes": 1052081
+      "sha256": "4c26100fc197bcb156cfb7e5958d6f53a326f62504a012f0017f26659e6c0b59",
+      "bytes": 1052074
     }
   },
   "engineVersion": "0.1.0",
-  "sourceSha256": "9077acc86f1f99072276d0fa16b61ce8edad07cddaf415e38354ff71c003cbf3",
+  "sourceSha256": "a8113786ae34930ada58dcb7cc5a97277f9490c7019b256ca579064c801722c8",
   "device": "cuda",
   "caseCount": 12
 }

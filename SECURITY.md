@@ -9,14 +9,16 @@ This project is developed on a rolling basis. Security fixes are applied to the 
 
 Please report suspected security issues **privately**, not in a public issue.
 
-- Preferred: use GitHub's **private vulnerability reporting** (the "Report a vulnerability" button under the
-  repository's Security tab), when enabled.
-- Alternatively, email **https://github.com/fsantibanezleal/CAOS_Aerovia/security/advisories/new** with a description, reproduction steps, and impact.
+- Use [private vulnerability reporting](https://github.com/fsantibanezleal/CAOS_Aerovia/security/advisories/new)
+  with a description, reproduction steps and impact. Do not include private network data or personal
+  information in public issues.
 
 Please do not disclose the issue publicly until it has been addressed.
 
 ## Response
 
-This is a personal/research project maintained by one person, so there is **no formal SLA**. Reports are
+There is **no formal response SLA**. Reports are
 handled on a best-effort basis: expect an acknowledgement and, where the issue is confirmed and in scope, a
 fix or a documented mitigation. Thank you for reporting responsibly.
+
+See the [security boundary](docs/security/security.md) for input limits and release audit details.

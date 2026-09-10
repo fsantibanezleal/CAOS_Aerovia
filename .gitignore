@@ -2,6 +2,7 @@
 node_modules/
 frontend/dist/
 frontend/public/data/
+frontend/public/release.json
 .env
 __pycache__/
 .pytest_cache/
@@ -9,3 +10,4 @@ __pycache__/
 data/raw/
 test-results/
 playwright-report/
+build/

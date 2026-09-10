@@ -43,22 +43,22 @@ def levels(identifier="hard-rock", count=3, bays=4):
         depth = -130 - 140 * lev
         inlet = node(n, f"intake-{lev}", -220, -30 + 30 * lev, depth)
         outlet = node(n, f"return-{lev}", 220, -30 + 30 * lev, depth)
-        edge(n, f"intake-shaft-{lev}", "atmosphere-in" if lev == 0 else f"intake-{lev-1}", inlet, "intake", .012 + .004 * lev, 30, level=lev)
-        edge(n, f"return-shaft-{lev}", outlet, "fan-house" if lev == 0 else f"return-{lev-1}", "return", .015 + .003 * lev, 28, level=lev)
+        edge(n, f"intake-shaft-{lev}", "atmosphere-in" if lev == 0 else f"intake-{lev-1}", inlet, "intake", .012 + .004 * lev, 30, level=lev, es=f"Pique de admisión · nivel {lev+1}")
+        edge(n, f"return-shaft-{lev}", outlet, "fan-house" if lev == 0 else f"return-{lev-1}", "return", .015 + .003 * lev, 28, level=lev, es=f"Pique de retorno · nivel {lev+1}")
         previous_i, previous_r = inlet, outlet
         for bay in range(bays):
             skew = (lev % 2) * 35 + bay * 10
             a = node(n, f"l{lev}-in-{bay}", -170 + skew, 160 + bay * 170, depth - 6 * bay)
             b = node(n, f"l{lev}-out-{bay}", 170 + skew, 170 + bay * 170, depth - 6 * bay)
             mid = node(n, f"l{lev}-stope-{bay}", 20 + skew, 205 + bay * 170, depth + 25)
-            edge(n, f"l{lev}-supply-{bay}", previous_i, a, "intake", .025 + .008 * bay, 22, level=lev)
-            edge(n, f"l{lev}-extract-{bay}", b, previous_r, "return", .03 + .007 * bay, 22, level=lev)
+            edge(n, f"l{lev}-supply-{bay}", previous_i, a, "intake", .025 + .008 * bay, 22, level=lev, es=f"Admisión · nivel {lev+1} · tramo {bay+1}")
+            edge(n, f"l{lev}-extract-{bay}", b, previous_r, "return", .03 + .007 * bay, 22, level=lev, es=f"Extracción · nivel {lev+1} · tramo {bay+1}")
             edge(n, f"l{lev}-working-{bay}", a, mid, "working", .75 + .22 * lev + .19 * bay, 13 + bay, 15 + (bay % 2) * 3, lev,
                  en=f"Level {lev+1} · stope {bay+1}", es=f"Nivel {lev+1} · caserón {bay+1}")
-            edge(n, f"l{lev}-stope-return-{bay}", mid, b, "return", .22 + .035 * bay, 15, level=lev)
+            edge(n, f"l{lev}-stope-return-{bay}", mid, b, "return", .22 + .035 * bay, 15, level=lev, es=f"Retorno de caserón {bay+1} · nivel {lev+1}")
             previous_i, previous_r = a, b
         if lev:
-            edge(n, f"ramp-link-{lev}", f"l{lev-1}-in-{bays-1}", f"l{lev}-in-{bays-1}", "crosscut", .85, 16, level=lev)
+            edge(n, f"ramp-link-{lev}", f"l{lev-1}-in-{bays-1}", f"l{lev}-in-{bays-1}", "crosscut", .85, 16, level=lev, es=f"Rampa entre niveles {lev} y {lev+1}")
     return n
 
 
@@ -71,16 +71,16 @@ def pillars():
     for row in range(5):
         for col in range(5):
             node(n, f"r{row}c{col}", col * 160, row * 145, -180 - 3 * row - 2 * col)
-    edge(n, "decline-intake", "atmosphere-in", "r0c0", "intake", .045, 32)
-    edge(n, "district-fan", "r4c4", "atmosphere-out", "fan", .03, 32, fan={"pressure": 2700, "coefficient": .012, "efficiency": .79})
+    edge(n, "decline-intake", "atmosphere-in", "r0c0", "intake", .045, 32, es="Rampa de admisión")
+    edge(n, "district-fan", "r4c4", "atmosphere-out", "fan", .03, 32, fan={"pressure": 2700, "coefficient": .012, "efficiency": .79}, es="Ventilador del distrito")
     for row in range(5):
         for col in range(5):
             if col < 4:
                 working = row in (2, 3, 4) and col == 3
-                edge(n, f"east-{row}-{col}", f"r{row}c{col}", f"r{row}c{col+1}", "working" if working else "intake", .12 + .04 * row if not working else .9 + .2 * row, 18, 22 if working else 0)
+                edge(n, f"east-{row}-{col}", f"r{row}c{col}", f"r{row}c{col+1}", "working" if working else "intake", .12 + .04 * row if not working else .9 + .2 * row, 18, 22 if working else 0, es=f"Galería este · fila {row+1} · tramo {col+1}")
             if row < 4:
                 regulated = col in (1, 2) and row < 3
-                edge(n, f"north-{row}-{col}", f"r{row}c{col}", f"r{row+1}c{col}", "crosscut" if regulated else "return", 9 if regulated else .16 + .025 * col, 15 if regulated else 20)
+                edge(n, f"north-{row}-{col}", f"r{row}c{col}", f"r{row+1}c{col}", "crosscut" if regulated else "return", 9 if regulated else .16 + .025 * col, 15 if regulated else 20, es=f"Cruce norte · fila {row+1} · columna {col+1}")
     return n
 
 
@@ -92,18 +92,19 @@ def districts():
     node(n, "atmosphere-out", 70, -200, 20, 0)
     node(n, "intake-hub", 0, 0, -240)
     node(n, "return-hub", 80, 0, -240)
-    edge(n, "intake-decline", "atmosphere-in", "intake-hub", "intake", .018, 35)
-    edge(n, "district-fan", "return-hub", "atmosphere-out", "fan", .02, 35, fan={"pressure": 3100, "coefficient": .011, "efficiency": .83})
+    edge(n, "intake-decline", "atmosphere-in", "intake-hub", "intake", .018, 35, es="Rampa de admisión")
+    edge(n, "district-fan", "return-hub", "atmosphere-out", "fan", .02, 35, fan={"pressure": 3100, "coefficient": .011, "efficiency": .83}, es="Ventilador del distrito")
     for district, sign, factor in (("west", -1, .7), ("east", 1, 1.7)):
+        district_es = "oeste" if district == "west" else "este"
         last_i, last_r = "intake-hub", "return-hub"
         for k in range(5):
             a = node(n, f"{district}-i{k}", sign*(170 + 160*k), 110 + 65*k, -230 - 13*k)
             b = node(n, f"{district}-r{k}", sign*(170 + 160*k), 310 + 65*k, -230 - 13*k)
             mid = node(n, f"{district}-face{k}", sign*(210+160*k), 220+65*k, -205-13*k)
-            edge(n, f"{district}-supply-{k}", last_i, a, "intake", .04*factor, 24, level=0)
-            edge(n, f"{district}-return-{k}", b, last_r, "return", .05*factor, 24)
-            edge(n, f"{district}-production-{k}", a, mid, "working", (.9+.15*k)*factor, 14, 20, en=f"{district.title()} production {k+1}", es=f"Producción {district} {k+1}")
-            edge(n, f"{district}-face-return-{k}", mid, b, "return", .3*factor, 16)
+            edge(n, f"{district}-supply-{k}", last_i, a, "intake", .04*factor, 24, level=0, es=f"Admisión {district_es} · tramo {k+1}")
+            edge(n, f"{district}-return-{k}", b, last_r, "return", .05*factor, 24, es=f"Retorno {district_es} · tramo {k+1}")
+            edge(n, f"{district}-production-{k}", a, mid, "working", (.9+.15*k)*factor, 14, 20, en=f"{district.title()} production {k+1}", es=f"Producción {district_es} {k+1}")
+            edge(n, f"{district}-face-return-{k}", mid, b, "return", .3*factor, 16, es=f"Retorno de frente {district_es} {k+1}")
             last_i, last_r = a,b
     return n
 
@@ -131,13 +132,13 @@ def create_cases():
         last = f"l{lev}-in-2"
         for k in range(3):
             dest = node(heading, f"duct-{lev}-{k}", -200-70*k, 700+150*k, -130-140*lev-10*k)
-            edge(heading, f"aux-duct-{lev}-{k}", last, dest, "intake", 2.5+.8*k, 2.2, level=lev)
+            edge(heading, f"aux-duct-{lev}-{k}", last, dest, "intake", 2.5+.8*k, 2.2, level=lev, es=f"Ducto auxiliar · nivel {lev+1} · tramo {k+1}")
             last = dest
         face = node(heading, f"heading-face-{lev}", -260, 1190, -170-140*lev)
         ret = node(heading, f"heading-return-{lev}", 90, 1030, -155-140*lev)
-        edge(heading, f"heading-work-{lev}", last, face, "working", 1.4, 12, 8, lev)
-        edge(heading, f"heading-return-a-{lev}", face, ret, "return", .18, 18, level=lev)
-        edge(heading, f"heading-return-b-{lev}", ret, f"l{lev}-out-2", "return", .2, 18, level=lev)
+        edge(heading, f"heading-work-{lev}", last, face, "working", 1.4, 12, 8, lev, es=f"Frente de desarrollo · nivel {lev+1}")
+        edge(heading, f"heading-return-a-{lev}", face, ret, "return", .18, 18, level=lev, es=f"Retorno de desarrollo A · nivel {lev+1}")
+        edge(heading, f"heading-return-b-{lev}", ret, f"l{lev}-out-2", "return", .2, 18, level=lev, es=f"Retorno de desarrollo B · nivel {lev+1}")
     maintenance = rename(deepcopy(base), "return-restriction", "Return-shaft maintenance", "Mantenimiento del pique de retorno", "A temporary return-shaft restriction raises the upper return resistance by eight times. Workings retain their targets; the model exposes redistribution and common-speed feasibility.", "Una restricción temporal multiplica por ocho la resistencia del retorno superior. Las labores mantienen sus objetivos; el modelo muestra redistribución y factibilidad de velocidad común.")
     next(e for e in maintenance["edges"] if e["id"]=="return-shaft-0")["resistance"] *= 8
     booster = rename(deepcopy(deep), "deep-booster", "Deep district booster", "Ventilador auxiliar profundo", "A 900 Pa series booster assists the deepest intake segment. Both fan curves follow the same speed control; compare changed district distribution and combined electrical demand.", "Un ventilador en serie de 900 Pa ayuda al segmento de admisión más profundo. Ambas curvas siguen el mismo control de velocidad; compare distribución y demanda eléctrica conjunta.")
@@ -147,8 +148,8 @@ def create_cases():
     split = rename(levels("split-intake", 3, 4), "split-intake", "Independent lower intake", "Admisión inferior independiente", "A second surface intake and inclined fresh-air raise feed the lowest horizon directly. Compare pressure sharing and deep-level supply against the original three-level mine.", "Una segunda admisión superficial y una chimenea inclinada alimentan directamente el horizonte inferior. Compare presiones y suministro profundo con la mina original de tres niveles.")
     node(split, "second-atmosphere", -800, 300, 20, 0)
     node(split, "intake-raise-mid", -500, 430, -220)
-    edge(split, "independent-intake-upper", "second-atmosphere", "intake-raise-mid", "intake", .12, 26, level=1)
-    edge(split, "independent-intake-lower", "intake-raise-mid", "l2-in-2", "intake", .16, 26, level=2)
+    edge(split, "independent-intake-upper", "second-atmosphere", "intake-raise-mid", "intake", .12, 26, level=1, es="Admisión independiente · tramo superior")
+    edge(split, "independent-intake-lower", "intake-raise-mid", "l2-in-2", "intake", .16, 26, level=2, es="Admisión independiente · tramo inferior")
     incline = rename(levels("narrow-incline", 3, 3), "narrow-incline", "Narrow-vein inclined mine", "Mina inclinada de veta angosta", "Oblique, shrinking working drives create higher resistance toward the deepest horizon. Coordinates depict an inclined orebody; resistance is authored explicitly and is not inferred from the drawing.", "Galerías oblicuas y estrechas generan más resistencia hacia el horizonte profundo. Las coordenadas representan un cuerpo inclinado; la resistencia es explícita y no se infiere del dibujo.")
     for v in incline["nodes"]:
         if "boundary" not in v:
@@ -159,4 +160,11 @@ def create_cases():
             e["resistance"] *= 2.4+e["level"]
             e["area"] = 8-e["level"]
             e["target"] = 12
-    return [base, deep, pillars(), twin, leak, sealed, regulated, heading, maintenance, booster, split, incline]
+    cases = [base, deep, pillars(), twin, leak, sealed, regulated, heading, maintenance, booster, split, incline]
+    # Generic graph-fixture helpers may use identifier-based labels, but the
+    # public authored library requires deliberately supplied Spanish labels.
+    for case in cases:
+        for airway in case["edges"]:
+            if airway["name"]["es"] == airway["name"]["en"]:
+                raise ValueError(f"Authored airway lacks a Spanish label: {case['id']}/{airway['id']}")
+    return cases

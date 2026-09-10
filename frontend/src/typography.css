@@ -1,0 +1,2 @@
+/* System typography avoids remote font requests and remains available offline. */
+strong{font-variant-numeric:tabular-nums}button,select{line-height:1.35}::selection{background:#54b89a50}

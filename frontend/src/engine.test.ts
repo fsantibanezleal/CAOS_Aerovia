@@ -283,3 +283,22 @@ describe('independent SciPy parity', () => {
     expect(Math.abs(computed.targetRatio - entry.result.targetRatio)).toBeLessThan(1e-6)
   })
 })
+
+describe('sampled resistance cross-device reference', () => {
+  const path = resolve(process.cwd(), '../data/artifacts/reference-checks.json')
+  type Sample = { networkId: string; sampleIndex: number; options: typeof DEFAULT_OPTIONS; result: Result; batchMaxAbsFlow: number }
+  const artifact: { fixtures: Sample[] } = existsSync(path) ? JSON.parse(readFileSync(path, 'utf-8')) : { fixtures: [] }
+  const cases: Network[] = JSON.parse(readFileSync(casePath, 'utf-8'))
+  const networks = new Map(cases.map(network => [network.id, network]))
+  it('requires all 96 independent GPU/SciPy resistance-draw checks', () => { expect(artifact.fixtures).toHaveLength(96) })
+  it.each(artifact.fixtures.map(fixture => [`${fixture.networkId}/${fixture.sampleIndex}`, fixture] as const))('matches the independent resistance draw %s', (_, fixture) => {
+    const network = networks.get(fixture.networkId)
+    expect(network).toBeDefined()
+    const result = solveNetwork(network!, fixture.options)
+    verified(result); verified(fixture.result)
+    expect(fixture.batchMaxAbsFlow).toBeLessThan(2e-6)
+    result.flows.forEach((flow, i) => expect(Math.abs(flow - fixture.result.flows[i])).toBeLessThan(2e-6))
+    result.pressures.forEach((pressure, i) => expect(Math.abs(pressure - fixture.result.pressures[i])).toBeLessThan(1e-4))
+    expect(Math.abs(result.fanPowerKW - fixture.result.fanPowerKW)).toBeLessThan(1e-5)
+  })
+})

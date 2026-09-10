@@ -1,0 +1,37 @@
+{
+  "name": "aerovia-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5908 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "npm run typecheck && node prepare-data.mjs && vite build",
+    "postbuild": "node generate-manifest.mjs",
+    "verify:deployment": "node verify-deployment.mjs",
+    "preview": "vite preview --host 127.0.0.1 --port 4908 --strictPort",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "lucide-react": "1.43.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.185.4",
+    "@vitejs/plugin-react": "6.1.1",
+    "prettier": "3.9.6",
+    "typescript": "7.0.2",
+    "vite": "8.2.2",
+    "vitest": "5.0.0"
+  }
+}
