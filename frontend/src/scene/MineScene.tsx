@@ -719,7 +719,10 @@ export default function MineScene(props: MineSceneProps) {
     <div className="av-mine-scene" ref={host} data-testid="mine-scene">
       <div className="av-horizon-labels">
         {horizonLabels.map((h) => (
-          <span key={h.id} style={{ left: h.x, top: h.y }}>
+          <span
+            key={h.id}
+            style={{ left: Math.max(8 + h.text.length * 6.2, h.x), top: h.y }}
+          >
             {h.text}
           </span>
         ))}

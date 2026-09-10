@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { CaseSelector, Tabs } from "@fasl-work/caos-app-shell";
+import { CaseSelector, Tabs, useLangStore } from "@fasl-work/caos-app-shell";
 import {
   MousePointer2,
   Pencil,
@@ -54,7 +54,9 @@ const fmt = (n: number | undefined, d = 2) =>
   n === undefined
     ? "--"
     : Number.isFinite(n)
-      ? n.toLocaleString(undefined, { maximumFractionDigits: d })
+      ? n.toLocaleString(useLangStore.getState().lang, {
+          maximumFractionDigits: d,
+        })
       : "--";
 
 export default function Workbench() {
@@ -115,7 +117,11 @@ export default function Workbench() {
               : []),
           ]}
         />
-        <div className="av-actions" role="toolbar" aria-label={w.b("Project actions", "Acciones del proyecto")}>
+        <div
+          className="av-actions"
+          role="toolbar"
+          aria-label={w.b("Project actions", "Acciones del proyecto")}
+        >
           <button
             onClick={() => setDialog("context")}
             aria-label={w.b(
@@ -1212,6 +1218,48 @@ function WorkspaceMode({
                       </span>
                       <strong>{fmt(w.chosenCase.ensemble.cv * 100)}%</strong>
                     </div>
+                    <div>
+                      <span>{b("Fan power P05–P95", "Potencia P05–P95")}</span>
+                      <strong>
+                        {fmt(w.chosenCase.ensemble.powerP05)} --{" "}
+                        {fmt(w.chosenCase.ensemble.powerP95)} kW
+                      </strong>
+                    </div>
+                    {selectedIndex >= 0 && (
+                      <section
+                        className="av-mobile-risk-summary"
+                        aria-label={b(
+                          "Selected airway uncertainty",
+                          "Incertidumbre de galería seleccionada",
+                        )}
+                      >
+                        <h4>{edge?.name[w.lang]}</h4>
+                        <p>
+                          {b("Flow P05–P95", "Caudal P05–P95")}:{" "}
+                          <strong>
+                            {fmt(w.chosenCase.ensemble.flowP05[selectedIndex])}{" "}
+                            --{" "}
+                            {fmt(w.chosenCase.ensemble.flowP95[selectedIndex])}{" "}
+                            m³/s
+                          </strong>
+                        </p>
+                        <p>
+                          {b("Median", "Mediana")}:{" "}
+                          <strong>
+                            {fmt(w.chosenCase.ensemble.flowP50[selectedIndex])}{" "}
+                            m³/s
+                          </strong>
+                        </p>
+                        <p>
+                          {b("Target probability", "Probabilidad de objetivo")}:{" "}
+                          <strong>
+                            {edge?.target
+                              ? `${fmt(w.chosenCase.ensemble.targetProbability[selectedIndex] * 100)}%`
+                              : b("no target", "sin objetivo")}
+                          </strong>
+                        </p>
+                      </section>
+                    )}
                   </div>
                 ) : (
                   <p className="av-hint">
@@ -1579,6 +1627,8 @@ function WorkspaceMode({
           >
             <EngineeringReadout
               w={w}
+              result={displayResult}
+              approximation={mode === "models" ? predictionMethod : null}
               mode={mode}
               analysis={analysis}
               route={routing?.path?.edgeIds ?? []}
@@ -1785,11 +1835,15 @@ function OperatingInputs({ w }: { w: WorkbenchState }) {
 
 function EngineeringReadout({
   w,
+  result,
+  approximation,
   mode,
   analysis,
   route,
 }: {
   w: WorkbenchState;
+  result: Result | null;
+  approximation: string | null;
   mode: Mode;
   analysis: "duty" | "sensitivity" | "baseline";
   route: string[];
@@ -1797,7 +1851,7 @@ function EngineeringReadout({
   const b = w.b,
     edge = w.edge,
     i = w.selectedIndex,
-    r = w.valid ? w.result : null;
+    r = result;
   if (
     mode === "operations" &&
     analysis === "duty" &&
@@ -1998,7 +2052,14 @@ function EngineeringReadout({
   return (
     <div className="av-selected-readout">
       <div>
-        <span>{b("Selected airway", "Galería seleccionada")}</span>
+        <span>
+          {approximation
+            ? b(
+                "Selected airway · approximation",
+                "Galería seleccionada · aproximación",
+              )
+            : b("Selected airway", "Galería seleccionada")}
+        </span>
         <h3>
           {edge?.name[w.lang] ?? b("Select a tunnel", "Seleccione una galería")}
         </h3>

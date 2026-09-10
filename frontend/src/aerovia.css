@@ -20,6 +20,9 @@
 .av-risk-chart .av-interval-readout strong {
   font-size: 0.83rem;
 }
+.av-mobile-risk-summary {
+  display: none;
+}
 .av-controls .av-learned .plot {
   height: 160px;
   min-height: 160px;
@@ -29,6 +32,12 @@
   min-height: 90px;
 }
 @media (max-width: 760px) {
+  .av-mobile-risk-summary {
+    display: block;
+  }
+  .av-mobile-risk-summary h4 {
+    margin: 0.5rem 0;
+  }
   .av-risk-chart {
     grid-template-columns: minmax(0, 1fr);
   }

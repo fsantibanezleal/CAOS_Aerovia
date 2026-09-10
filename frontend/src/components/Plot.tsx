@@ -134,7 +134,7 @@ export default function Plot({
               y={bottom + 15}
               textAnchor="middle"
             >
-              {(minx + t * (maxx - minx)).toFixed(1)}
+              {Number((minx + t * (maxx - minx)).toPrecision(3)).toString()}
             </text>
           </g>
         ))}
