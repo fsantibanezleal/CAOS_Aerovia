@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.02.001: 2026-09-10
+
+Visual interaction release. The solved ventilation network now exposes a live, data-driven flow field: tracer particles propagate along the signed solved flow, fan rotors animate at the calculated duty, and the scene identifies the active airflow stream. During tracer playback the selected frame remains the source of truth for recoloring and the worker keeps the timeline responsive.
+
+- Added a visible animated stream field derived from the solved airway flows, with concentration-aware color during tracer inspection.
+- Added a live-airflow status marker and continuous fan rotor motion tied to operating flow.
+- Added a browser regression that proves the stream tick advances, while transport playback and scheduled fan tests continue to pass.
+
 ## v0.02.000: 2026-09-10
 
 Complete rebuild after the initial interface was rejected. The numerical foundation remains, while the product now supports direct design authoring and calculated time-dependent analysis through the actual shared CAOS shell.

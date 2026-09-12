@@ -49,6 +49,13 @@ type Controller = {
   dispose: () => void;
 };
 
+type StreamParticle = {
+  edge: number;
+  phase: number;
+  speed: number;
+  cellCount: number;
+};
+
 /** Direct design surface. Geometry is rebuilt only when geometry changes; scalar fields recolor cells. */
 export default function MineScene(props: MineSceneProps) {
   const host = useRef<HTMLDivElement>(null),
@@ -110,6 +117,15 @@ export default function MineScene(props: MineSceneProps) {
       edges: T.Object3D[] = [],
       nodes: T.Mesh[] = [],
       grid: T.GridHelper | null = null;
+    let streamPoints: T.Points | null = null,
+      streamParticles: StreamParticle[] = [],
+      streamPositions: T.BufferAttribute | null = null,
+      streamColors: T.BufferAttribute | null = null,
+      fanRotors: Array<{ group: T.Group; rate: number }> = [],
+      animationFrame = 0,
+      animationTime = 0,
+      lastAnimation = performance.now(),
+      animationTick = 0;
     let center = new T.Vector3(),
       scale = 1,
       boundsKey = "",
@@ -205,9 +221,68 @@ export default function MineScene(props: MineSceneProps) {
           ),
       );
     }
+    function updateStreamField(now = performance.now()) {
+      if (!streamPoints || !streamPositions || !streamColors) return;
+      const positions = streamPositions;
+      const colors = streamColors;
+      const p = latest.current;
+      const dt = Math.min(0.05, Math.max(0, (now - lastAnimation) / 1000));
+      lastAnimation = now;
+      animationTime += dt;
+      const byId = new Map(p.network.nodes.map((n) => [n.id, n]));
+      const dark = p.theme === "dark";
+      const color = new T.Color();
+      streamParticles.forEach((particle, index) => {
+        const edge = p.network.edges[particle.edge];
+        if (!edge) return;
+        const from = byId.get(edge.from);
+        const to = byId.get(edge.to);
+        if (!from || !to) return;
+        const signed = p.result?.flows[particle.edge] ?? 0;
+        const direction = signed < 0 ? -1 : 1;
+        const speed = 0.12 + Math.min(0.72, Math.abs(signed) / 85);
+        const travel = (particle.phase + animationTime * speed * direction) % 1;
+        const u = travel < 0 ? travel + 1 : travel;
+        const start = map(direction > 0 ? from : to);
+        const end = map(direction > 0 ? to : from);
+        const position = start.lerp(end, u);
+        // Lift the stream above the solid airway skin so motion remains visible in the scene.
+        position.y += 1.35 + Math.sin((u * 2 + particle.phase) * Math.PI) * 0.22;
+        positions.setXYZ(index, position.x, position.y, position.z);
+        const concentration = p.frame?.cellConcentrations[particle.edge]?.[
+          Math.min(particle.cellCount - 1, Math.floor(u * particle.cellCount))
+        ] ?? 0;
+        const normalized = Math.min(1, Math.log1p(100 * concentration) / Math.log(101));
+        p.metric === "tracer"
+          ? color.setHSL(0.58 - normalized * 0.58, 0.95, dark ? 0.58 : 0.42)
+          : color.setHSL(0.53 - Math.min(1, Math.abs(signed) / 40) * 0.18, 0.9, dark ? 0.64 : 0.42);
+        colors.setXYZ(index, color.r, color.g, color.b);
+      });
+      positions.needsUpdate = true;
+      colors.needsUpdate = true;
+      streamPoints.visible = !!p.result?.converged;
+      for (const rotor of fanRotors) rotor.group.rotation.z += dt * rotor.rate;
+    }
     function render() {
+      updateStreamField();
       renderer.render(scene, camera);
       drawLabels();
+    }
+    function animate(now: number) {
+      animationFrame = requestAnimationFrame(animate);
+      animationTick += 1;
+      // The stream is deliberately sampled at roughly 7 Hz. This leaves the browser
+      // worker and interaction budget available for transport and editing while
+      // keeping the motion unmistakable.
+      if (now - lastAnimation < 150) return;
+      element.dataset.streamTick = String(animationTick);
+      // Transport frames are repainted by the selected timeline frame. Avoid
+      // a second continuous WebGL loop while the worker and slider are moving.
+      // The live flow field resumes as soon as the scene leaves transport mode.
+      if (latest.current.frame) return;
+      if (document.querySelector(".av-dialog[open], [role=\"dialog\"]")) return;
+      updateStreamField(now);
+      renderer.render(scene, camera);
     }
     function disposeGroup() {
       gizmo.detach();
@@ -225,6 +300,11 @@ export default function MineScene(props: MineSceneProps) {
       edges = [];
       edgeGlyphs = [];
       horizons = [];
+      streamPoints = null;
+      streamParticles = [];
+      streamPositions = null;
+      streamColors = null;
+      fanRotors = [];
     }
     function fit() {
       const p = latest.current;
@@ -324,6 +404,36 @@ export default function MineScene(props: MineSceneProps) {
         });
       }
       const cellCount = p.frame?.cellConcentrations[0]?.length ?? 8;
+      const pointCapacity = p.network.edges.length * 6;
+      const pointGeometry = new T.BufferGeometry();
+      streamPositions = new T.Float32BufferAttribute(new Float32Array(pointCapacity * 3), 3);
+      streamColors = new T.Float32BufferAttribute(new Float32Array(pointCapacity * 3), 3);
+      pointGeometry.setAttribute("position", streamPositions);
+      pointGeometry.setAttribute("color", streamColors);
+      streamPoints = new T.Points(
+        pointGeometry,
+        new T.PointsMaterial({
+          size: Math.max(4.2, scale * 16),
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.94,
+          blending: T.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true,
+        }),
+      );
+      streamParticles = [];
+      p.network.edges.forEach((edge, edgeIndex) => {
+        const flow = Math.abs(p.result?.flows[edgeIndex] ?? 0);
+        for (let particle = 0; particle < 6; particle++)
+          streamParticles.push({
+            edge: edgeIndex,
+            phase: (particle / 6 + edgeIndex * 0.071) % 1,
+            speed: 0.12 + Math.min(0.72, flow / 85),
+            cellCount,
+          });
+      });
+      geometry.add(streamPoints);
       p.network.edges.forEach((edge, i) => {
         const start = map(byId.get(edge.from)!),
           end = map(byId.get(edge.to)!);
@@ -392,6 +502,10 @@ export default function MineScene(props: MineSceneProps) {
             }),
           );
           fan.add(ring);
+          fanRotors.push({
+            group: fan,
+            rate: 2.5 + Math.min(8, Math.abs(p.result?.flows[i] ?? 0) / 8),
+          });
           for (let blade = 0; blade < 4; blade++) {
             const fin = new T.Mesh(
               new T.BoxGeometry(radius * 0.42, radius * 2.5, radius * 0.17),
@@ -658,6 +772,7 @@ export default function MineScene(props: MineSceneProps) {
     renderer.domElement.addEventListener("pointerdown", onDown);
     renderer.domElement.addEventListener("pointerup", onUp);
     renderer.domElement.addEventListener("pointermove", onPointer);
+    animationFrame = requestAnimationFrame(animate);
     const resize = new ResizeObserver(() => {
       const { clientWidth: w, clientHeight: h } = element;
       if (!w || !h) return;
@@ -669,6 +784,7 @@ export default function MineScene(props: MineSceneProps) {
     resize.observe(element);
     const dispose = () => {
       resize.disconnect();
+      cancelAnimationFrame(animationFrame);
       orbit.dispose();
       gizmo.dispose();
       disposeGroup();
@@ -748,6 +864,12 @@ export default function MineScene(props: MineSceneProps) {
         ))}
       </div>
       {hover && <output className="av-scene-hover">{hover}</output>}
+      {props.result?.converged && (
+        <div className="av-stream-status" aria-label={props.lang === "en" ? "Live airflow stream" : "Flujo de aire en vivo"}>
+          <i aria-hidden="true" />
+          <span>{props.lang === "en" ? "LIVE AIRFLOW" : "FLUJO EN VIVO"}</span>
+        </div>
+      )}
       <div className="av-orientation" aria-hidden="true">
         <span>Z ↑</span>
         <span>X → · Y ↗</span>
