@@ -2,8 +2,6 @@ name: Verify and publish Pages
 
 on:
   push:
-    branches: [main, develop, 'task/**', 'work/**']
-  pull_request:
     branches: [main, develop]
   workflow_dispatch:
 
