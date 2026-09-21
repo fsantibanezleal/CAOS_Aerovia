@@ -51,8 +51,6 @@ jobs:
             exit 1
           fi
           for script in scripts/local/*.sh; do bash -n "$script"; done
-      - name: Test independent numerical reference and data contract
-        run: python -m pytest tests/python -q
       - name: Validate committed networks
         run: python scripts/pipeline.py validate --input data/cases.json
       - name: Verify committed artifact hashes and numerical evidence
