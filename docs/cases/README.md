@@ -1,6 +1,6 @@
 # Authored engineering case library
 
-These twelve networks are transparent engineering scenarios authored for Aerovia under Apache-2.0. They are useful for reproducing a calculation, comparing interventions and learning the workflow. They are not surveyed or calibrated operating mines. Resistance, fan curves and targets are supplied design assumptions. No legal airflow target is implied.
+These twelve networks are transparent engineering scenarios authored for Aerovia and released under Apache-2.0, the licence their checksummed provenance records (the source code is MIT since 0.03.000). They are useful for reproducing a calculation, comparing interventions and learning the workflow. They are not surveyed or calibrated operating mines. Resistance, fan curves and targets are supplied design assumptions. No legal airflow target is implied.
 
 Recreate identical input values with `python scripts/pipeline.py create`. Each case is stored in `data/cases.json`, and the corresponding accepted reference result, GPU uncertainty and checksum are in `data/artifacts`. Full source generation is in `data-pipeline/aerovia_pipeline/cases.py`. Coordinates use meters in an x/y plan and z elevation. Changing display level separation does not change the physical network.
 

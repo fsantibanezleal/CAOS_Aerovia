@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Pause, Play } from "lucide-react";
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
@@ -62,6 +63,13 @@ export default function MineScene(props: MineSceneProps) {
     latest = useRef(props),
     controller = useRef<Controller | null>(null);
   latest.current = props;
+  // The airflow stream starts PAUSED and moves only when the reader asks. It used to run a
+  // requestAnimationFrame loop from the first view with no control and no regard for
+  // prefers-reduced-motion. Paused, the field is still drawn, frozen, and every repaint (orbit,
+  // edit, theme) redraws it without advancing time.
+  const [streaming, setStreaming] = useState(false),
+    streamingRef = useRef(false),
+    streamControl = useRef<{ start(): void; stop(): void } | null>(null);
   const [labels, setLabels] = useState<NodeLabel[]>([]),
     [hover, setHover] = useState(""),
     [failure, setFailure] = useState("");
@@ -226,7 +234,7 @@ export default function MineScene(props: MineSceneProps) {
       const positions = streamPositions;
       const colors = streamColors;
       const p = latest.current;
-      const dt = Math.min(0.05, Math.max(0, (now - lastAnimation) / 1000));
+      const dt = streamingRef.current ? Math.min(0.05, Math.max(0, (now - lastAnimation) / 1000)) : 0;
       lastAnimation = now;
       animationTime += dt;
       const byId = new Map(p.network.nodes.map((n) => [n.id, n]));
@@ -269,6 +277,10 @@ export default function MineScene(props: MineSceneProps) {
       drawLabels();
     }
     function animate(now: number) {
+      if (!streamingRef.current) {
+        animationFrame = 0;
+        return;
+      }
       animationFrame = requestAnimationFrame(animate);
       animationTick += 1;
       // The stream is deliberately sampled at roughly 7 Hz. This leaves the browser
@@ -772,7 +784,18 @@ export default function MineScene(props: MineSceneProps) {
     renderer.domElement.addEventListener("pointerdown", onDown);
     renderer.domElement.addEventListener("pointerup", onUp);
     renderer.domElement.addEventListener("pointermove", onPointer);
-    animationFrame = requestAnimationFrame(animate);
+    streamControl.current = {
+      start() {
+        lastAnimation = performance.now();
+        if (!animationFrame) animationFrame = requestAnimationFrame(animate);
+      },
+      stop() {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        render();
+      },
+    };
+    if (streamingRef.current) animationFrame = requestAnimationFrame(animate);
     const resize = new ResizeObserver(() => {
       const { clientWidth: w, clientHeight: h } = element;
       if (!w || !h) return;
@@ -797,9 +820,15 @@ export default function MineScene(props: MineSceneProps) {
     rebuild();
     return () => {
       controller.current = null;
+      streamControl.current = null;
       dispose();
     };
   }, []);
+  useEffect(() => {
+    streamingRef.current = streaming;
+    if (streaming) streamControl.current?.start();
+    else streamControl.current?.stop();
+  }, [streaming]);
   useEffect(() => {
     controller.current?.rebuild();
   }, [
@@ -865,10 +894,26 @@ export default function MineScene(props: MineSceneProps) {
       </div>
       {hover && <output className="av-scene-hover">{hover}</output>}
       {props.result?.converged && (
-        <div className="av-stream-status" aria-label={props.lang === "en" ? "Live airflow stream" : "Flujo de aire en vivo"}>
+        <button
+          type="button"
+          className={`av-stream-status${streaming ? "" : " is-paused"}`}
+          aria-pressed={streaming}
+          aria-label={
+            streaming
+              ? props.lang === "en" ? "Pause the airflow animation" : "Pausar la animación del flujo"
+              : props.lang === "en" ? "Play the airflow animation" : "Animar el flujo de aire"
+          }
+          data-streaming={streaming ? "true" : "false"}
+          onClick={() => setStreaming((on) => !on)}
+        >
           <i aria-hidden="true" />
-          <span>{props.lang === "en" ? "LIVE AIRFLOW" : "FLUJO EN VIVO"}</span>
-        </div>
+          <span>
+            {streaming
+              ? props.lang === "en" ? "LIVE AIRFLOW" : "FLUJO EN VIVO"
+              : props.lang === "en" ? "AIRFLOW PAUSED" : "FLUJO EN PAUSA"}
+          </span>
+          {streaming ? <Pause size={11} aria-hidden="true" /> : <Play size={11} aria-hidden="true" />}
+        </button>
       )}
       <div className="av-orientation" aria-hidden="true">
         <span>Z ↑</span>

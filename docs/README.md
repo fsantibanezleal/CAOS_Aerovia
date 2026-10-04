@@ -53,6 +53,6 @@ The [guide index](guides/guides.md) links local execution, acquisition/import, C
 deployment verification. Normal processing writes to ignored local directories; releases deliberately
 promote a complete verified input/artifact set.
 
-Source and authored data use [Apache-2.0](../LICENSE). Follow [contribution guidance](../CONTRIBUTING.md)
+The source uses [MIT](../LICENSE) since 0.03.000; the authored cases and trained models keep the Apache-2.0 licence recorded in their checksummed metadata. Follow [contribution guidance](../CONTRIBUTING.md)
 when changing a contract, equation or artifact. A successful solve establishes numerical closure for
 the entered model; field applicability and survey calibration are separate questions.

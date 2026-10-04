@@ -420,7 +420,25 @@
   font: 600 0.68rem var(--font-mono);
   letter-spacing: 0.08em;
   box-shadow: 0 0 18px color-mix(in srgb, #2fd5cc 24%, transparent);
-  pointer-events: none;
+  cursor: pointer;
+}
+.av-stream-status svg {
+  opacity: 0.85;
+}
+.av-stream-status:focus-visible {
+  outline: 2px solid #59d7d0;
+  outline-offset: 2px;
+}
+/* Paused is the default: the dot stops pulsing, so nothing on the page moves until asked. */
+.av-stream-status.is-paused i {
+  animation: none;
+  background: #8aa4b4;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .av-stream-status i {
+    animation: none;
+  }
 }
 .av-stream-status i {
   display: block;
