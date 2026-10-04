@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.03.000: 2026-10-04
+
+Pre-publication fixes (#12).
+
+- The airflow stream is paused by default. The field is drawn frozen on load, the status badge reads "AIRFLOW PAUSED" and is the control: it plays and pauses the stream, and time advances only while it plays, so orbiting or editing a paused scene moves nothing. The badge's pulse stops while paused and under `prefers-reduced-motion`. The browser journey now proves the stream does not tick until played, ticks while playing and stops when paused.
+- `<html lang>` follows the interface language on every route. Only the workbench wrote it, so a direct load of the five content routes in Spanish declared `lang="en"`; the journey now loads each route directly and checks it.
+- The source is MIT licensed, the CAOS standard. The twelve authored cases and the trained models were released under Apache-2.0 and keep that licence in their checksummed metadata (case provenance, catalog, model registry, ONNX doc strings); the README and the docs say so.
+- The CI-budget changes made after v0.02.001 (trunk-only triggers, ADR-0074) ship in this release.
+
 ## v0.02.001: 2026-09-10
 
 Visual interaction release. The solved ventilation network now exposes a live, data-driven flow field: tracer particles propagate along the signed solved flow, fan rotors animate at the calculated duty, and the scene identifies the active airflow stream. During tracer playback the selected frame remains the source of truth for recoloring and the worker keeps the timeline responsive.

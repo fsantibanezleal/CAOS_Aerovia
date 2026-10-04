@@ -83,6 +83,13 @@ for (const { lang, theme } of appearances)
         animations: "disabled",
       });
     }
+    // A direct load of each content route declares the page's language too. Navigation inside one
+    // session hid the defect: the workbench set lang on "/" and the attribute survived the clicks,
+    // while a reader arriving on /benchmark in Spanish got lang="en".
+    for (const route of routes.filter((r) => r.path !== "/")) {
+      await page.goto(route.path);
+      await expect(page.locator("html")).toHaveAttribute("lang", lang);
+    }
     expect(errors).toEqual([]);
   });
 
@@ -128,16 +135,30 @@ test("the benchmark reruns exact calculations and exposes same-input numerical a
   expect(uiNumber(await difference.innerText())).toBeLessThan(1e-5);
 });
 
-test("the solved instrument exposes a continuously animated airflow stream", async ({ page }) => {
+test("the airflow stream is paused until the reader plays it, and pauses again", async ({ page }) => {
+  // No autoplay: the field is drawn but frozen on load, the badge says so, and nothing ticks.
   await openWorkbench(page);
-  await expect(page.getByText("LIVE AIRFLOW", { exact: true })).toBeVisible();
+  const toggle = page.getByRole("button", { name: "Play the airflow animation", exact: true });
+  await expect(toggle).toBeVisible();
+  await expect(page.getByText("AIRFLOW PAUSED", { exact: true })).toBeVisible();
   const scene = page.getByTestId("mine-scene");
+  const idle = await scene.getAttribute("data-stream-tick");
+  await page.waitForTimeout(600);
+  expect(await scene.getAttribute("data-stream-tick")).toBe(idle);
+
+  await toggle.click();
+  await expect(page.getByText("LIVE AIRFLOW", { exact: true })).toBeVisible();
   await expect(scene).toHaveAttribute("data-stream-tick", /\d+/, { timeout: 12000 });
   const first = await scene.getAttribute("data-stream-tick");
-  await page.waitForTimeout(180);
+  await page.waitForTimeout(400);
   const second = await scene.getAttribute("data-stream-tick");
-  expect(first).not.toBeNull();
   expect(second).not.toBe(first);
+
+  await page.getByRole("button", { name: "Pause the airflow animation", exact: true }).click();
+  await expect(page.getByText("AIRFLOW PAUSED", { exact: true })).toBeVisible();
+  const stopped = await scene.getAttribute("data-stream-tick");
+  await page.waitForTimeout(600);
+  expect(await scene.getAttribute("data-stream-tick")).toBe(stopped);
 });
 
 test("held-out browser inference runs both exported models and renders actual comparison errors", async ({

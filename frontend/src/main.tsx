@@ -7,6 +7,7 @@ import {
   applyTheme,
   readTheme,
   CitationsProvider,
+  useShellLang,
   type ShellConfig,
 } from "@fasl-work/caos-app-shell";
 import "@fasl-work/caos-app-shell/styles.css";
@@ -36,13 +37,23 @@ const config: ShellConfig = {
   links: { github: "https://github.com/fsantibanezleal/CAOS_Aerovia" },
   footer: {
     attribution: false,
-    license: { en: "Apache-2.0", es: "Apache-2.0" },
+    license: { en: "MIT", es: "MIT" },
     provenance: {
       en: "Authored networks · local computation",
       es: "Redes construidas · cálculo local",
     },
   },
 };
+// The document declares the language it is written in, on every route. The shell never writes it
+// (CAOS_MANAGE conventions/shell-known-defects.md, entry 4) and only the workbench hook did, so the
+// five content routes declared lang="en" in Spanish until 0.03.000.
+function DocumentLanguage(): null {
+  const lang = useShellLang();
+  React.useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+  return null;
+}
 class Boundary extends React.Component<
   { children: React.ReactNode },
   { error: boolean }
@@ -70,6 +81,7 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <CitationsProvider items={CONTENT_CITATIONS}>
         <AppShell config={config}>
+          <DocumentLanguage />
           <React.Suspense
             fallback={
               <div className="page-body prose" role="status">
