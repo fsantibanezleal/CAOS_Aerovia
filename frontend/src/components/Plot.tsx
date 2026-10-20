@@ -2,6 +2,12 @@
 import { useShellLang } from "@fasl-work/caos-app-shell";
 import { fixed } from "../presentation";
 import "./plot.css";
+/** An x-axis tick at three significant figures, in the interface language's decimal separator. */
+export function tickX(v: number, lang: "en" | "es"): string {
+  const n = Number(v.toPrecision(3));
+  const decimals = n === 0 ? 0 : Math.max(0, 2 - Math.floor(Math.log10(Math.abs(n))));
+  return fixed(n, decimals, lang);
+}
 export interface Series {
   label: string;
   color: string;
@@ -138,7 +144,7 @@ export default function Plot({
               y={bottom + 15}
               textAnchor="middle"
             >
-              {Number((minx + t * (maxx - minx)).toPrecision(3)).toString()}
+              {tickX(minx + t * (maxx - minx), lang)}
             </text>
           </g>
         ))}
