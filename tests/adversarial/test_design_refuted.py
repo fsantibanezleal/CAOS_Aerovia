@@ -61,6 +61,7 @@ def test_every_node_gate_of_design_passes_on_the_clean_copy(web: Path) -> None:
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_the_browser_journey_of_design_passes_on_the_clean_build(web: Path) -> None:
     assert_journeys_clean(web, "workbench.spec.ts", [DS011])
 
@@ -148,6 +149,7 @@ def test_ds_010_a_workspace_cleared_before_its_replacement_is_valid_is_caught(we
 # ---------------------------------------------------------------- the project dialog
 
 @needs_browser
+@pytest.mark.full_plants
 def test_ds_011_a_failed_import_that_resets_the_inputs_is_caught(web: Path) -> None:
     plant(web, fe("src/workbench/ProjectDialog.tsx"), "        if (w.importText(text)) close();\n",
           "        const imported = w.importText(text);\n"

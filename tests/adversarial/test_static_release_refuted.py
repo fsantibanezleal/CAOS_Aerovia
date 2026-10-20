@@ -261,11 +261,13 @@ def test_sr_008_a_ci_step_broader_than_the_budget_is_caught(tmp_path: Path) -> N
 # ---------------------------------------------------------------- the deep link
 
 @needs_browser
+@pytest.mark.full_plants
 def test_the_deep_link_journey_passes_on_the_clean_build_served_as_a_static_host(web: Path) -> None:
     assert_journeys_clean(web, "routes.spec.ts", [DEEP_LINK], spa=False)
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_sr_009_a_build_without_the_app_route_entry_is_caught(web: Path) -> None:
     # `vite preview` answers any path with the index, so the build is served as a static host serves it (spa=False)
     plant(web, fe("scripts/generate-manifest.mjs"), 'for (const route of ["app", "introduction"', 'for (const route of ["introduction"')

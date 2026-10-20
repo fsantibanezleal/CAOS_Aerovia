@@ -93,6 +93,7 @@ def test_every_python_gate_of_base_0_08_passes_on_the_clean_copy(repo: Path) -> 
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_every_browser_journey_of_base_0_08_passes_on_the_clean_build(web: Path) -> None:
     assert_journeys_clean(web, "routes.spec.ts", [HEADER, OLD_LINK])
     # the build is served once per call; the other two specs read the same build
@@ -111,12 +112,14 @@ def test_bw_001_a_root_that_renders_the_workbench_is_caught(web: Path) -> None:
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_bw_002_a_header_with_the_app_last_is_caught(web: Path) -> None:
     plant(web, fe("src/main.tsx"), "routes: STANDARD_ROUTES,", "routes: [...STANDARD_ROUTES.slice(1), STANDARD_ROUTES[0]],")
     assert_journeys_caught(web, "routes.spec.ts", [HEADER])
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_bw_003_a_forward_that_drops_the_query_string_is_caught(web: Path) -> None:
     # the shell's Landing forwards `/?case=B2#x` to `/app?case=B2#x`; the plant is a landing that forwards to a bare `/app`
     main = fe("src/main.tsx")
@@ -157,6 +160,7 @@ def test_bw_006_a_selection_key_that_ignores_the_resistance_scale_is_caught(web:
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_bw_007_a_focus_exit_that_resets_the_group_is_caught(web: Path) -> None:
     plant(web, fe("src/workbench/Workbench.tsx"), "focus={{ hud: s.hud, onChange: setFocusOn }}",
           'focus={{ hud: s.hud, onChange: (on: boolean) => { setFocusOn(on); if (!on) selectGroup("design"); } }}')
@@ -192,6 +196,7 @@ def test_bw_010_an_illustration_with_a_raw_colour_or_no_reduced_motion_is_caught
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_bw_011_an_introduction_that_opens_on_the_technical_view_is_caught(web: Path) -> None:
     plant(web, fe("src/pages/Introduction.tsx"), "initial={initial}", 'initial={initial ?? "technical"}')
     assert_journeys_caught(web, "documentation.spec.ts", [INTRO])

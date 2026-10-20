@@ -60,6 +60,7 @@ def test_uq_006_a_summary_that_defaults_a_missing_failure_count_is_caught(tmp_pa
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_uq_007_a_recorded_interval_kept_after_an_edit_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     browser_plant(tmp_path, tmp_path_factory, "e2e/workbench.spec.ts",
                   "recorded uncertainty selects an airway and disappears when the operating inputs no longer match",
