@@ -17,6 +17,8 @@ const CAPTION: Record<Lang, string> = {
   en: 'Every contract of the catalog with the state the readiness document declares for it',
   es: 'Cada contrato del catálogo con el estado que declara el documento de disponibilidad',
 };
+/** The reason column keeps a readable width; below it the region scrolls sideways instead of breaking the text letter by letter. */
+const REASON_MIN = '16rem';
 const LOADING: Record<Lang, string> = { en: 'Loading the readiness document', es: 'Cargando el documento de disponibilidad' };
 
 /** The table for a given document: pure, so a test renders it for either language and for the three document states. */
@@ -36,7 +38,7 @@ export function ReadinessRows({ doc, lang }: { doc: Readiness | null | undefined
         <thead>
           <tr>
             {HEAD[lang].map((h, i) => (
-              <th key={h} scope="col" className={i === 5 ? 'caos-col-text' : undefined} style={i === 5 ? { minWidth: 0 } : undefined}>
+              <th key={h} scope="col" className={i === 5 ? 'caos-col-text' : undefined} style={i === 5 ? { minWidth: REASON_MIN } : undefined}>
                 {h}
               </th>
             ))}
@@ -50,7 +52,7 @@ export function ReadinessRows({ doc, lang }: { doc: Readiness | null | undefined
               <td>{c.status}</td>
               <td>{c.provenance ? PROVENANCE_LABEL[c.provenance][lang] : '-'}</td>
               <td>{STATE_LABEL[c.state][lang]}</td>
-              <td className="caos-col-text" style={{ ...WRAP, minWidth: 0 }}>
+              <td className="caos-col-text" style={{ ...WRAP, minWidth: REASON_MIN }}>
                 {c.reason ? c.reason[lang] : '-'}
               </td>
             </tr>
