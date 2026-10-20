@@ -1,5 +1,6 @@
 import type { Network, Options, Result } from "../contracts";
 import Plot from "./Plot";
+import { fixed } from "../presentation";
 
 export type FanOperatingState =
   | { kind: "no-fans" }
@@ -104,7 +105,7 @@ export default function FanPlot({
   const state = fanOperatingState(network, options, result);
   if (state.kind === "no-fans")
     return (
-      <div className="analysis-card">
+      <div>
         <h3>{b("Pressure-driven network", "Red impulsada por presión")}</h3>
         <p>
           {b(
@@ -116,7 +117,7 @@ export default function FanPlot({
     );
   if (state.kind === "all-closed")
     return (
-      <div className="analysis-card">
+      <div>
         <h3>
           {b(
             "All fan branches are closed",
@@ -133,7 +134,7 @@ export default function FanPlot({
     );
   if (state.kind === "unavailable")
     return (
-      <div className="analysis-card">
+      <div>
         <h3>
           {b(
             "Fan operating point unavailable",
@@ -156,7 +157,7 @@ export default function FanPlot({
   const resistance = equivalent ? head / (q * q) : 0;
   const system = fan.map(({ x }) => ({ x, y: resistance * x * x }));
   return (
-    <div className="analysis-grid">
+    <div>
       <Plot
         title={b("Fan operating point", "Punto de operación del ventilador")}
         xlabel="m³/s"
@@ -182,14 +183,14 @@ export default function FanPlot({
           },
         ]}
       />
-      <div className="analysis-card">
-        <div className="section-label">
+      <div>
+        <div>
           <span>
             {b("PRESSURE MEETS RESISTANCE", "PRESIÓN FRENTE A RESISTENCIA")}
           </span>
           <span>{b("current calculation", "cálculo actual")}</span>
         </div>
-        <h2 className="fan-headline">
+        <h2>
           {b(
             "The fan and the mine set the flow together.",
             "El ventilador y la mina determinan juntos el caudal.",
@@ -207,13 +208,13 @@ export default function FanPlot({
             "La curva mostrada se restringe al caudal hacia adelante y presión entregada no negativa. Su dominio termina en descarga libre cuando el coeficiente cuadrático es positivo.",
           )}
         </p>
-        <div className="cost-line">
+        <div>
           <span>{b("Delivered fan pressure", "Presión entregada")}</span>
-          <strong>{head.toFixed(1)} Pa</strong>
+          <strong>{fixed(head, 1, lang)} Pa</strong>
         </div>
-        <div className="cost-line">
+        <div>
           <span>{b("Volume flow through fan", "Caudal del ventilador")}</span>
-          <strong>{q.toFixed(2)} m³/s</strong>
+          <strong>{fixed(q, 2, lang)} m³/s</strong>
         </div>
         <p>
           {equivalent

@@ -14,6 +14,7 @@ import {
   type ColumnMap,
 } from "../engine/tableImport";
 import { download } from "../storage";
+import { fixed } from "../presentation";
 import CaseContext from "../content/CaseContext";
 
 export default function ProjectDialog({
@@ -230,7 +231,7 @@ export default function ProjectDialog({
                       </td>
                       <td>{e.area}</td>
                       <td>{e.resistance.toPrecision(3)}</td>
-                      <td>{w.valid ? w.result!.flows[i].toFixed(2) : "--"}</td>
+                      <td>{w.valid ? fixed(w.result!.flows[i], 2, w.lang) : "--"}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -3,16 +3,17 @@ import { DeepSection, PageHeading, tr } from "../content/primitives";
 import { implementationSections } from "../content/implementation";
 import ScienceDiagram from "../content/ScienceDiagram";
 
-const tabLabels: Record<string, readonly [string, string]> = {
-  ingestion: ["Inputs", "Entradas"],
-  geometry: ["Geometry", "Geometría"],
-  "browser-engine": ["Browser solver", "Solucionador web"],
-  "reference-engine": ["Reference", "Referencia"],
-  "cuda-ensemble": ["CUDA batches", "Lotes CUDA"],
-  "learned-pipeline": ["Models", "Modelos"],
-  "transport-engine": ["Transport", "Transporte"],
-  "release-runtime": ["Deployment", "Despliegue"],
-};
+// The shell reports more than six peer tabs (ADR-0071 rule 5, enforced since 0.7.0), and the eight stages were eight
+// peers. Four of them are read in pairs: the inputs with their geometry, the two solvers side by side. Every section is
+// still shown, whole, in the order it had.
+const stageTabs: { id: string; sections: string[]; label: readonly [string, string] }[] = [
+  { id: "inputs", sections: ["ingestion", "geometry"], label: ["Inputs and geometry", "Entradas y geometría"] },
+  { id: "solvers", sections: ["browser-engine", "reference-engine"], label: ["Solvers", "Solucionadores"] },
+  { id: "cuda-ensemble", sections: ["cuda-ensemble"], label: ["CUDA batches", "Lotes CUDA"] },
+  { id: "learned-pipeline", sections: ["learned-pipeline"], label: ["Models", "Modelos"] },
+  { id: "transport-engine", sections: ["transport-engine"], label: ["Transport", "Transporte"] },
+  { id: "release-runtime", sections: ["release-runtime"], label: ["Deployment", "Despliegue"] },
+];
 
 export default function Implementation() {
   const es = useShellLang() === "es";
@@ -38,10 +39,17 @@ export default function Implementation() {
       <SubTabs
         orientation="vertical"
         ariaLabel={es ? "Etapas de implementación" : "Implementation stages"}
-        tabs={implementationSections.map((section) => ({
-          id: section.id,
-          label: tr(tabLabels[section.id] ?? section.title, es),
-          content: <DeepSection section={section} />,
+        tabs={stageTabs.map((stage) => ({
+          id: stage.id,
+          label: tr(stage.label, es),
+          content: (
+            <>
+              {stage.sections.map((id) => {
+                const section = implementationSections.find((s) => s.id === id);
+                return section ? <DeepSection key={id} section={section} /> : null;
+              })}
+            </>
+          ),
         }))}
       />
     </div>

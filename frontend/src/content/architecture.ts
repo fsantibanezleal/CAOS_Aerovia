@@ -1,4 +1,12 @@
 import type { ArchitectureConfig } from "@fasl-work/caos-app-shell";
+// Since shell 0.7.0 the modal takes inline SVG strings only (a fetched file cannot be checked against the theme tokens
+// before it is shown), so the five diagrams are imported as text. The files stay in public/svg/tech/, where the
+// documentation capture scripts read them.
+import appSvg from "../../public/svg/tech/app.svg?raw";
+import lanesSvg from "../../public/svg/tech/lanes.svg?raw";
+import webSvg from "../../public/svg/tech/web.svg?raw";
+import scienceSvg from "../../public/svg/tech/science.svg?raw";
+import contractsSvg from "../../public/svg/tech/contracts.svg?raw";
 
 export const ARCHITECTURE: ArchitectureConfig = {
   title_en: "How Aerovia works",
@@ -8,7 +16,7 @@ export const ARCHITECTURE: ArchitectureConfig = {
       id: "app",
       en: "The app",
       es: "La aplicación",
-      svg: `${import.meta.env.BASE_URL}svg/tech/app.svg`,
+      svg: appSvg,
       body_en:
         "Aerovia uses one physical network for design, computation and inspection. Junctions define coordinates and optional pressure boundaries; airways define connectivity, resistance, area, targets and optional fan curves. Edits are complete model changes. A closure changes active connectivity, an aerodynamic intervention changes resistance, and a geometry change affects represented length and transport volume. Display-only camera or level separation changes never masquerade as a new physical calculation.\n\nThe shared CAOS shell provides six routes, language and theme controls, architecture access and consistent navigation. The primary route is the instrument. Introduction explains the industrial question; Methodology defines equations and scope; Implementation documents actual execution; Experiments states comparison design; Benchmark reads numerical evidence. An airway selection links spatial inspection to values and comparisons. User data stays in the browser, with local file import/export and saved project state.\n\nThe offline repository is independently useful. Its reference solver, seeded CPU/CUDA batches and learned-method stages create reproducible outputs before publication. Authored cases have explicit assumptions and licenses; they are not measured mine surveys. A useful visual change is supported by actual model state, and an engineering conclusion requires inputs, results and limitations together.",
       body_es:
@@ -18,7 +26,7 @@ export const ARCHITECTURE: ArchitectureConfig = {
       id: "lanes",
       en: "Execution lanes",
       es: "Vías de ejecución",
-      svg: `${import.meta.env.BASE_URL}svg/tech/lanes.svg`,
+      svg: lanesSvg,
       body_en:
         "The offline lane executes independent SciPy reference calculations, seeded uncertainty batches and explicit learned-model training and evaluation. CUDA is a local computational backend with recorded dtype, hardware, versions and timings. It is not a service secretly running behind the web page. CPU alternatives are labeled according to their actual execution. Training checkpoints, partition identities and model exports belong to the scientific record.\n\nThe replay lane serves reviewed artifacts that bind the exact network, operating options, method and results. Catalog hashes and physical acceptance checks prevent an incomplete bake from becoming evidence. An uncertainty interval belongs to its recorded inputs. Editing the design invalidates unmatched replay rather than silently applying the old interval to new geometry or operating conditions. Learned evidence additionally records model identity, supported domain, prediction errors and export parity.\n\nThe live lane runs bounded tools in the browser: steady network solution, fan analysis, passive transport, routing and eligible exported inference. Approximate inference is explicitly separated from exact numerical acceptance. A registered model can be unavailable, out of domain or failed without making the valid exact network solver unavailable. Building and deploying the site copy verified scientific outputs; neither operation retrains models or reruns the canonical random experiments.",
       body_es:
@@ -28,7 +36,7 @@ export const ARCHITECTURE: ArchitectureConfig = {
       id: "web",
       en: "Web flow",
       es: "Flujo web",
-      svg: `${import.meta.env.BASE_URL}svg/tech/web.svg`,
+      svg: webSvg,
       body_en:
         "The build verifies the committed catalog against its manifest, copies public scientific payloads and produces a versioned static application. A release identity records source commit, version and catalog hash. The runtime manifest records byte counts and SHA-256 digests of served assets. GitHub Pages delivers those files over HTTPS at the custom domain; it does not run a remote Python solver or store visitor engineering projects.\n\nInside the browser, the shared shell mounts the instrument and companion routes. A validated edit creates a new input snapshot. Numerical requests carry identities, and results are accepted for display only when they still correspond to the active state. Pending and failed calculations remain visible states. Spatial selections, plots and tables read the same physical object and its current results, while display-only changes retain the calculation. Local project persistence and file export carry complete inputs, not just a screenshot.\n\nRelease verification checks actual HTTPS bytes against the expected commit, then browser journeys exercise the interactions, language/theme matrix and responsive layout. A scheduled monitor repeats live checks. Loading successfully is therefore only one part of delivery evidence. Runtime performance remains a measured property of a particular browser and workload, separate from offline GPU timings.",
       body_es:
@@ -38,7 +46,7 @@ export const ARCHITECTURE: ArchitectureConfig = {
       id: "science",
       en: "The science",
       es: "La ciencia",
-      svg: `${import.meta.env.BASE_URL}svg/tech/science.svg`,
+      svg: scienceSvg,
       body_en:
         "The steady network solves internal volume-flow conservation and signed quadratic pressure loss. The browser uses nodal Newton continuation; the independent reference uses mixed flow-pressure SciPy trust-region least squares. Final acceptance checks the original equations in SI units and the supported fan regime. Common-speed optimization is a bounded feasibility search requiring equal boundary pressures; resistance sensitivity is a separate one-at-a-time five-percent perturbation. Neither is a global mine redesign optimum.\n\nUncertainty samples positive independent lognormal resistance multipliers with mean one and solves every realization, retaining rejected samples and independent same-draw checks. Passive transport uses finite airway cells, upwind mass flux, junction mixing and two-stage time integration. A mass ledger follows injected, stored, escaped and removed tracer. Flow schedules are quasi-steady events; fixed cell volumes, clean external boundaries and numerical dispersion are explicit. Routing minimizes nominal volume-over-flow transit along actual signed flow, not human evacuation or earliest tracer arrival.\n\nThe MLP and shared graph surrogate predict corrections around disclosed nominal calibration, project flows onto conservation and reconstruct pressure. Raw errors and pressure residuals remain measurable. They learn numerical response on authored networks, not observations of a working mine. Model availability and benchmark accuracy require actual checkpoints and results; an architecture alone is not evidence.",
       body_es:
@@ -48,7 +56,7 @@ export const ARCHITECTURE: ArchitectureConfig = {
       id: "contracts",
       en: "Data and design",
       es: "Datos y diseño",
-      svg: `${import.meta.env.BASE_URL}svg/tech/contracts.svg`,
+      svg: contractsSvg,
       body_en:
         "The ingestion contract defines SI network data with unique node and airway identities, endpoint references, pressure boundaries and explicit equipment parameters. Structural and numeric validation happens before replacing the current project. Geometry, area, resistance and targets have distinct meanings. The result contract binds inputs and operating options to the method, output arrays, numerical status, physical residuals and execution provenance. Saved comparisons are recomputed from their inputs rather than trusting arbitrary imported result arrays.\n\nScientific coverage is indexed by case, physical regime and method. Twelve authored networks support six concrete regimes: nominal speed, turndown, boost, working restriction, return restriction and distributed resistance. These definitions are separate from the computed evidence matrix; missing or failed cells remain explicit. Learned compatibility adds physical topology identity, calibrated features and parameter bounds, while imported graphs remain eligible for the exact solver under its broader validated contract.\n\nPublication requires matching schemas and hashes, complete expected coverage, physical checks and same-input comparisons. Browser live exports have their own parity and runtime gate. Source provenance distinguishes authored examples from user imports, and exact solutions from approximations. The result is reviewable because assumptions travel with the outputs; no label changes an authored scenario into a measured mine.",
       body_es:

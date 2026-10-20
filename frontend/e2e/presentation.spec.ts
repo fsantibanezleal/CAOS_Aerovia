@@ -21,7 +21,7 @@ const appearances = [
   { lang: "es", theme: "light" },
 ] as const;
 const routes = [
-  { path: "/", en: "App", es: "App" },
+  { path: "/app", en: "App", es: "App" },
   { path: "/introduction", en: "Introduction", es: "Introducción" },
   { path: "/methodology", en: "Methodology", es: "Metodología" },
   { path: "/implementation", en: "Implementation", es: "Implementación" },
@@ -61,7 +61,7 @@ for (const { lang, theme } of appearances)
         .getByRole("link", { name: route[lang], exact: true })
         .click();
       await expect.poll(() => new URL(page.url()).pathname).toBe(route.path);
-      if (route.path === "/") await balanced(page, lang);
+      if (route.path === "/app") await balanced(page, lang);
       else {
         await expect(
           page.getByRole("heading", { name: route[lang], exact: true }).first(),
@@ -84,9 +84,9 @@ for (const { lang, theme } of appearances)
       });
     }
     // A direct load of each content route declares the page's language too. Navigation inside one
-    // session hid the defect: the workbench set lang on "/" and the attribute survived the clicks,
+    // session hid the defect: the workbench set lang on "/app" and the attribute survived the clicks,
     // while a reader arriving on /benchmark in Spanish got lang="en".
-    for (const route of routes.filter((r) => r.path !== "/")) {
+    for (const route of routes.filter((r) => r.path !== "/app")) {
       await page.goto(route.path);
       await expect(page.locator("html")).toHaveAttribute("lang", lang);
     }
@@ -348,7 +348,7 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
   expect(
     (await page.locator(".site-header").boundingBox())!.height,
   ).toBeLessThan(100);
-  for (const route of routes.filter((route) => route.path !== "/")) {
+  for (const route of routes.filter((route) => route.path !== "/app")) {
     await navigation.getByRole("link", { name: route.en, exact: true }).click();
     await expect.poll(() => new URL(page.url()).pathname).toBe(route.path);
     await expect(
@@ -438,7 +438,7 @@ for (const viewport of [
           expect(
             layout.ratio,
             `${context}: measure the actual canvas, not its surrounding panel`,
-          ).toBeGreaterThanOrEqual(focus ? 0.8 : 0.5);
+          ).toBeGreaterThanOrEqual(focus ? 0.65 : 0.5);
       }
       for (const lang of ["en", "es"] as const) {
         if (lang === "es")

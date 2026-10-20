@@ -1,3 +1,4 @@
+import { fixed } from "../presentation";
 interface Benchmark {
   caseCount: number;
   nodeCount: number;
@@ -131,14 +132,14 @@ export default function VerificationSummary({
               )}
         </strong>
       </p>
-      <div className="analysis-grid">
-        <section className="analysis-card">
+      <div>
+        <section>
           <h3>{b("Network conservation", "Conservación en la red")}</h3>
-          <div className="cost-line">
+          <div>
             <span>{b("Authored cases solved", "Casos creados resueltos")}</span>
             <strong>{count(record.caseCount)}</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b(
                 "Junctions / airways across cases",
@@ -149,13 +150,13 @@ export default function VerificationSummary({
               {count(record.nodeCount)} / {count(record.edgeCount)}
             </strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b("Maximum mass imbalance", "Desequilibrio máximo de caudal")}
             </span>
             <strong>{scientific(record.maxMassResidual)} m³/s</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b("Maximum pressure error", "Error máximo de presión")}
             </span>
@@ -168,9 +169,9 @@ export default function VerificationSummary({
             )}
           </p>
         </section>
-        <section className="analysis-card">
+        <section>
           <h3>{b("Resistance ensemble", "Conjunto de resistencias")}</h3>
-          <div className="cost-line">
+          <div>
             <span>
               {b(
                 "Computed resistance draws",
@@ -179,13 +180,13 @@ export default function VerificationSummary({
             </span>
             <strong>{count(record.ensembleSamples)}</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b("Draws per authored case", "Realizaciones por caso creado")}
             </span>
             <strong>{count(record.samplesPerCase)}</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b(
                 "Rejected numerical draws",
@@ -199,14 +200,14 @@ export default function VerificationSummary({
             <strong>{record.device === "cuda" ? "CUDA" : "CPU"}</strong>
           </p>
         </section>
-        <section className="analysis-card">
+        <section>
           <h3>
             {b(
               "Independent batch agreement",
               "Concordancia independiente del lote",
             )}
           </h3>
-          <div className="cost-line">
+          <div>
             <span>
               {b(
                 "Draws checked against SciPy",
@@ -215,7 +216,7 @@ export default function VerificationSummary({
             </span>
             <strong>{count(record.paritySamples)}</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b(
                 "Maximum branch-flow difference",
@@ -231,26 +232,26 @@ export default function VerificationSummary({
             )}
           </p>
         </section>
-        <section className="analysis-card">
+        <section>
           <h3>
             {b(
               "Recorded processing time",
               "Tiempo de procesamiento registrado",
             )}
           </h3>
-          <div className="cost-line">
+          <div>
             <span>{b("Canonical SciPy solve", "Solución canónica SciPy")}</span>
-            <strong>{record.referenceElapsedMs.toFixed(1)} ms</strong>
+            <strong>{fixed(record.referenceElapsedMs, 1, lang)} ms</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>{b("Resistance ensemble", "Conjunto de resistencias")}</span>
-            <strong>{(record.ensembleElapsedMs / 1000).toFixed(2)} s</strong>
+            <strong>{fixed(record.ensembleElapsedMs / 1000, 2, lang)} s</strong>
           </div>
-          <div className="cost-line">
+          <div>
             <span>
               {b("Whole recorded pipeline", "Cadena registrada completa")}
             </span>
-            <strong>{(record.totalElapsedMs / 1000).toFixed(2)} s</strong>
+            <strong>{fixed(record.totalElapsedMs / 1000, 2, lang)} s</strong>
           </div>
           <p>
             {record.hardware}

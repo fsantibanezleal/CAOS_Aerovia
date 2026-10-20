@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import ToolPages from "./ToolPages";
-import { CaseSelector, Tabs, useLangStore } from "@fasl-work/caos-app-shell";
+import { CaseSelector, SurfacePage, useLangStore } from "@fasl-work/caos-app-shell";
 import {
   MousePointer2,
   Pencil,
@@ -48,6 +48,7 @@ import Numeric from "../components/Numeric";
 import Plot from "../components/Plot";
 import { fanOperatingState, fanCurveSamples } from "../components/FanPlot";
 import { download } from "../storage";
+import { fixed } from "../presentation";
 const MineScene = lazy(() => import("../scene/MineScene"));
 type Mode = "design" | "flow" | "transport" | "operations" | "risk" | "models";
 type Transport = ReturnType<typeof useTransport>;
@@ -96,100 +97,107 @@ export default function Workbench() {
     { id: "models", en: "Learned screening", es: "Modelos aprendidos" },
   ];
   return (
-    <div className={`page-body wide av-workbench${w.focus ? " av-focus" : ""}`}>
-      <div className="av-project-row">
-        <CaseSelector
-          layout="select"
-          lang={w.lang}
-          ariaLabel={w.b("Network case", "Caso de red")}
-          selectedId={w.network.id}
-          onSelect={w.choose}
-          cases={[
-            ...w.catalog.cases.map((c) => ({
-              id: c.network.id,
-              name: c.network.name[w.lang],
-              category: w.b(
-                "Authored planning networks",
-                "Redes de planificación construidas",
-              ),
-              kind: "synthetic" as const,
-            })),
-            ...(!w.catalog.cases.some((c) => c.network.id === w.network!.id)
-              ? [
-                  {
-                    id: w.network.id,
-                    name: w.network.name[w.lang],
-                    kind: "uploaded" as const,
-                    category: w.b("Your design", "Su diseño"),
-                  },
-                ]
-              : []),
-          ]}
-        />
-        <div
-          className="av-actions"
-          role="toolbar"
-          aria-label={w.b("Project actions", "Acciones del proyecto")}
-        >
-          <button
-            onClick={() => setDialog("context")}
-            aria-label={w.b(
-              "Selected case guide",
-              "Guía del caso seleccionado",
-            )}
-          >
-            <CircleHelp size={16} />
-          </button>
-          <button
-            title={w.b("New design", "Nuevo diseño")}
-            aria-label={w.b("New design", "Nuevo diseño")}
-            onClick={() => setDialog("new")}
-          >
-            <FilePlus2 size={16} />
-            <span>{w.b("New", "Nuevo")}</span>
-          </button>
-          <button
-            onClick={() => setDialog("import")}
-            aria-label={w.b("Load", "Cargar")}
-          >
-            <FolderOpen size={16} />
-            <span>{w.b("Load", "Cargar")}</span>
-          </button>
-          <button onClick={w.exportProject} aria-label={w.b("Save", "Guardar")}>
-            <Download size={16} />
-            <span>{w.b("Save", "Guardar")}</span>
-          </button>
-          <button
-            onClick={() => setDialog("tables")}
-            title={w.b("Network tables", "Tablas de la red")}
-            aria-label={w.b("Network tables", "Tablas de la red")}
-          >
-            <Table2 size={16} />
-          </button>
-          <button
-            onClick={w.undo}
-            disabled={!w.history.length}
-            aria-label={w.b("Undo edit", "Deshacer edición")}
-          >
-            <Undo2 size={16} />
-          </button>
-          <button
-            onClick={w.redo}
-            disabled={!w.future.length}
-            aria-label={w.b("Redo edit", "Rehacer edición")}
-          >
-            <Redo2 size={16} />
-          </button>
-          <button
-            onClick={() => w.setFocus(!w.focus)}
-            aria-label={w.b("Toggle focus view", "Alternar vista enfocada")}
-          >
-            {w.focus ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
-        </div>
-      </div>
-      <Tabs
-        ariaLabel={w.b("Engineering tools", "Herramientas de ingeniería")}
+    <div className={`av-workbench${w.focus ? " av-focus" : ""}`}>
+      {/* SurfacePage (shell 0.8.0) owns the containment of a tab App: the head, one tab row and the open panel
+          filling the viewport. The product's modes are its views; the mode is not held in the URL. */}
+      <SurfacePage
+        ariaLabel={{ en: "Engineering tools", es: "Herramientas de ingeniería" }}
+        deepLinkView={false}
+        instrument
+        actions={
+          <div className="av-project-row">
+            <CaseSelector
+              className="av-case"
+              layout="select"
+              lang={w.lang}
+              ariaLabel={w.b("Network case", "Caso de red")}
+              selectedId={w.network.id}
+              onSelect={w.choose}
+              cases={[
+                ...w.catalog.cases.map((c) => ({
+                  id: c.network.id,
+                  name: c.network.name[w.lang],
+                  category: w.b(
+                    "Authored planning networks",
+                    "Redes de planificación construidas",
+                  ),
+                  kind: "synthetic" as const,
+                })),
+                ...(!w.catalog.cases.some((c) => c.network.id === w.network!.id)
+                  ? [
+                      {
+                        id: w.network.id,
+                        name: w.network.name[w.lang],
+                        kind: "uploaded" as const,
+                        category: w.b("Your design", "Su diseño"),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+            <div
+              className="av-actions"
+              role="toolbar"
+              aria-label={w.b("Project actions", "Acciones del proyecto")}
+            >
+              <button
+                onClick={() => setDialog("context")}
+                aria-label={w.b(
+                  "Selected case guide",
+                  "Guía del caso seleccionado",
+                )}
+              >
+                <CircleHelp size={16} />
+              </button>
+              <button
+                title={w.b("New design", "Nuevo diseño")}
+                aria-label={w.b("New design", "Nuevo diseño")}
+                onClick={() => setDialog("new")}
+              >
+                <FilePlus2 size={16} />
+                <span>{w.b("New", "Nuevo")}</span>
+              </button>
+              <button
+                onClick={() => setDialog("import")}
+                aria-label={w.b("Load", "Cargar")}
+              >
+                <FolderOpen size={16} />
+                <span>{w.b("Load", "Cargar")}</span>
+              </button>
+              <button onClick={w.exportProject} aria-label={w.b("Save", "Guardar")}>
+                <Download size={16} />
+                <span>{w.b("Save", "Guardar")}</span>
+              </button>
+              <button
+                onClick={() => setDialog("tables")}
+                title={w.b("Network tables", "Tablas de la red")}
+                aria-label={w.b("Network tables", "Tablas de la red")}
+              >
+                <Table2 size={16} />
+              </button>
+              <button
+                onClick={w.undo}
+                disabled={!w.history.length}
+                aria-label={w.b("Undo edit", "Deshacer edición")}
+              >
+                <Undo2 size={16} />
+              </button>
+              <button
+                onClick={w.redo}
+                disabled={!w.future.length}
+                aria-label={w.b("Redo edit", "Rehacer edición")}
+              >
+                <Redo2 size={16} />
+              </button>
+              <button
+                onClick={() => w.setFocus(!w.focus)}
+                aria-label={w.b("Toggle focus view", "Alternar vista enfocada")}
+              >
+                {w.focus ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </button>
+            </div>
+          </div>
+        }
         tabs={modes.map((m) => ({
           id: m.id,
           label: w.b(m.en, m.es),
@@ -2206,7 +2214,7 @@ function EngineeringReadout({
                 }}
               />
               <strong>
-                {p.elasticity.toFixed(3)} · {p.powerDelta.toFixed(2)} kW
+                {fixed(p.elasticity, 3, w.lang)} · {fixed(p.powerDelta, 2, w.lang)} kW
               </strong>
             </button>
           ))}

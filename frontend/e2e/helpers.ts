@@ -66,7 +66,7 @@ export async function balanced(page: Page, language = "en") {
   );
 }
 export async function openWorkbench(page: Page) {
-  await page.goto("/");
+  await page.goto("/app");
   await expect(page.locator("canvas")).toBeVisible();
   await balanced(page);
 }
@@ -143,5 +143,8 @@ export async function noDocumentOverflow(page: Page) {
     viewportHeight: innerHeight,
   }));
   expect(dimensions.width).toBeLessThanOrEqual(dimensions.viewportWidth + 1);
-  expect(dimensions.height).toBeLessThanOrEqual(dimensions.viewportHeight + 1);
+  // Shell 0.8.0 (ADR-0071 rule 1): the page is exactly the viewport from 900 px up; below it the contained page is
+  // released and the document scrolls as a whole, so only the width is held there.
+  if (dimensions.viewportWidth >= 900)
+    expect(dimensions.height).toBeLessThanOrEqual(dimensions.viewportHeight + 1);
 }

@@ -19,7 +19,7 @@
     "transport": "tsx ../scripts/transport.mts"
   },
   "dependencies": {
-    "@fasl-work/caos-app-shell": "0.6.8",
+    "@fasl-work/caos-app-shell": "0.15.0",
     "katex": "0.16.47",
     "lucide-react": "1.43.0",
     "onnxruntime-web": "1.29.0",

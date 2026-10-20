@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createVizLoop } from "@fasl-work/caos-app-shell";
+import { usePausedViz } from "@fasl-work/caos-app-shell";
 import type { Network, Options } from "../contracts";
 import type { TransportOptions, TransportResult } from "../engine/transport";
 
@@ -74,30 +74,26 @@ export default function useTransport(
     };
     active.postMessage({ network, options, request });
   }
+  // The playback loop is the shell's: paused until play, halted while the tab is hidden. `frame` is read through a
+  // ref by the shell, so it sees the current result and rate on every tick.
+  const viz = usePausedViz(
+    (dt) => {
+      if (!result?.frames.length) return false;
+      const end = result.frames.at(-1)!.timeSeconds;
+      cursor.current += (dt / 1000) * rate;
+      const index = result.frames.findIndex(
+        (f) => f.timeSeconds >= cursor.current,
+      );
+      setFrame(index < 0 ? result.frames.length - 1 : index);
+      return cursor.current < end;
+    },
+    { onComplete: () => setPlaying(false) },
+  );
   useEffect(() => {
     if (!result?.frames.length || !playing) return;
     cursor.current = result.frames[frame]?.timeSeconds ?? 0;
-    const end = result.frames.at(-1)!.timeSeconds;
-    const loop = createVizLoop(
-      (dt) => {
-        cursor.current += (dt / 1000) * rate;
-        const index = result.frames.findIndex(
-          (f) => f.timeSeconds >= cursor.current,
-        );
-        setFrame(index < 0 ? result.frames.length - 1 : index);
-        return cursor.current < end;
-      },
-      { onComplete: () => setPlaying(false) },
-      { raf: requestAnimationFrame, caf: cancelAnimationFrame },
-    );
-    const visibility = () => loop.setHidden(document.hidden);
-    visibility();
-    loop.play();
-    document.addEventListener("visibilitychange", visibility);
-    return () => {
-      loop.dispose();
-      document.removeEventListener("visibilitychange", visibility);
-    };
+    viz.play();
+    return () => viz.pause();
   }, [result, playing, rate]);
   function scrub(value: number) {
     setPlaying(false);

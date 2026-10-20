@@ -7,12 +7,15 @@ import {
   applyTheme,
   readTheme,
   CitationsProvider,
+  Landing,
+  STANDARD_ROUTES,
   useShellLang,
   type ShellConfig,
 } from "@fasl-work/caos-app-shell";
 import "@fasl-work/caos-app-shell/styles.css";
 import "./aerovia.css";
 import { CONTENT_CITATIONS } from "./content/citations";
+import { ROUTE_TABLE, type PageName } from "./routes";
 import Workbench from "./workbench/Workbench";
 const Introduction = React.lazy(() => import("./pages/Introduction"));
 const Methodology = React.lazy(() => import("./pages/Methodology"));
@@ -24,20 +27,18 @@ applyTheme(readTheme());
 const config: ShellConfig = {
   product: { name: "Aerovia", mark: <Wind size={18} /> },
   version: __APP_VERSION__,
-  fixed: true,
+  // Every route is the viewport (ADR-0071 rule 1): the workbench fills it and a documentation route scrolls inside
+  // the main container. It replaces the `fixed` option of 0.6.x.
+  contain: true,
   architecture: ARCHITECTURE,
-  routes: [
-    { path: "/", en: "App", es: "App" },
-    { path: "/introduction", en: "Introduction", es: "Introducción" },
-    { path: "/methodology", en: "Methodology", es: "Metodología" },
-    { path: "/implementation", en: "Implementation", es: "Implementación" },
-    { path: "/experiments", en: "Experiments", es: "Experimentos" },
-    { path: "/benchmark", en: "Benchmark", es: "Benchmark" },
-  ],
+  // The shell's header order: App, Introduction, Methodology, Implementation, Experiments, Benchmark.
+  routes: STANDARD_ROUTES,
   links: { github: "https://github.com/fsantibanezleal/CAOS_Aerovia" },
+  // Required since shell 0.7.0: the footer shows the product's own licence, never a default.
+  license: { en: "MIT licence", es: "Licencia MIT" },
+  visibility: "public",
   footer: {
     attribution: false,
-    license: { en: "MIT", es: "MIT" },
     provenance: {
       en: "Authored networks · local computation",
       es: "Redes construidas · cálculo local",
@@ -76,6 +77,17 @@ class Boundary extends React.Component<
     );
   }
 }
+// The landing: `/` and every unknown path render <Landing />, which opens /introduction and forwards an old App link
+// such as /?case=B2 to /app?case=B2 (query string and hash kept). The path table is routes.ts.
+const ELEMENT: Record<PageName, React.ReactNode> = {
+  landing: <Landing />,
+  app: <Workbench />,
+  introduction: <Introduction />,
+  methodology: <Methodology />,
+  implementation: <Implementation />,
+  experiments: <Experiments />,
+  benchmark: <Benchmark />,
+};
 createRoot(document.getElementById("root")!).render(
   <Boundary>
     <BrowserRouter>
@@ -90,13 +102,9 @@ createRoot(document.getElementById("root")!).render(
             }
           >
             <Routes>
-              <Route path="/" element={<Workbench />} />
-              <Route path="/introduction" element={<Introduction />} />
-              <Route path="/methodology" element={<Methodology />} />
-              <Route path="/implementation" element={<Implementation />} />
-              <Route path="/experiments" element={<Experiments />} />
-              <Route path="/benchmark" element={<Benchmark />} />
-              <Route path="*" element={<Workbench />} />
+              {ROUTE_TABLE.map((r) => (
+                <Route key={r.path} path={r.path} element={ELEMENT[r.page]} />
+              ))}
             </Routes>
           </React.Suspense>
         </AppShell>

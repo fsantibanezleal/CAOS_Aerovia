@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
+import { usePausedViz } from "@fasl-work/caos-app-shell";
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
@@ -7,6 +8,7 @@ import type { Network, Result } from "../contracts";
 import type { Position } from "../engine/editor";
 import type { TransportFrame } from "../engine/transport";
 import { edgeColor, type Metric } from "./field";
+import { fixed } from "../presentation";
 
 export type EditTool = "select" | "draw" | "connect" | "move";
 export interface MineSceneProps {
@@ -64,12 +66,17 @@ export default function MineScene(props: MineSceneProps) {
     controller = useRef<Controller | null>(null);
   latest.current = props;
   // The airflow stream starts PAUSED and moves only when the reader asks. It used to run a
-  // requestAnimationFrame loop from the first view with no control and no regard for
+  // frame loop from the first view with no control and no regard for
   // prefers-reduced-motion. Paused, the field is still drawn, frozen, and every repaint (orbit,
   // edit, theme) redraws it without advancing time.
   const [streaming, setStreaming] = useState(false),
     streamingRef = useRef(false),
-    streamControl = useRef<{ start(): void; stop(): void } | null>(null);
+    streamControl = useRef<{ start(): void; stop(): void } | null>(null),
+    streamTick = useRef<(() => void) | null>(null);
+  // The frame loop is the shell's (shell 0.9 and later): paused until play, halted while the tab is hidden.
+  const { play: playStream, pause: pauseStream } = usePausedViz(() => {
+    streamTick.current?.();
+  });
   const [labels, setLabels] = useState<NodeLabel[]>([]),
     [hover, setHover] = useState(""),
     [failure, setFailure] = useState("");
@@ -130,7 +137,6 @@ export default function MineScene(props: MineSceneProps) {
       streamPositions: T.BufferAttribute | null = null,
       streamColors: T.BufferAttribute | null = null,
       fanRotors: Array<{ group: T.Group; rate: number }> = [],
-      animationFrame = 0,
       animationTime = 0,
       lastAnimation = performance.now(),
       animationTick = 0;
@@ -184,7 +190,7 @@ export default function MineScene(props: MineSceneProps) {
               id: h.id,
               x: (v.x * 0.5 + 0.5) * element.clientWidth,
               y: (-v.y * 0.5 + 0.5) * element.clientHeight,
-              text: `Z ${h.elevation.toFixed(0)} m`,
+              text: `Z ${fixed(h.elevation, 0, p.lang)} m`,
             };
           })
           .filter(
@@ -276,12 +282,9 @@ export default function MineScene(props: MineSceneProps) {
       renderer.render(scene, camera);
       drawLabels();
     }
-    function animate(now: number) {
-      if (!streamingRef.current) {
-        animationFrame = 0;
-        return;
-      }
-      animationFrame = requestAnimationFrame(animate);
+    function animate() {
+      if (!streamingRef.current) return;
+      const now = performance.now();
       animationTick += 1;
       // The stream is deliberately sampled at roughly 7 Hz. This leaves the browser
       // worker and interaction budget available for transport and editing while
@@ -724,14 +727,14 @@ export default function MineScene(props: MineSceneProps) {
         const nodeId = h.node.object.userData.id;
         const n = p.network.nodes.find((n) => n.id === nodeId)!;
         setHover(
-          `${n.id} · X ${n.x.toFixed(1)} · Y ${n.y.toFixed(1)} · Z ${n.z.toFixed(1)} m`,
+          `${n.id} · X ${fixed(n.x, 1, p.lang)} · Y ${fixed(n.y, 1, p.lang)} · Z ${fixed(n.z, 1, p.lang)} m`,
         );
       } else if (h.edge) {
         const i = h.edge.object.userData.edge as number,
           edge = p.network.edges[i],
           c = h.edge.object.userData.cell ?? 0;
         setHover(
-          `${edge.name[p.lang]} · ${p.result ? p.result.flows[i].toFixed(2) + " m³/s · " + p.result.velocities[i].toFixed(2) + " m/s" : "--"}${p.frame ? " · " + (p.frame.cellConcentrations[i]?.[c] ?? 0).toPrecision(3) + " mg/m³" : ""}`,
+          `${edge.name[p.lang]} · ${p.result ? fixed(p.result.flows[i], 2, p.lang) + " m³/s · " + fixed(p.result.velocities[i], 2, p.lang) + " m/s" : "--"}${p.frame ? " · " + (p.frame.cellConcentrations[i]?.[c] ?? 0).toPrecision(3) + " mg/m³" : ""}`,
         );
       } else setHover("");
     };
@@ -765,7 +768,7 @@ export default function MineScene(props: MineSceneProps) {
       preview.computeLineDistances();
       const pos = unmap(gizmo.object.position);
       setHover(
-        `X ${pos.x.toFixed(1)} · Y ${pos.y.toFixed(1)} · Z ${pos.z.toFixed(1)} m`,
+        `X ${fixed(pos.x, 1, latest.current.lang)} · Y ${fixed(pos.y, 1, latest.current.lang)} · Z ${fixed(pos.z, 1, latest.current.lang)} m`,
       );
       render();
     });
@@ -787,15 +790,15 @@ export default function MineScene(props: MineSceneProps) {
     streamControl.current = {
       start() {
         lastAnimation = performance.now();
-        if (!animationFrame) animationFrame = requestAnimationFrame(animate);
+        playStream();
       },
       stop() {
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        animationFrame = 0;
+        pauseStream();
         render();
       },
     };
-    if (streamingRef.current) animationFrame = requestAnimationFrame(animate);
+    streamTick.current = animate;
+    if (streamingRef.current) playStream();
     const resize = new ResizeObserver(() => {
       const { clientWidth: w, clientHeight: h } = element;
       if (!w || !h) return;
@@ -807,7 +810,8 @@ export default function MineScene(props: MineSceneProps) {
     resize.observe(element);
     const dispose = () => {
       resize.disconnect();
-      cancelAnimationFrame(animationFrame);
+      pauseStream();
+      streamTick.current = null;
       orbit.dispose();
       gizmo.dispose();
       disposeGroup();

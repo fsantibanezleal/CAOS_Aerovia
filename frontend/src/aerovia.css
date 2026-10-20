@@ -62,15 +62,19 @@
   transform: translate(-100%, 0);
   white-space: nowrap;
 }
+/* The wrapper of the App route: it fills what the shell's page leaves, and the shell's SurfacePage inside it owns the
+   head, the tab row and the open panel (shell 0.8.0). */
 .av-workbench {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  flex: 1 1 auto;
   overflow: hidden;
+  min-height: 0;
   min-width: 0;
 }
-.app-shell.fixed .page-body.av-workbench {
-  padding: 0.6rem 0.75rem;
+.av-workbench > [data-surface] {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 .av-workbench button,
 .av-dialog button {
@@ -131,46 +135,17 @@
   min-width: 0;
   flex: 0 0 auto;
 }
-.av-project-row > .cs {
+.av-project-row > .av-case {
   flex: 1;
   min-width: 0;
 }
-.av-project-row > .cs select {
+.av-project-row > .av-case select {
   width: min(100%, 410px);
 }
 .av-actions {
   display: flex;
   gap: 0.3rem;
   align-items: center;
-  min-width: 0;
-}
-.av-workbench > .tabs {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.av-workbench > .tabs > .tablist {
-  flex: 0 0 auto;
-  margin: 0 0 0.55rem;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  min-width: 0;
-}
-.av-workbench > .tabs > .tablist .tab {
-  white-space: nowrap;
-  border-color: transparent;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.83rem;
-}
-.av-workbench > .tabs > .tablist .tab.active {
-  border-color: var(--color-accent);
-}
-.av-workbench > .tabs > .tabpanel:not([hidden]) {
-  flex: 1;
-  min-height: 0;
-  display: flex;
   min-width: 0;
 }
 .av-mode {
@@ -745,13 +720,6 @@
   padding: 0.6rem;
   background: var(--color-bg);
 }
-.app-shell.fixed .page-body.av-workbench.av-focus {
-  padding: 0.15rem 0.35rem;
-  gap: 0.25rem;
-}
-.av-focus > .tabs > .tablist {
-  margin-bottom: 0.25rem;
-}
 .av-focus .av-controls {
   display: none;
 }
@@ -787,7 +755,7 @@
   gap: 0.7rem;
 }
 .av-error {
-  color: var(--color-danger, #de7765);
+  color: var(--color-bad);
 }
 .av-dialog {
   color: var(--color-fg);
@@ -918,7 +886,7 @@
     overflow-x: auto;
     flex: 1;
   }
-  .av-project-row > .cs {
+  .av-project-row > .av-case {
     flex: 0 1 45%;
     max-width: 45%;
   }
@@ -939,10 +907,6 @@
     width: min(290px, 90%);
     z-index: 12;
     box-shadow: 0 10px 40px #0007;
-  }
-  .av-workbench > .tabs > .tablist .tab {
-    font-size: 0.7rem;
-    padding: 0.4rem 0.5rem;
   }
   .av-viewport-bar {
     padding: 0.4rem;
@@ -1023,5 +987,22 @@
   }
   .av-mapping {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* Hooks of the browser journeys and the documentation capture script; they only let the box shrink. */
+.av-file,
+.av-scientific-figure {
+  min-width: 0;
+}
+/* Below 900 px the shell releases the contained page and the document scrolls as a whole (ADR-0071 rule 1), so a view
+   no longer takes the height the viewport leaves: the instrument keeps a readable height of its own. */
+@media (max-width: 899px) {
+  .av-mode {
+    min-height: 72dvh;
+  }
+  /* The surface head shrinks to its content, so the project row would run past the screen: it keeps to the viewport
+     less the page padding, and its own actions scroll (see the 760 px rules). */
+  .av-project-row {
+    max-width: calc(100vw - 2.5rem);
   }
 }

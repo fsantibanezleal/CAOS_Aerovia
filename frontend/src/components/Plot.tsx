@@ -1,4 +1,6 @@
 ﻿import { useEffect, useRef, useState } from "react";
+import { useShellLang } from "@fasl-work/caos-app-shell";
+import { fixed } from "../presentation";
 import "./plot.css";
 export interface Series {
   label: string;
@@ -10,7 +12,7 @@ export default function Plot({
   xlabel,
   ylabel,
   title,
-  format = (v: number) => v.toFixed(1),
+  format,
   markers = [],
   onSelect,
 }: {
@@ -22,6 +24,8 @@ export default function Plot({
   markers?: { x: number; y: number; label: string; color: string }[];
   onSelect?: (x: number) => void;
 }) {
+  const lang = useShellLang();
+  const formatY = format ?? ((v: number) => fixed(v, 1, lang));
   const [cursor, setCursor] = useState<number | null>(null),
     [size, setSize] = useState({ width: 580, height: 220 });
   const ref = useRef<SVGSVGElement>(null);
@@ -127,7 +131,7 @@ export default function Plot({
               y={top + t * (bottom - top) + 3}
               textAnchor="end"
             >
-              {format(maxy - t * (maxy - miny))}
+              {formatY(maxy - t * (maxy - miny))}
             </text>
             <text
               x={left + t * (right - left)}
@@ -144,7 +148,7 @@ export default function Plot({
             d={s.values
               .map(
                 (p, i) =>
-                  `${i ? "L" : "M"}${x(p.x).toFixed(2)},${y(p.y).toFixed(2)}`,
+                  `${i ? "L" : "M"}${Math.round(x(p.x) * 100) / 100},${Math.round(y(p.y) * 100) / 100}`,
               )
               .join(" ")}
             fill="none"
@@ -214,7 +218,7 @@ export default function Plot({
             {s.label}
             {s.point && (
               <strong>
-                {s.point.x.toFixed(2)} {xlabel}: {format(s.point.y)} {ylabel}
+                {fixed(s.point.x, 2, lang)} {xlabel}: {formatY(s.point.y)} {ylabel}
               </strong>
             )}
           </span>
