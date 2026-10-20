@@ -1,0 +1,1035 @@
+{
+  "title": {
+    "en": "Underground mines must deliver more air, deeper and against tighter exposure limits, while their ventilation is designed for the worst case and run at a fixed duty.",
+    "es": "Las minas subterráneas deben dar más aire, más hondo y con límites de exposición más estrictos, mientras su ventilación se diseña para el peor caso y opera a régimen fijo."
+  },
+  "key_statement": {
+    "en": "Ventilation is a major underground energy user, and underground ore takes several times the open pit's electricity per tonne, while diesel exhaust limits tighten and workings grow hotter. The direction: airflow run as one service from one calibrated model, matched to active workings with a safe minimum, blast fumes cleared by measured return air, results proven by sampling.",
+    "es": "La ventilación consume mucha energía bajo tierra, donde cada tonelada exige varias veces la electricidad del cielo abierto, mientras los límites diésel se endurecen y las labores se calientan. El rumbo: un servicio de aire desde un modelo calibrado, ajustado al trabajo activo con mínimo seguro, gases de voladura despejados por aire de retorno medido, resultados probados con muestreo."
+  },
+  "headline_figures": [
+    {
+      "heading": {
+        "en": "Electricity per tonne of ore underground",
+        "es": "Electricidad por tonelada de mineral bajo tierra"
+      },
+      "value": {
+        "en": "31.1",
+        "es": "31,1"
+      },
+      "unit": {
+        "en": "megajoules of electricity per tonne of ore extracted underground in Chilean copper mining in 2023, at least 7 times the open pit. Underground mining is at most 3 percent of that sector's electricity in the projection of Chile's copper commission to 2034.",
+        "es": "megajulios de electricidad por tonelada de mineral extraído bajo tierra en la minería chilena del cobre en 2023, al menos 7 veces la mina a cielo abierto. La minería subterránea es como máximo 3 por ciento de la electricidad de ese sector en la proyección de la Comisión Chilena del Cobre a 2034."
+      },
+      "source": "cochilco-energy-2023"
+    },
+    {
+      "heading": {
+        "en": "Diesel exhaust limit in European Union underground mines",
+        "es": "Límite de gases de escape diésel en la minería subterránea de la Unión Europea"
+      },
+      "value": {
+        "en": "0.05",
+        "es": "0,05"
+      },
+      "unit": {
+        "en": "milligrams per cubic metre of elemental carbon, the European Union limit for diesel exhaust in underground mining from 2026-02-21",
+        "es": "miligramos por metro cúbico de carbono elemental, el límite de la Unión Europea para los gases de escape diésel en la minería subterránea desde 2026-02-21"
+      },
+      "source": "eu-directive-2019-130"
+    },
+    {
+      "heading": {
+        "en": "Ventilation share of underground energy",
+        "es": "Peso de la ventilación en la energía subterránea"
+      },
+      "value": {
+        "en": "up to 45",
+        "es": "hasta 45"
+      },
+      "unit": {
+        "en": "percent of the energy used in underground mines goes to ventilation, a 2007 statement of a Canadian government laboratory",
+        "es": "por ciento de la energía usada en las minas subterráneas se va en ventilación, según una afirmación de 2007 de un laboratorio del gobierno de Canadá"
+      },
+      "source": "canmet-ventilation-2007"
+    }
+  ],
+  "pain": {
+    "key_message": {
+      "en": "Ventilation cannot stop underground and is one of its largest energy users, while unmatched airflow, slow blast clearing and heat cost workers, schedule and budget.",
+      "es": "La ventilación no se detiene bajo tierra y consume mucha energía, mientras el aire mal repartido, el despeje lento tras voladuras y el calor recaen en personas, plan y presupuesto."
+    },
+    "paragraphs": [
+      {
+        "en": "Ventilation is the underground service that cannot stop: it supplies air, dilutes diesel exhaust, blast fumes and dust, and carries heat out of the workings. It is also one of the largest energy users. A Canadian government laboratory stated in 2007 that ventilation typically accounts for up to 45 percent of the energy used in underground mines, and that some mines may be over-ventilated. In United States mining, ventilation took 122 of 1,246 trillion British thermal units a year in data for the year 2000, about a tenth. Chile's copper commission prints 31.1 megajoules of electricity per tonne of ore underground in 2023, at least 7 times the open pit and up 122.2 percent since 2001. It ties this mainly to compressed air and ventilation. At national level the share is small, since underground mining is projected at no more than 3 percent of that sector's electricity. The waste comes from a mismatch: systems are designed for peak demand, while the need follows the active workings. The result is excess airflow, throttling losses at regulators and fans away from their best operating point.",
+        "es": "La ventilación es el servicio subterráneo que no puede detenerse: aporta aire, diluye gases de escape diésel, gases de voladura y polvo, y saca el calor de las labores. También es de los mayores consumidores de energía. En 2007 un laboratorio del gobierno de Canadá afirmó que la ventilación suele representar hasta 45 por ciento de la energía usada en minas subterráneas. Agregó que algunas minas pueden estar sobreventiladas. En la minería de Estados Unidos, la ventilación sumó 122 de 1.246 billones de unidades térmicas británicas al año en datos del año 2000, cerca de una décima parte. En 2023 la Comisión Chilena del Cobre informa 31,1 megajulios de electricidad por tonelada de mineral subterráneo, al menos 7 veces el cielo abierto. Es 122,2 por ciento más que en 2001, y lo atribuye sobre todo al aire comprimido y a la ventilación. A escala nacional la parte es pequeña, pues la minería subterránea sería como máximo 3 por ciento de la electricidad de ese sector. El desperdicio nace de un desajuste: los sistemas se diseñan para la demanda máxima, mientras la necesidad real sigue a las labores activas. El resultado es aire de más, pérdidas por estrangulamiento en reguladores y ventiladores lejos de su mejor punto de operación."
+      },
+      {
+        "en": "Diesel exhaust falls under the European Union directive on carcinogens at work, whose limit of 0.05 milligrams per cubic metre, measured as elemental carbon, applies to underground mining from 2026-02-21. The United States sets its limit for underground metal and nonmetal mines in total carbon, a different measure, so the two cannot be compared number to number. After a blast, carbon monoxide is the gas that takes longest to clear. At one limestone mine the return time averaged 1.3 hours, over 3 hours at times, as reported in 2019, while practice checks with portable monitors after a fixed time. Acute events are rare but severe. In Chile's extractive industry from 2000 to 2025, 21 people died of gas poisoning or lack of oxygen and 13 in explosions other than of explosives. Heat also grows with depth: a 2025 review calls heat and humidity a major safety obstacle in deep mines, and refrigeration uses a lot of energy.",
+        "es": "En la Unión Europea los gases de escape diésel quedan bajo la directiva sobre agentes cancerígenos en el trabajo. Su límite, 0,05 miligramos por metro cúbico medido como carbono elemental, rige en la minería subterránea desde 2026-02-21. Estados Unidos fija su límite para las minas metálicas y no metálicas subterráneas en carbono total, otra medida, de modo que ambos no se pueden comparar número a número. Tras una voladura, el gas que más tarda en despejarse es el monóxido de carbono. En una mina de caliza el tiempo de reingreso promedió 1,3 horas, y más de 3 horas a veces, según un informe de 2019. La práctica actual revisa con monitores portátiles tras un tiempo fijo. Los eventos agudos son raros pero graves. En la industria extractiva chilena, de 2000 a 2025, murieron 21 personas por intoxicación por gases o falta de oxígeno y 13 en explosiones distintas de las de explosivos. El calor y la humedad crecen con la profundidad: una revisión de 2025 los llama un obstáculo mayor de seguridad en minas profundas, y la refrigeración gasta mucha energía."
+      }
+    ],
+    "bearers": [
+      {
+        "who": {
+          "en": "Underground workers",
+          "es": "Quienes trabajan bajo tierra"
+        },
+        "cost": {
+          "en": "Exposure to diesel exhaust, blast gases and heat, and in the worst case gas poisoning or explosion.",
+          "es": "Exposición a gases de escape diésel, gases de voladura y calor, y en el peor caso intoxicación por gases o explosión."
+        },
+        "measure": {
+          "en": "Personal sampling over a shift against a limit, gas monitors and fatality counts by type.",
+          "es": "Muestreo personal durante el turno frente a un límite, monitores de gases y recuento de fallecidos por tipo."
+        }
+      },
+      {
+        "who": {
+          "en": "The operation's energy budget",
+          "es": "El presupuesto de energía de la operación"
+        },
+        "cost": {
+          "en": "Ventilation takes up to 45 percent of underground energy in a 2007 statement; Chilean underground ore takes at least 7 times the open pit's electricity.",
+          "es": "La ventilación toma hasta 45 por ciento de la energía subterránea en una afirmación de 2007; el mineral subterráneo chileno exige al menos 7 veces la electricidad del cielo abierto."
+        },
+        "measure": {
+          "en": "Kilowatt hours per tonne, share of site energy and tariff.",
+          "es": "Kilovatios hora por tonelada, parte de la energía del sitio y tarifa."
+        }
+      },
+      {
+        "who": {
+          "en": "The production schedule",
+          "es": "El plan de producción"
+        },
+        "cost": {
+          "en": "Crews wait to return after a blast, over 3 hours at times at one limestone mine, and deeper air needs refrigeration earlier.",
+          "es": "Las cuadrillas esperan para reingresar tras una voladura, más de 3 horas a veces en una mina de caliza, y el aire más profundo exige refrigeración antes."
+        },
+        "measure": {
+          "en": "Re-entry hours per blast, and the start date and load of refrigeration.",
+          "es": "Horas de reingreso por voladura, y fecha de inicio y carga de la refrigeración."
+        }
+      },
+      {
+        "who": {
+          "en": "Capital and plant for cooling and air",
+          "es": "Capital y planta para enfriar y ventilar"
+        },
+        "cost": {
+          "en": "Refrigeration uses much energy, dehumidifies poorly and loses cold, and diesel fleets call for larger fans and raises.",
+          "es": "La refrigeración gasta mucha energía, deshumidifica mal y pierde frío, y las flotas diésel piden ventiladores y chimeneas mayores."
+        },
+        "measure": {
+          "en": "Installed refrigeration and fan power, and shaft and raise size.",
+          "es": "Potencia instalada de refrigeración y de ventiladores, y tamaño de piques y chimeneas."
+        }
+      },
+      {
+        "who": {
+          "en": "The electricity system and the climate budget",
+          "es": "El sistema eléctrico y el presupuesto climático"
+        },
+        "cost": {
+          "en": "Chilean copper mining emitted 14.56 million tonnes of carbon dioxide equivalent in 2022, 56 percent from purchased electricity.",
+          "es": "La minería chilena del cobre emitió 14,56 millones de toneladas de dióxido de carbono equivalente en 2022, 56 por ciento por electricidad comprada."
+        },
+        "measure": {
+          "en": "Tonnes of carbon dioxide equivalent and terawatt hours.",
+          "es": "Toneladas de dióxido de carbono equivalente y teravatios hora."
+        }
+      }
+    ],
+    "figures": [
+      {
+        "heading": {
+          "en": "Time to re-enter after a blast",
+          "es": "Tiempo para reingresar tras una voladura"
+        },
+        "value": {
+          "en": "1.3",
+          "es": "1,3"
+        },
+        "unit": {
+          "en": "hours on average for carbon monoxide to clear after a blast, and over 3 hours at times, at one limestone mine in the United States, in a 2019 report",
+          "es": "horas en promedio para despejar el monóxido de carbono tras una voladura, más de 3 horas a veces, en una mina de caliza de Estados Unidos, informe de 2019"
+        },
+        "source": "niosh-blast-reentry-2019"
+      },
+      {
+        "heading": {
+          "en": "Gas deaths in Chile's extractive industry",
+          "es": "Muertes por gases en la industria extractiva de Chile"
+        },
+        "value": {
+          "en": "21",
+          "es": "21"
+        },
+        "unit": {
+          "en": "deaths from gas poisoning or lack of oxygen in the whole extractive industry of Chile, from 2000 to 2025",
+          "es": "muertes por intoxicación por gases o falta de oxígeno en toda la industria extractiva de Chile, de 2000 a 2025"
+        },
+        "source": "sernageomin-statistics-2025"
+      },
+      {
+        "heading": {
+          "en": "Ventilation in United States mining energy",
+          "es": "La ventilación en la energía minera de Estados Unidos"
+        },
+        "value": {
+          "en": "122 of 1,246",
+          "es": "122 de 1.246"
+        },
+        "unit": {
+          "en": "trillion British thermal units a year of United States mining energy go to ventilation, in data for the year 2000. It covers all mining methods, with power plant losses counted.",
+          "es": "billones de unidades térmicas británicas al año de la energía minera de Estados Unidos van a ventilación, en datos del año 2000. Cubre todos los métodos mineros, con las pérdidas de generación eléctrica contadas."
+        },
+        "source": "doe-mining-bandwidth"
+      }
+    ],
+    "causes": [
+      {
+        "cause": {
+          "en": "Airflow is not matched in time and place to the work: it is designed for peak demand and run at a fixed duty.",
+          "es": "El aire no se ajusta en tiempo y lugar al trabajo: se diseña para la demanda máxima y se opera a régimen fijo."
+        },
+        "weight": 30
+      },
+      {
+        "cause": {
+          "en": "The network model does not match the mine as it is: airway resistance and leakage change with deformation and development, and airflow measurements are sparse.",
+          "es": "El modelo de la red no coincide con la mina real: resistencia y fugas cambian con la deformación y el avance, y los caudales medidos son escasos."
+        },
+        "weight": 20
+      },
+      {
+        "cause": {
+          "en": "The diesel fleet sets a high continuous load of exhaust and heat, and rules size the airflow per kilowatt of engine power.",
+          "es": "La flota diésel impone una carga continua alta de gases y calor, y las normas dimensionan el caudal por kilovatio de potencia del motor."
+        },
+        "weight": 25
+      },
+      {
+        "cause": {
+          "en": "Heat from rock and machines grows with depth, so air alone stops being enough and cooling plants are added.",
+          "es": "El calor de la roca y de las máquinas crece con la profundidad, de modo que el aire solo deja de bastar y se agregan plantas de refrigeración."
+        },
+        "weight": 15
+      },
+      {
+        "cause": {
+          "en": "Blast fumes are cleared by fixed times, kept conservative to be safe, and not by measured return air.",
+          "es": "Los gases de voladura se despejan por tiempos fijos, conservadores por seguridad, y no según el aire de retorno medido."
+        },
+        "weight": 10
+      }
+    ]
+  },
+  "context": {
+    "key_message": {
+      "en": "Mines go deeper and hotter and energy is counted, yet ventilation stays designed for the worst case and run on models that no longer match the mine.",
+      "es": "Las minas se hacen más hondas y calientes y la energía se cuenta, pero la ventilación sigue diseñada para el peor caso y operada con modelos desajustados."
+    },
+    "paragraphs": [
+      {
+        "en": "The pain persists because mines go deeper and hotter while diesel exhaust limits tighten and energy is counted. Meanwhile ventilation stays designed for the worst case, run at a fixed duty and modelled from networks that no longer match the mine.",
+        "es": "El problema persiste porque las minas se hacen más profundas y calientes mientras los límites de gases de escape diésel se endurecen y la energía se contabiliza. Entretanto la ventilación sigue diseñada para el peor caso, operada a régimen fijo y modelada con redes que ya no coinciden con la mina."
+      },
+      {
+        "en": "Two changes add to the pressure. Heat and humidity become a major safety obstacle with depth, and refrigeration uses much energy. Battery-electric equipment is also being tried, which changes the airflow and the heat a fleet needs, but the evidence so far is mostly a modelling study.",
+        "es": "Dos cambios suman presión. La humedad y el calor pasan a ser un obstáculo mayor de seguridad con la profundidad, y la refrigeración gasta mucha energía. También se prueban equipos eléctricos a batería, que cambian el aire y el calor que necesita una flota, pero la evidencia hasta ahora es sobre todo un estudio de modelación."
+      }
+    ],
+    "setting": {
+      "en": "Underground mines of every kind: metal mines worked by sublevel stoping, sublevel caving or block caving, room-and-pillar mines of limestone and coal, and deep mines. Air enters through intake shafts or declines and circulates through the levels with active work. It leaves through the return airway, driven by main fans at surface and booster and auxiliary fans underground. The rules limit exposure to diesel exhaust and gases, size the airflow by engine power, and in some jurisdictions require a certified ventilation officer. The data are airflow, pressure, gas and temperature measurements, ventilation surveys and the network model, and the technology is network simulation, variable-speed fans, gas monitoring and refrigeration.",
+      "es": "Minas subterráneas de todo tipo: minas metálicas explotadas por subniveles, hundimiento por subniveles o hundimiento por bloques, minas de caliza y de carbón por cámaras y pilares, y minas profundas. El aire entra por piques de entrada o rampas y circula por los niveles con trabajo activo. Sale por la galería de retorno, impulsado por ventiladores principales en superficie y ventiladores auxiliares o de refuerzo bajo tierra. Las normas limitan la exposición a gases diésel y otros, dimensionan el caudal por potencia de motor y, en algunas jurisdicciones, exigen un oficial de ventilación certificado. Los datos son mediciones de caudal, presión, gases y temperatura, levantamientos de ventilación y el modelo de la red. La tecnología es la simulación de redes, los variadores de velocidad, el monitoreo de gases y la refrigeración."
+    },
+    "forces": [
+      {
+        "force": {
+          "en": "Mines go deeper and hotter, so air carries more heat and cooling is needed earlier.",
+          "es": "Las minas se hacen más profundas y calientes, así que el aire lleva más calor y se necesita refrigeración antes."
+        },
+        "direction": "rising"
+      },
+      {
+        "force": {
+          "en": "Energy and emission budgets are counted at the site.",
+          "es": "Los presupuestos de energía y de emisiones se cuentan en la operación."
+        },
+        "direction": "rising"
+      },
+      {
+        "force": {
+          "en": "Diesel gives way to battery-electric equipment, which changes the airflow and heat a fleet needs.",
+          "es": "El diésel da paso a equipos eléctricos a batería, que cambian el aire y el calor que necesita una flota."
+        },
+        "direction": "rising"
+      },
+      {
+        "force": {
+          "en": "Exposure limits for diesel exhaust tighten in the European Union, while the United States limit has stood unchanged since 2008.",
+          "es": "Los límites de exposición a gases de escape diésel se endurecen en la Unión Europea, mientras el de Estados Unidos no cambia desde 2008."
+        },
+        "direction": "rising"
+      }
+    ],
+    "evidence": [
+      {
+        "statement": {
+          "en": "In Chilean copper mining, underground electricity is 31.1 megajoules per tonne of ore in 2023, at least 7 times the open pit's and up 122.2 percent since 2001.",
+          "es": "En 2023 la minería subterránea chilena del cobre usa 31,1 megajulios de electricidad por tonelada, al menos 7 veces el cielo abierto, 122,2 por ciento más que en 2001."
+        },
+        "source": "cochilco-energy-2023"
+      },
+      {
+        "statement": {
+          "en": "Chilean copper-mining electricity is projected from 26.0 terawatt hours in 2023 to 34.2 in 2034, up 31.4 percent against 20.7 percent for production.",
+          "es": "La electricidad de la minería chilena del cobre pasaría de 26,0 a 34,2 teravatios hora entre 2023 y 2034, 31,4 por ciento más, contra 20,7 por ciento en producción."
+        },
+        "source": "cochilco-electricity-2034"
+      },
+      {
+        "statement": {
+          "en": "The European Union limit for diesel exhaust, 0.05 milligrams per cubic metre measured as elemental carbon, applies to underground mining and tunnel construction from 2026-02-21.",
+          "es": "El límite de la Unión Europea para gases de escape diésel, 0,05 miligramos por metro cúbico como carbono elemental, rige en minería subterránea y construcción de túneles desde 2026-02-21."
+        },
+        "source": "eu-directive-2019-130"
+      },
+      {
+        "statement": {
+          "en": "Chile's mining ministry opened a consultation on 9 June 2025 on amending its mine safety regulation, to harmonise it with a 2023 preventive risk management regulation.",
+          "es": "El Ministerio de Minería abrió el 9 de junio de 2025 una consulta para modificar el reglamento de seguridad minera y alinearlo con el de gestión de riesgos de 2023."
+        },
+        "source": "chile-mine-safety-consultation-2025"
+      }
+    ]
+  },
+  "situation": {
+    "key_message": {
+      "en": "Four roles each hold part of the picture, every approach has a limit, and airflow is fixed at the worst case when planning hands over to operation.",
+      "es": "Cuatro roles tienen cada uno parte del cuadro, cada enfoque tiene un límite, y el aire queda fijado en el peor caso cuando la planificación pasa a la operación."
+    },
+    "roles": [
+      {
+        "role": {
+          "en": "Ventilation officer or engineer",
+          "es": "Oficial o ingeniero de ventilación"
+        },
+        "decides": {
+          "en": "Fan duty, regulator settings and the airflow to each working, under the manager.",
+          "es": "El régimen de los ventiladores, los reguladores y el caudal a cada labor, bajo el gerente."
+        },
+        "needs": {
+          "en": "A network model that matches the mine, measured airflows and gases, and a way to change airflow without losing the safe minimum.",
+          "es": "Un modelo de red que coincida con la mina, caudales y gases medidos, y una forma de cambiar el caudal sin perder el mínimo seguro."
+        }
+      },
+      {
+        "role": {
+          "en": "Mine planning engineer",
+          "es": "Ingeniero de planificación minera"
+        },
+        "decides": {
+          "en": "The production schedule and layout, and with them where work, diesel equipment and heat will be.",
+          "es": "El plan de producción y el diseño de la mina, y con ellos dónde estarán el trabajo, los equipos diésel y el calor."
+        },
+        "needs": {
+          "en": "The airflow and refrigeration each schedule requires, early, when development is designed.",
+          "es": "El aire y la refrigeración que exige cada plan, temprano, cuando se diseña el desarrollo."
+        }
+      },
+      {
+        "role": {
+          "en": "Underground mine manager or superintendent",
+          "es": "Gerente o superintendente de mina subterránea"
+        },
+        "decides": {
+          "en": "Whether crews re-enter, which equipment runs, appointments of statutory officials and the budget.",
+          "es": "Si las cuadrillas reingresan, qué equipos operan, los nombramientos de cargos legales y el presupuesto."
+        },
+        "needs": {
+          "en": "One view of risk, time and energy, and return-air gas readings after a blast.",
+          "es": "Una sola vista de riesgo, tiempo y energía, y lecturas de gases del aire de retorno tras una voladura."
+        }
+      },
+      {
+        "role": {
+          "en": "Health and safety manager or occupational hygienist",
+          "es": "Jefe de seguridad y salud o higienista ocupacional"
+        },
+        "decides": {
+          "en": "The sampling plan, the response to an exceedance, and medical and respirator measures.",
+          "es": "El plan de muestreo, la respuesta ante un exceso, y las medidas médicas y de respiradores."
+        },
+        "needs": {
+          "en": "Personal exposure results against the limit in force, and a way to trace an exceedance to the airflow that caused it.",
+          "es": "Resultados de exposición personal frente al límite vigente, y una forma de rastrear un exceso hasta el caudal que lo causó."
+        }
+      }
+    ],
+    "interaction": {
+      "en": "The planner sets the layout and fleet, then airflow designed for the worst case is handed to the ventilation officer, who runs it against a model that drifts.",
+      "es": "El planificador fija el diseño y la flota; el aire, pensado para el peor caso, pasa al oficial de ventilación, que lo opera con un modelo que se desajusta."
+    },
+    "state_of_the_art": [
+      {
+        "approach": {
+          "en": "Network simulation for planning",
+          "es": "Simulación de redes para planificar"
+        },
+        "achieves": {
+          "en": "Compares operating scenarios efficiently; a 1936 method, now run on computers, solves looped airway networks.",
+          "es": "Compara escenarios de operación con eficiencia; un método de 1936, hoy en computadores, resuelve redes de galerías en lazo."
+        },
+        "falls_short": {
+          "en": "Savings stay potential until measured, and results are sensitive to resistance and leakage estimates.",
+          "es": "Los ahorros siguen siendo potenciales hasta medirlos, y los resultados son sensibles a las estimaciones de resistencia y fugas."
+        },
+        "source": "hardy-cross-overview-2019"
+      },
+      {
+        "approach": {
+          "en": "Ventilation on demand with variable-speed fans",
+          "es": "Ventilación según demanda con ventiladores de velocidad variable"
+        },
+        "achieves": {
+          "en": "Fan power follows roughly the cube of speed, so partial load saves most.",
+          "es": "La potencia del ventilador sigue más o menos el cubo de la velocidad, así que la carga parcial ahorra más."
+        },
+        "falls_short": {
+          "en": "Reported savings are not comparable across mines, and it needs a minimum safe airflow and an automatic safe mode.",
+          "es": "Los ahorros informados no son comparables entre minas, y exige un caudal mínimo seguro y un modo seguro automático."
+        },
+        "source": "ventilation-review-2026"
+      },
+      {
+        "approach": {
+          "en": "Battery-electric equipment",
+          "es": "Equipos eléctricos a batería"
+        },
+        "achieves": {
+          "en": "A 2025 modelling study finds refrigeration delayed by weeks to over a year and exhaust nearly eliminated.",
+          "es": "Un estudio de modelación de 2025 halla la refrigeración retrasada de semanas a más de un año y los gases casi eliminados."
+        },
+        "falls_short": {
+          "en": "It is a model, not a field result, and batteries bring fire and charging hazards.",
+          "es": "Es un modelo y no un resultado en terreno, y las baterías traen riesgos de incendio y de carga."
+        },
+        "source": "battery-fleet-heat-2025"
+      },
+      {
+        "approach": {
+          "en": "Real-time monitoring and calibrated digital twins",
+          "es": "Monitoreo en tiempo real y gemelos digitales calibrados"
+        },
+        "achieves": {
+          "en": "A calibrated twin of a deep mine network found areas at risk of heat, dust and gas build-up.",
+          "es": "Un gemelo calibrado de la red de una mina profunda halló zonas con riesgo de calor, polvo y acumulación de gases."
+        },
+        "falls_short": {
+          "en": "Monitoring and simulation save no energy by themselves; they enable control.",
+          "es": "El monitoreo y la simulación no ahorran energía por sí solos; habilitan el control."
+        },
+        "source": "digital-twin-deep-mine-2022"
+      },
+      {
+        "approach": {
+          "en": "Refrigeration and cooling plants",
+          "es": "Plantas de refrigeración y enfriamiento"
+        },
+        "achieves": {
+          "en": "Mechanical refrigeration controls heat damage where ventilation alone cannot.",
+          "es": "La refrigeración mecánica controla el daño por calor donde la ventilación sola no alcanza."
+        },
+        "falls_short": {
+          "en": "High energy use, weak dehumidification and large cold losses; heat recovery and heat pumps are being studied.",
+          "es": "Alto uso de energía, deshumidificación débil y grandes pérdidas de frío; se estudian la recuperación de calor y las bombas de calor."
+        },
+        "source": "heat-damage-review-2025"
+      }
+    ],
+    "status": {
+      "heading": {
+        "en": "Fan energy saved at one underground metal mine",
+        "es": "Energía de ventiladores ahorrada en una mina metálica subterránea"
+      },
+      "value": {
+        "en": "40",
+        "es": "40"
+      },
+      "unit": {
+        "en": "percent less energy for the fans involved, and 15 percent less total airflow, at one Swedish underground metal mine. Model-based control was added to its on-demand system. It is one site, and the figure is of the fans involved, not of the whole mine.",
+        "es": "por ciento menos de energía en los ventiladores involucrados, y 15 por ciento menos de aire total, en una mina metálica subterránea sueca. Se sumó control basado en un modelo a su ventilación según demanda. Es un solo sitio, y la cifra es de los ventiladores involucrados, no de toda la mina."
+      },
+      "date": {
+        "en": "Implemented in 2018, published in 2020",
+        "es": "Implementado en 2018, publicado en 2020"
+      },
+      "source": "model-control-fans-2020"
+    }
+  },
+  "trends": {
+    "key_message": {
+      "en": "Diesel limits apply now, control on calibrated models within two years, and energy and heat pressure within ten, first for the hygienist and the ventilation officer.",
+      "es": "Los límites diésel rigen ahora, el control con modelos calibrados en dos años y la presión energética y térmica en diez, primero al higienista y al oficial de ventilación."
+    },
+    "items": [
+      {
+        "trend": {
+          "en": "Diesel exhaust limits tighten where they are written",
+          "es": "Los límites de gases diésel se endurecen donde están escritos"
+        },
+        "kind": "regulatory",
+        "direction": "rising",
+        "horizon": "now",
+        "signal": {
+          "statement": {
+            "en": "The United States limit has stood unchanged since 2008, while the European Union limit applies to underground mining from 2026-02-21.",
+            "es": "El límite de Estados Unidos no cambia desde 2008, mientras el de la Unión Europea rige en la minería subterránea desde 2026-02-21."
+          },
+          "source": "msha-diesel-limit-us"
+        },
+        "effect": {
+          "en": "The hygienist and the ventilation officer measure and prove compliance, the manager answers for it, and the planner must size airflow or fleet to meet it.",
+          "es": "El higienista y el oficial de ventilación miden y prueban el cumplimiento, el gerente responde por él, y el planificador debe dimensionar el aire o la flota para cumplirlo."
+        },
+        "confidence": "medium"
+      },
+      {
+        "trend": {
+          "en": "Energy and climate cost counted at the site",
+          "es": "Costo de energía y clima contabilizado en la operación"
+        },
+        "kind": "market",
+        "direction": "rising",
+        "horizon": "ten_years",
+        "signal": {
+          "statement": {
+            "en": "A Chilean sector plan sets neutrality by 2050, and copper mining emitted 14.56 million tonnes of carbon dioxide equivalent in 2022, 56 percent from electricity.",
+            "es": "Un plan sectorial chileno fija neutralidad al 2050; la minería del cobre emitió en 2022 14,56 millones de toneladas de dióxido de carbono equivalente, 56 por ciento por electricidad."
+          },
+          "source": "chile-mining-climate-plan-2025"
+        },
+        "effect": {
+          "en": "The manager counts kilowatt hours per tonne, and the ventilation officer is asked for a fan saving that keeps the safe minimum.",
+          "es": "El gerente cuenta kilovatios hora por tonelada, y al oficial de ventilación se le pide un ahorro de ventiladores que mantenga el mínimo seguro."
+        },
+        "confidence": "medium"
+      },
+      {
+        "trend": {
+          "en": "Battery-electric equipment changes airflow and heat",
+          "es": "Los equipos a batería cambian el aire y el calor"
+        },
+        "kind": "technological",
+        "direction": "rising",
+        "horizon": "ten_years",
+        "signal": {
+          "statement": {
+            "en": "A 2025 modelling study of a deep metal mine finds refrigeration needs delayed by weeks to over a year as battery equipment replaces diesel.",
+            "es": "Un estudio de modelación de 2025 en una mina metálica profunda halla la refrigeración retrasada de semanas a más de un año al reemplazar diésel por equipos a batería."
+          },
+          "source": "battery-fleet-heat-2025"
+        },
+        "effect": {
+          "en": "The planner re-sizes airflow and refrigeration, and the ventilation officer faces rules written per kilowatt of diesel engine power.",
+          "es": "El planificador redimensiona el aire y la refrigeración, y el oficial de ventilación enfrenta normas escritas por kilovatio de potencia diésel."
+        },
+        "confidence": "low"
+      },
+      {
+        "trend": {
+          "en": "Closed-loop control on calibrated models",
+          "es": "Control en lazo cerrado con modelos calibrados"
+        },
+        "kind": "practice",
+        "direction": "rising",
+        "horizon": "two_years",
+        "signal": {
+          "statement": {
+            "en": "A 2026 study calibrates ventilation network models from sparse and inconsistent measurements, since resistance deviations distort simulation and control decisions.",
+            "es": "Un estudio de 2026 calibra modelos de redes de ventilación con mediciones escasas e inconsistentes, pues las desviaciones de resistencia distorsionan la simulación y las decisiones de control."
+          },
+          "source": "network-calibration-2026"
+        },
+        "effect": {
+          "en": "The ventilation officer moves from fixed to managed duty, and the hygienist gets airflow data to link to exposure.",
+          "es": "El oficial de ventilación pasa de un régimen fijo a uno gestionado, y el higienista obtiene datos de caudal para vincularlos con la exposición."
+        },
+        "confidence": "medium"
+      },
+      {
+        "trend": {
+          "en": "Deeper, hotter workings",
+          "es": "Labores más profundas y calientes"
+        },
+        "kind": "technological",
+        "direction": "rising",
+        "horizon": "ten_years",
+        "signal": {
+          "statement": {
+            "en": "A 2016 study measured rock temperature gradients of 2.3 and 3.6 degrees Celsius per 100 m at two pitheads of one deep metal mine, nearly 1,000 m deep.",
+            "es": "Un estudio de 2016 midió gradientes de roca de 2,3 y 3,6 grados Celsius por 100 m en dos bocas de una mina metálica profunda, de casi 1.000 m."
+          },
+          "source": "airway-temperature-metal-mine-2016"
+        },
+        "effect": {
+          "en": "The planner brings refrigeration and airflow into the schedule earlier, and the manager and the hygienist face heat as well as gases.",
+          "es": "El planificador incorpora antes la refrigeración y el aire al plan, y el gerente y el higienista enfrentan calor además de gases."
+        },
+        "confidence": "low"
+      }
+    ]
+  },
+  "proposal": {
+    "key_message": {
+      "en": "Run the mine's airflow as one service from one calibrated model, starting with the ventilation officer re-calibrating the network model after each development change.",
+      "es": "Operar el aire de la mina como un servicio desde un modelo calibrado, empezando por el oficial o ingeniero de ventilación, que recalibra el modelo tras cada cambio."
+    },
+    "paragraphs": [
+      {
+        "en": "Treat the mine's airflow as a service that is planned and run from one calibrated model, matched in time and place to the work. Keep the model matched to the mine as it changes, which answers the drift of the network model. Run the fans to the demand of the active workings, with a safe minimum and a safe mode, which answers airflow designed for the worst case.",
+        "es": "Tratar el aire de la mina como un servicio planificado y operado desde un modelo calibrado, ajustado en tiempo y lugar al trabajo. Mantener el modelo alineado con la mina a medida que cambia, lo que responde al desajuste del modelo de la red. Operar los ventiladores según la demanda de las labores activas, con un mínimo seguro y un modo seguro, lo que responde al aire diseñado para el peor caso."
+      },
+      {
+        "en": "Plan each schedule and each fleet choice with its airflow and heat load shown, which answers the diesel load and the heat of depth. Clear blast fumes by measured return air with a margin, and prove the result by personal sampling against the limit in force.",
+        "es": "Planificar cada plan y cada elección de flota mostrando su carga de aire y de calor, lo que responde a la carga diésel y al calor de la profundidad. Despejar los gases de voladura según el aire de retorno medido, con un margen, y probar el resultado con muestreo personal frente al límite vigente."
+      }
+    ],
+    "four_cs": [
+      {
+        "c": {
+          "en": "Choice",
+          "es": "Elección"
+        },
+        "applies": {
+          "en": "A mine can use a proprietary network tool, an open solver or a learned surrogate on the same network, and replace any without redoing the survey data.",
+          "es": "Una mina puede usar una herramienta de red propietaria, un solucionador abierto o un sustituto aprendido sobre la misma red, y reemplazar cualquiera sin rehacer los datos del levantamiento."
+        }
+      },
+      {
+        "c": {
+          "en": "Context",
+          "es": "Contexto"
+        },
+        "applies": {
+          "en": "Airflow carries its business meaning, so the planner, the ventilation officer and the hygienist read one figure: area served, equipment running, exposure and cost per tonne.",
+          "es": "El caudal lleva su sentido de negocio, y el planificador, el oficial de ventilación y el higienista leen una cifra: área atendida, equipos operando, exposición y costo por tonelada."
+        }
+      },
+      {
+        "c": {
+          "en": "Cost",
+          "es": "Costo"
+        },
+        "applies": {
+          "en": "Every fan speed, cooling plant and model run carries its cost in energy and tariff, so a saving in energy is not confused with a saving in money.",
+          "es": "Cada velocidad de ventilador, planta de enfriamiento y corrida del modelo lleva su costo en energía y tarifa, para no confundir ahorro de energía con ahorro de dinero."
+        }
+      },
+      {
+        "c": {
+          "en": "Control",
+          "es": "Control"
+        },
+        "applies": {
+          "en": "One record joins the network model, airflow and gas measurements, schedule and exposure results, with a named owner, a minimum safe airflow and an audit trail for each change.",
+          "es": "Un registro une modelo de red, mediciones de caudal y gases, plan y resultados de exposición, con responsable nombrado, caudal mínimo seguro y traza de auditoría de cada cambio."
+        }
+      }
+    ],
+    "actions": [
+      {
+        "action": {
+          "en": "Re-calibrate the network model against measured airflows and pressures after each development change.",
+          "es": "Recalibrar el modelo de la red con los caudales y presiones medidos tras cada cambio de desarrollo."
+        },
+        "owner": {
+          "en": "Ventilation officer or engineer",
+          "es": "Oficial o ingeniero de ventilación"
+        },
+        "horizon": {
+          "en": "Within a year",
+          "es": "En un año"
+        },
+        "check": {
+          "en": "The share of surveyed branches within a stated tolerance, reported after each change.",
+          "es": "La proporción de ramales medidos dentro de una tolerancia declarada, informada tras cada cambio."
+        }
+      },
+      {
+        "action": {
+          "en": "Show airflow, fan power and refrigeration start for each schedule scenario in the mine plan.",
+          "es": "Mostrar el caudal, la potencia de ventiladores y el inicio de la refrigeración de cada escenario del plan minero."
+        },
+        "owner": {
+          "en": "Mine planning engineer",
+          "es": "Ingeniero de planificación minera"
+        },
+        "horizon": {
+          "en": "Two years",
+          "es": "En dos años"
+        },
+        "check": {
+          "en": "Every scenario in the plan carries those three values.",
+          "es": "Cada escenario del plan lleva esos tres valores."
+        }
+      },
+      {
+        "action": {
+          "en": "Match fan speed to the demand of active workings, with a minimum safe airflow and an automatic safe mode on sensor failure.",
+          "es": "Ajustar la velocidad de los ventiladores a la demanda de las labores activas, con un caudal mínimo seguro y un modo seguro automático ante una falla de sensor."
+        },
+        "owner": {
+          "en": "Ventilation officer or engineer",
+          "es": "Oficial o ingeniero de ventilación"
+        },
+        "horizon": {
+          "en": "Two years",
+          "es": "En dos años"
+        },
+        "check": {
+          "en": "Fan energy per tonne against a baseline with the same boundary, and no breach of the minimum airflow.",
+          "es": "La energía de ventiladores por tonelada frente a una línea base con el mismo límite, y ninguna violación del caudal mínimo."
+        }
+      },
+      {
+        "action": {
+          "en": "Sample diesel exhaust and gases against the limit in force and give the results to the model.",
+          "es": "Muestrear los gases de escape diésel y otros gases frente al límite vigente y entregar los resultados al modelo."
+        },
+        "owner": {
+          "en": "Health and safety manager or occupational hygienist",
+          "es": "Jefe de seguridad y salud o higienista ocupacional"
+        },
+        "horizon": {
+          "en": "Now",
+          "es": "Ahora"
+        },
+        "check": {
+          "en": "The share of sampled shifts under the limit, and every exceedance traced to an airflow cause.",
+          "es": "La proporción de turnos muestreados bajo el límite, y cada exceso rastreado hasta una causa de caudal."
+        }
+      },
+      {
+        "action": {
+          "en": "Set re-entry after a blast from return-air gas readings with a margin, not from a fixed time alone.",
+          "es": "Fijar el reingreso tras una voladura según lecturas de gases del aire de retorno con un margen, y no solo por un tiempo fijo."
+        },
+        "owner": {
+          "en": "Underground mine manager or superintendent",
+          "es": "Gerente o superintendente de mina subterránea"
+        },
+        "horizon": {
+          "en": "Two years",
+          "es": "En dos años"
+        },
+        "check": {
+          "en": "The distribution of re-entry hours per blast, with no reading above the limit when crews return.",
+          "es": "La distribución de horas de reingreso por voladura, sin ninguna lectura sobre el límite cuando las cuadrillas regresan."
+        }
+      },
+      {
+        "action": {
+          "en": "Value fan and cooling energy at the tariff and keep the saving in energy apart from the saving in cost.",
+          "es": "Valorar la energía de ventiladores y de refrigeración a la tarifa y mantener separado el ahorro de energía del ahorro de costo."
+        },
+        "owner": {
+          "en": "Underground mine manager or superintendent",
+          "es": "Gerente o superintendente de mina subterránea"
+        },
+        "horizon": {
+          "en": "Within a year",
+          "es": "En un año"
+        },
+        "check": {
+          "en": "Each ventilation change reports both kilowatt hours and cost.",
+          "es": "Cada cambio de ventilación informa tanto los kilovatios hora como el costo."
+        }
+      }
+    ],
+    "risks": [
+      {
+        "en": "Lowering airflow to save energy can breach the safe minimum if a sensor or a model is wrong.",
+        "es": "Bajar el caudal para ahorrar energía puede violar el mínimo seguro si un sensor o un modelo falla."
+      },
+      {
+        "en": "A model that is not calibrated can mislead control.",
+        "es": "Un modelo no calibrado puede inducir a error al control."
+      },
+      {
+        "en": "Battery equipment brings fires and charging problems and may move the load to the grid.",
+        "es": "Los equipos a batería traen incendios y problemas de carga y pueden trasladar la carga a la red eléctrica."
+      },
+      {
+        "en": "A re-entry model fitted at one mine does not hold at another.",
+        "es": "Un modelo de reingreso ajustado en una mina no vale en otra."
+      }
+    ],
+    "unknowns": [
+      {
+        "en": "How much of a saving at one mine holds at another is unknown, since reported savings are not comparable.",
+        "es": "Cuánto de un ahorro en una mina se mantiene en otra se desconoce, pues los ahorros informados no son comparables."
+      },
+      {
+        "en": "The sector-level trend in mine depth and rock temperature was not found at a primary source.",
+        "es": "La tendencia sectorial de la profundidad de las minas y la temperatura de la roca no se encontró en una fuente primaria."
+      },
+      {
+        "en": "The share of miners above the diesel exhaust limit today was not found.",
+        "es": "La proporción de mineros sobre el límite de gases de escape diésel hoy no se encontró."
+      },
+      {
+        "en": "The weights of the causes are the author's estimate of relative size, and no source measures them.",
+        "es": "Los pesos de las causas son una estimación del autor de su tamaño relativo, y ninguna fuente los mide."
+      }
+    ],
+    "handoff": {
+      "en": "The technical view explores the planning side of the network model: how airflow, pressure and fan duty respond when airways, fans and regulators change.",
+      "es": "La vista técnica explora el lado de planificación del modelo de la red: cómo responden caudal, presión y régimen de ventiladores cuando cambian galerías, ventiladores y reguladores."
+    }
+  },
+  "illustrations": {
+    "pain": {
+      "file": "executive/pain.svg",
+      "caption": {
+        "en": "In a cross-section of an underground mine, the main fan runs at full duty and air reaches idle headings, while exhaust, fumes and heat stay where crews work.",
+        "es": "En un corte de una mina subterránea, el ventilador opera a pleno régimen y el aire llega a frentes inactivos, mientras gases, humo y calor quedan donde se trabaja."
+      }
+    },
+    "situation": {
+      "file": "executive/situation.svg",
+      "caption": {
+        "en": "In the same mine, four roles each hold part of the picture, each tool has a limit, and only a thin line of information crosses from planning to operation.",
+        "es": "En la misma mina, cuatro roles ven parte del cuadro, cada herramienta tiene un límite y solo una línea delgada de información va de la planificación a la operación."
+      }
+    },
+    "proposal": {
+      "file": "executive/proposal.svg",
+      "caption": {
+        "en": "In the same cross-section of an underground mine, one record joins planning, ventilation and sampling, so air follows the work, crews return on measured air and the energy meter falls.",
+        "es": "En el mismo corte de una mina subterránea, un registro une planificación, ventilación y muestreo: el aire sigue al trabajo, las cuadrillas vuelven con aire medido y la energía baja."
+      }
+    }
+  },
+  "sources": [
+    {
+      "id": "cochilco-energy-2023",
+      "title": {
+        "en": "Chilean Copper Commission (Cochilco), Energy consumption of copper mining to 2023",
+        "es": "Comisión Chilena del Cobre (Cochilco), Consumo energético de la minería del cobre al año 2023"
+      },
+      "url": "https://www.cochilco.cl/web/download/816/2024/13426/informe-de-consumo-de-energia-al-2023.pdf",
+      "note": {
+        "en": "Figures are for Chilean copper mining; the underground unit electricity is in section 6.4, on printed page 28.",
+        "es": "Las cifras son de la minería chilena del cobre; la electricidad unitaria subterránea está en la sección 6.4, en la página impresa 28."
+      }
+    },
+    {
+      "id": "eu-directive-2019-130",
+      "title": {
+        "en": "European Union, Directive 2019/130 on carcinogens or mutagens at work, Official Journal L 30",
+        "es": "Unión Europea, Directiva 2019/130 sobre agentes cancerígenos o mutágenos en el trabajo, Diario Oficial L 30"
+      },
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32019L0130",
+      "note": {
+        "en": "Annex III sets 0.05 milligrams per cubic metre as elemental carbon, applying to underground mining and tunnel construction from 21 February 2026.",
+        "es": "El anexo III fija 0,05 miligramos por metro cúbico como carbono elemental, aplicable a la minería subterránea y la construcción de túneles desde el 21 de febrero de 2026."
+      }
+    },
+    {
+      "id": "canmet-ventilation-2007",
+      "title": {
+        "en": "Natural Resources Canada laboratory (CANMET), Strategic mine ventilation control: a source of potential energy savings",
+        "es": "Laboratorio de Recursos Naturales de Canadá (CANMET), Control estratégico de la ventilación de minas: una fuente de ahorro potencial de energía"
+      },
+      "url": "https://www.osti.gov/etdeweb/biblio/21001277",
+      "note": {
+        "en": "Conference paper of 2007; only its abstract was read.",
+        "es": "Artículo de congreso de 2007; solo se leyó su resumen."
+      }
+    },
+    {
+      "id": "niosh-blast-reentry-2019",
+      "title": {
+        "en": "United States mine safety research institute (NIOSH), Evaluation of post-blast re-entry times based on gas monitoring of return air",
+        "es": "Instituto de investigación de seguridad minera de Estados Unidos (NIOSH), Evaluación de los tiempos de reingreso tras la voladura según el monitoreo de gases del aire de retorno"
+      },
+      "url": "https://stacks.cdc.gov/view/cdc/227967/cdc_227967_DS1.pdf",
+      "note": {
+        "en": "One limestone mine, 265 blasts and 182 usable curves; the model parameters are specific to the site.",
+        "es": "Una mina de caliza, 265 voladuras y 182 curvas utilizables; los parámetros del modelo son propios del sitio."
+      }
+    },
+    {
+      "id": "sernageomin-statistics-2025",
+      "title": {
+        "en": "Chile's mining safety service (Sernageomin), Quarterly statistics, close of 2025, extractive mining industry",
+        "es": "Servicio Nacional de Geología y Minería (Sernageomin), Estadísticas trimestrales, cierre del año 2025, industria extractiva minera"
+      },
+      "url": "https://www.sernageomin.cl/wp-content/uploads/2026/06/Estadisticas-Trimestrales-2025-Cierre-Ano.pdf",
+      "note": {
+        "en": "The deaths by type of accident, 2000 to 2025, are read from a chart of the deck, and cover the whole extractive industry.",
+        "es": "Las muertes por tipo de accidente, de 2000 a 2025, se leen de un gráfico de la presentación y cubren toda la industria extractiva."
+      }
+    },
+    {
+      "id": "doe-mining-bandwidth",
+      "title": {
+        "en": "United States Department of Energy, Mining Industry Energy Bandwidth Study",
+        "es": "Departamento de Energía de Estados Unidos, Estudio del ancho de banda de energía de la industria minera"
+      },
+      "url": "https://www.energy.gov/sites/prod/files/2013/11/f4/mining_bandwidth.pdf",
+      "note": {
+        "en": "Ventilation is the third largest equipment use of mining energy; the data year is 2000.",
+        "es": "La ventilación es el tercer mayor uso de equipos de la energía minera; el año de los datos es 2000."
+      }
+    },
+    {
+      "id": "cochilco-electricity-2034",
+      "title": {
+        "en": "Chilean Copper Commission (Cochilco), Projection of electricity consumption in copper mining 2023 to 2034",
+        "es": "Comisión Chilena del Cobre (Cochilco), Proyección del consumo de energía eléctrica en la minería del cobre 2023 a 2034"
+      },
+      "url": "https://cochilco.cl/web/download/816/2024/11353/proyeccion-del-consumo-de-energia-electrica-2023-2034.pdf",
+      "note": {
+        "en": "The projection assumes no disruptive technological change and puts underground mining at most 3 percent of sector electricity.",
+        "es": "La proyección supone ningún cambio tecnológico disruptivo y sitúa la minería subterránea como máximo en 3 por ciento de la electricidad del sector."
+      }
+    },
+    {
+      "id": "chile-mine-safety-consultation-2025",
+      "title": {
+        "en": "Chile's mining ministry, public consultation on amending the mine safety regulation, Official Journal 44.171",
+        "es": "Ministerio de Minería de Chile, consulta pública sobre la modificación del Reglamento de Seguridad Minera, Diario Oficial 44.171"
+      },
+      "url": "https://www.diariooficial.interior.gob.cl/publicaciones/2025/06/11/44171/01/2658665.pdf",
+      "note": {
+        "en": "The notice carries no detail on ventilation or exposure limits.",
+        "es": "El aviso no trae detalle sobre ventilación ni límites de exposición."
+      }
+    },
+    {
+      "id": "chile-mining-climate-plan-2025",
+      "title": {
+        "en": "Chile's mining ministry, sector plan for climate change mitigation and adaptation in mining, Official Journal 44.328",
+        "es": "Ministerio de Minería de Chile, Plan sectorial de mitigación y adaptación al cambio climático en el sector minería, Diario Oficial 44.328"
+      },
+      "url": "https://www.diariooficial.interior.gob.cl/publicaciones/2025/12/19/44328/01/2738174.pdf",
+      "note": {
+        "en": "The emissions of copper mining in 2022 are on pages 22 and 23 of the decree.",
+        "es": "Las emisiones de la minería del cobre en 2022 están en las páginas 22 y 23 del decreto."
+      }
+    },
+    {
+      "id": "msha-diesel-limit-us",
+      "title": {
+        "en": "United States mine safety agency (MSHA), Limit on exposure to diesel particulate matter in underground metal and nonmetal mines",
+        "es": "Agencia de seguridad minera de Estados Unidos (MSHA), Límite de exposición al material particulado diésel en minas metálicas y no metálicas subterráneas"
+      },
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2023-title30-vol1/pdf/CFR-2023-title30-vol1-sec57-5060.pdf",
+      "note": {
+        "en": "The limit is set in total carbon and has applied since 20 May 2008; the European Union half of the signal is in the Directive cited in the context.",
+        "es": "El límite se fija en carbono total y rige desde el 20 de mayo de 2008; la parte europea del indicio está en la Directiva citada en el contexto."
+      }
+    },
+    {
+      "id": "hardy-cross-overview-2019",
+      "title": {
+        "en": "Brkic and Praks, Short overview of early developments of the Hardy Cross type methods for flow distribution in pipe networks",
+        "es": "Brkic y Praks, Breve revisión de los primeros desarrollos de los métodos tipo Hardy Cross para la distribución de flujo en redes de tuberías"
+      },
+      "url": "https://arxiv.org/abs/1904.08488",
+      "note": {
+        "en": "The review names ventilation systems among the first looped networks modelled with the method of 1936.",
+        "es": "La revisión nombra a los sistemas de ventilación entre las primeras redes en lazo modeladas con el método de 1936."
+      }
+    },
+    {
+      "id": "ventilation-review-2026",
+      "title": {
+        "en": "Bajic and others, Energy efficiency of modern underground mine ventilation control strategies: a critical review",
+        "es": "Bajic y otros, Eficiencia energética de las estrategias modernas de control de la ventilación de minas subterráneas: una revisión crítica"
+      },
+      "url": "https://ume.rgf.bg.ac.rs/index.php/ume/article/download/243/203/",
+      "note": {
+        "en": "Underground Mining Engineering 48, 2026; the review warns that reported savings are not comparable.",
+        "es": "Underground Mining Engineering 48, 2026; la revisión advierte que los ahorros informados no son comparables."
+      }
+    },
+    {
+      "id": "battery-fleet-heat-2025",
+      "title": {
+        "en": "Ayaburi and others, The impact of fleet electrification on productivity in heat-constrained underground mines",
+        "es": "Ayaburi y otros, El impacto de la electrificación de la flota en la productividad de minas subterráneas limitadas por el calor"
+      },
+      "url": "https://doi.org/10.1016/j.jclepro.2025.146014",
+      "note": {
+        "en": "Journal of Cleaner Production 520, 2025; a modelling study of one deep metal mine layout.",
+        "es": "Journal of Cleaner Production 520, 2025; un estudio de modelación de una mina metálica profunda."
+      }
+    },
+    {
+      "id": "digital-twin-deep-mine-2022",
+      "title": {
+        "en": "Jacobs and others, Strategy to identify and mitigate hazards in deep-level mine ventilation systems using a calibrated digital twin",
+        "es": "Jacobs y otros, Estrategia para identificar y mitigar peligros en los sistemas de ventilación de minas profundas con un gemelo digital calibrado"
+      },
+      "url": "https://sajie.journals.ac.za/pub/article/view/2795",
+      "note": {
+        "en": "South African Journal of Industrial Engineering 33(3), 2022.",
+        "es": "South African Journal of Industrial Engineering 33(3), 2022."
+      }
+    },
+    {
+      "id": "heat-damage-review-2025",
+      "title": {
+        "en": "Xu and others, Research progress of heat damage prevention and control technology in deep mine",
+        "es": "Xu y otros, Avances de investigación de la tecnología de prevención y control del daño por calor en minas profundas"
+      },
+      "url": "https://doi.org/10.3390/su17136200",
+      "note": {
+        "en": "Sustainability 17(13), 2025; read through its abstract.",
+        "es": "Sustainability 17(13), 2025; se leyó su resumen."
+      }
+    },
+    {
+      "id": "model-control-fans-2020",
+      "title": {
+        "en": "Sjostrom and others, Optimized model-based control of main mine ventilation air flows with minimized energy consumption",
+        "es": "Sjostrom y otros, Control optimizado basado en un modelo de los caudales principales de ventilación de una mina con consumo mínimo de energía"
+      },
+      "url": "https://doi.org/10.1016/j.ijmst.2020.05.016",
+      "note": {
+        "en": "International Journal of Mining Science and Technology 30(4), 2020; read through its abstract, and the figure is of one site.",
+        "es": "International Journal of Mining Science and Technology 30(4), 2020; se leyó su resumen, y la cifra es de un solo sitio."
+      }
+    },
+    {
+      "id": "network-calibration-2026",
+      "title": {
+        "en": "Wu and others, Mine ventilation network calibration based on slack variables and sequential quadratic programming",
+        "es": "Wu y otros, Calibración de redes de ventilación de minas con variables de holgura y programación cuadrática secuencial"
+      },
+      "url": "https://doi.org/10.3390/pr14040715",
+      "note": {
+        "en": "Processes 14(4), 2026; the study treats resistance data as hard to acquire.",
+        "es": "Processes 14(4), 2026; el estudio trata los datos de resistencia como difíciles de obtener."
+      }
+    },
+    {
+      "id": "airway-temperature-metal-mine-2016",
+      "title": {
+        "en": "Chang and others, Measurement and analysis of virgin-rock temperature in a metal mine, Mine Safety Science and Engineering symposium",
+        "es": "Chang y otros, Medición y análisis de la temperatura de la roca virgen en una mina metálica, simposio de ciencia e ingeniería de seguridad minera"
+      },
+      "url": "https://isms2016.proceedings.mcgill.ca/article/view/62",
+      "note": {
+        "en": "A single-mine measurement, not a trend of the sector.",
+        "es": "Una medición en una sola mina, no una tendencia del sector."
+      }
+    }
+  ]
+}
