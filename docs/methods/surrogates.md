@@ -125,16 +125,18 @@ Vite selects the package's `onnxruntime-web-use-extern-wasm` conditional export 
 
 Changed connectivity, node/edge order, airway role, fan curve, boundary pressure, closed edges, unknown network IDs or resistance ratios outside the registry bounds yield an explicit unsupported domain status. Coordinate-only display changes and area/target edits do not falsely become hydraulic inputs. A supplied numerical reference must itself satisfy the current equations before the browser reports prediction errors; stale results cannot become a comparison baseline.
 
-ONNX CPU parity gates are absolute 0.001 m³/s flow and 0.05 Pa pressure, including a separate dynamic single-sample check. The recorded actual differences are available in the registry. `node frontend/scripts/verify-learned-browser.mjs` runs all exported methods in actual Chromium WASM on identical fixtures and records evidence under `build/qa/learned-browser.json`. Run `node scripts/prepare-data.mjs` from the frontend first to copy the verified artifacts and WASM assets. The rendered workbench and Benchmark tests remain separate visual and interaction gates.
+ONNX CPU parity gates are absolute 0.001 m³/s flow and 0.05 Pa pressure, including a separate dynamic single-sample check. The recorded actual differences are available in the registry. `node frontend/scripts/verify-learned-browser.mjs` runs all exported methods in actual Chromium WASM on identical fixtures and records evidence under `build/qa/learned-browser.json`. Run `node scripts/prepare-data.mjs` and then `node scripts/copy-data.mjs` from the frontend first: the first copies the verified artifacts and WASM assets, the second copies `readiness.json` (without it every view says readiness unknown). `npm run predev` and `npm run build` run both in that order. The rendered workbench and Benchmark tests remain separate visual and interaction gates.
 
 To publish the actual browser receipt with a canonical release, execute the following from the repository root after export. Publishing adds the browser receipt to the owned model manifest and refreshes the science hash in the numerical manifest. Run the final preparation again so the website receives that verified receipt.
 
 ```text
 node frontend/scripts/prepare-data.mjs
+node frontend/scripts/copy-data.mjs
 node frontend/scripts/verify-learned-browser.mjs --publish
 python scripts/surrogates.py validate --models-output data/models --science-output data/artifacts/science.json
 python scripts/pipeline.py verify --artifacts data/artifacts --input data/cases.json
 node frontend/scripts/prepare-data.mjs
+node frontend/scripts/copy-data.mjs
 ```
 
 ## Executed release evidence
