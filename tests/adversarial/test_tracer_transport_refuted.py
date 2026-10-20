@@ -130,8 +130,8 @@ def test_tt_009_a_schedule_that_changes_the_volume_is_caught(web: Path) -> None:
 
 @needs_node
 def test_tt_010_a_source_extended_past_its_end_is_caught(web: Path) -> None:
-    # the continuous release is not cut at its end: its source runs on to the end of the simulation
-    plant(web, TRANSPORT, "      end: Math.min(duration, start + releaseDuration),", "      end: duration,")
+    # the integration segments are not cut at the release end: a segment that straddles the end keeps the source on to its far side
+    plant(web, TRANSPORT, "      ...releases.flatMap((release) => [release.start, release.end]),", "      ...releases.map((release) => release.start),")
     assert_vitest_caught(web, TRANSPORT_TEST, TT010)
 
 
