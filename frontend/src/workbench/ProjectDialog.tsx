@@ -15,7 +15,6 @@ import {
 } from "../engine/tableImport";
 import { download } from "../storage";
 import { fixed } from "../presentation";
-import CaseContext from "../content/CaseContext";
 
 export default function ProjectDialog({
   w,
@@ -23,7 +22,7 @@ export default function ProjectDialog({
   close,
 }: {
   w: WorkbenchState;
-  kind: "new" | "import" | "tables" | "context";
+  kind: "new" | "import" | "tables";
   close: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null),
@@ -111,11 +110,9 @@ export default function ProjectDialog({
         <h2>
           {kind === "new"
             ? b("Create a design", "Crear diseño")
-            : kind === "context"
-              ? b("Case guide", "Guía del caso")
-              : kind === "tables"
-                ? b("Network tables", "Tablas de la red")
-                : b("Load a design", "Cargar diseño")}
+            : kind === "tables"
+              ? b("Network tables", "Tablas de la red")
+              : b("Load a design", "Cargar diseño")}
         </h2>
         <button
           className="icon-btn"
@@ -126,9 +123,7 @@ export default function ProjectDialog({
         </button>
       </header>
       <div className="av-dialog-body">
-        {kind === "context" ? (
-          <CaseContext network={w.network!} />
-        ) : kind === "new" ? (
+        {kind === "new" ? (
           <form
             onSubmit={(e) => {
               e.preventDefault();

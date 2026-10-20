@@ -1,6 +1,30 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import ToolPages from "./ToolPages";
-import { CaseSelector, SurfacePage, useLangStore } from "@fasl-work/caos-app-shell";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import {
+  CaseWorkbench,
+  ChipGroup,
+  Knob,
+  Readout,
+  SubTabs,
+  Verdict,
+  formatNumber,
+  removeQueryParam,
+  replaceQueryParam,
+  useLangStore,
+  useUrlView,
+  useWorkbenchState,
+  type CaseDef,
+  type RailSection,
+} from "@fasl-work/caos-app-shell";
 import {
   MousePointer2,
   Pencil,
@@ -12,17 +36,15 @@ import {
   FolderOpen,
   Download,
   Table2,
-  Maximize2,
-  Minimize2,
-  Focus,
   Play,
   Pause,
   Scissors,
   Trash2,
   Fan,
   PanelLeft,
-  RotateCcw,
-  CircleHelp,
+  Focus,
+  BookmarkPlus,
+  GitCompare,
 } from "lucide-react";
 import type { Network, NetworkEdge, Options, Result } from "../contracts";
 import { DEFAULT_OPTIONS } from "../engine";
@@ -40,17 +62,35 @@ import { analyzeRoutes } from "../engine/routing";
 import type { EditTool, MineSceneProps } from "../scene/MineScene";
 import { fieldScale, type Metric } from "../scene/field";
 import { regimeDefinitions } from "../content/cases";
+import CaseContext from "../content/CaseContext";
 import useWorkbench, { type WorkbenchState } from "./useWorkbench";
 import useTransport from "./useTransport";
 import ProjectDialog from "./ProjectDialog";
 import LearnedComparison from "./LearnedComparison";
+import { GROUPS, groupById, type GroupId } from "./groups";
+import { stateControls } from "./railState";
 import Numeric from "../components/Numeric";
 import Plot from "../components/Plot";
 import { fanOperatingState, fanCurveSamples } from "../components/FanPlot";
 import { download } from "../storage";
 import { fixed } from "../presentation";
 const MineScene = lazy(() => import("../scene/MineScene"));
+/** The mode of the old App that a group's code still branches on (the airflow group merges flow and operations). */
 type Mode = "design" | "flow" | "transport" | "operations" | "risk" | "models";
+const MODE_OF: Record<GroupId, Mode> = {
+  design: "design",
+  airflow: "flow",
+  transport: "transport",
+  uncertainty: "risk",
+  models: "models",
+};
+const DEFAULT_METRIC: Record<GroupId, Metric | "tracer"> = {
+  design: "route",
+  airflow: "flow",
+  transport: "tracer",
+  uncertainty: "target",
+  models: "flow",
+};
 type Transport = ReturnType<typeof useTransport>;
 const fmt = (n: number | undefined, d = 2) =>
   n === undefined
@@ -60,151 +100,54 @@ const fmt = (n: number | undefined, d = 2) =>
           maximumFractionDigits: d,
         })
       : "--";
+const SUB_PARAM = "sub";
+const isGroupId = (id: string | undefined): id is GroupId =>
+  GROUPS.some((g) => g.id === id);
+const readSub = () => {
+  try {
+    return new URLSearchParams(window.location.search).get(SUB_PARAM);
+  } catch {
+    return null;
+  }
+};
+
+/** The words of the loading and failure states of the whole App: the shell's frame is up, the network is not. */
+function Pending({ w }: { w: WorkbenchState }) {
+  return w.error ? (
+    <p className="caos-pending" role="alert" data-state="unavailable">
+      {w.error}
+    </p>
+  ) : (
+    <p className="caos-pending" role="status" data-state="loading">
+      {w.b("Loading the design workspace…", "Cargando el espacio de diseño…")}
+    </p>
+  );
+}
 
 export default function Workbench() {
   const w = useWorkbench(),
     transport = useTransport(w.network, w.options);
-  const [dialog, setDialog] = useState<
-    "new" | "import" | "tables" | "context" | null
-  >(null);
-  useEffect(() => {
-    if (!w.focus) return;
-    const leaveFocus = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !dialog) w.setFocus(false);
-    };
-    window.addEventListener("keydown", leaveFocus);
-    return () => window.removeEventListener("keydown", leaveFocus);
-  }, [w.focus, w.setFocus, dialog]);
-  if (!w.network || !w.effective || !w.catalog)
-    return (
-      <div className="page-body prose">
-        <h1>Aerovia</h1>
-        <p role="status">
-          {w.error ||
-            w.b(
-              "Loading the design workspace…",
-              "Cargando el espacio de diseño…",
-            )}
-        </p>
-      </div>
-    );
-  const modes: { id: Mode; en: string; es: string }[] = [
-    { id: "design", en: "Design", es: "Diseño" },
-    { id: "flow", en: "Airflow & paths", es: "Flujo y rutas" },
-    { id: "transport", en: "Tracer transport", es: "Transporte" },
-    { id: "operations", en: "Fan operations", es: "Operación" },
-    { id: "risk", en: "Uncertainty", es: "Incertidumbre" },
-    { id: "models", en: "Learned screening", es: "Modelos aprendidos" },
-  ];
+  const [dialog, setDialog] = useState<"new" | "import" | "tables" | null>(
+    null,
+  );
+  const loaded = w.network && w.effective && w.catalog;
   return (
-    <div className={`av-workbench${w.focus ? " av-focus" : ""}`}>
-      {/* SurfacePage (shell 0.8.0) owns the containment of a tab App: the head, one tab row and the open panel
-          filling the viewport. The product's modes are its views; the mode is not held in the URL. */}
-      <SurfacePage
-        ariaLabel={{ en: "Engineering tools", es: "Herramientas de ingeniería" }}
-        deepLinkView={false}
-        instrument
-        actions={
-          <div className="av-project-row">
-            <CaseSelector
-              className="av-case"
-              layout="select"
-              lang={w.lang}
-              ariaLabel={w.b("Network case", "Caso de red")}
-              selectedId={w.network.id}
-              onSelect={w.choose}
-              cases={[
-                ...w.catalog.cases.map((c) => ({
-                  id: c.network.id,
-                  name: c.network.name[w.lang],
-                  category: w.b(
-                    "Authored planning networks",
-                    "Redes de planificación construidas",
-                  ),
-                  kind: "synthetic" as const,
-                })),
-                ...(!w.catalog.cases.some((c) => c.network.id === w.network!.id)
-                  ? [
-                      {
-                        id: w.network.id,
-                        name: w.network.name[w.lang],
-                        kind: "uploaded" as const,
-                        category: w.b("Your design", "Su diseño"),
-                      },
-                    ]
-                  : []),
-              ]}
-            />
-            <div
-              className="av-actions"
-              role="toolbar"
-              aria-label={w.b("Project actions", "Acciones del proyecto")}
-            >
-              <button
-                onClick={() => setDialog("context")}
-                aria-label={w.b(
-                  "Selected case guide",
-                  "Guía del caso seleccionado",
-                )}
-              >
-                <CircleHelp size={16} />
-              </button>
-              <button
-                title={w.b("New design", "Nuevo diseño")}
-                aria-label={w.b("New design", "Nuevo diseño")}
-                onClick={() => setDialog("new")}
-              >
-                <FilePlus2 size={16} />
-                <span>{w.b("New", "Nuevo")}</span>
-              </button>
-              <button
-                onClick={() => setDialog("import")}
-                aria-label={w.b("Load", "Cargar")}
-              >
-                <FolderOpen size={16} />
-                <span>{w.b("Load", "Cargar")}</span>
-              </button>
-              <button onClick={w.exportProject} aria-label={w.b("Save", "Guardar")}>
-                <Download size={16} />
-                <span>{w.b("Save", "Guardar")}</span>
-              </button>
-              <button
-                onClick={() => setDialog("tables")}
-                title={w.b("Network tables", "Tablas de la red")}
-                aria-label={w.b("Network tables", "Tablas de la red")}
-              >
-                <Table2 size={16} />
-              </button>
-              <button
-                onClick={w.undo}
-                disabled={!w.history.length}
-                aria-label={w.b("Undo edit", "Deshacer edición")}
-              >
-                <Undo2 size={16} />
-              </button>
-              <button
-                onClick={w.redo}
-                disabled={!w.future.length}
-                aria-label={w.b("Redo edit", "Rehacer edición")}
-              >
-                <Redo2 size={16} />
-              </button>
-              <button
-                onClick={() => w.setFocus(!w.focus)}
-                aria-label={w.b("Toggle focus view", "Alternar vista enfocada")}
-              >
-                {w.focus ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-            </div>
-          </div>
-        }
-        tabs={modes.map((m) => ({
-          id: m.id,
-          label: w.b(m.en, m.es),
-          content: <WorkspaceMode w={w} mode={m.id} transport={transport} />,
-        }))}
-      />
-      {(w.error || w.notice) && (
+    <>
+      {loaded ? (
+        <Loaded w={w} transport={transport} setDialog={setDialog} />
+      ) : (
+        <CaseWorkbench
+          caseId=""
+          groups={GROUPS.map((g) => ({
+            id: g.id,
+            label: { en: g.en, es: g.es },
+            content: <Pending w={w} />,
+          }))}
+          rail={<Pending w={w} />}
+          context={{ content: <Pending w={w} /> }}
+        />
+      )}
+      {(w.error || w.notice) && loaded && (
         <div
           className={`av-toast ${w.error ? "av-error" : ""}`}
           role={w.error ? "alert" : "status"}
@@ -224,19 +167,416 @@ export default function Workbench() {
       {dialog && (
         <ProjectDialog w={w} kind={dialog} close={() => setDialog(null)} />
       )}
+    </>
+  );
+}
+
+/** Operating point of the rail (Knob and ChipGroup are registered controls): every value that changes the solve. */
+function OperatingRail({ w }: { w: WorkbenchState }) {
+  const edge = w.edge;
+  return (
+    <>
+      <Knob
+        id="speed"
+        label={{ en: "Fan speed", es: "Velocidad del ventilador" }}
+        hint={{
+          en: "Common speed factor of every fan; 1 is the design speed.",
+          es: "Factor de velocidad común de todos los ventiladores; 1 es la velocidad de diseño.",
+        }}
+        value={w.options.speed}
+        min={0}
+        max={1.5}
+        step={0.01}
+        unit="×"
+        format={{ decimals: 2 }}
+        onChange={(speed) => w.change(w.network!, { ...w.options, speed })}
+      />
+      <Knob
+        id="resistance"
+        label={{ en: "Resistance scale", es: "Escala de resistencia" }}
+        hint={{
+          en: "Global factor on every airway resistance, for roughness or fouling.",
+          es: "Factor global sobre la resistencia de cada galería, por rugosidad o ensuciamiento.",
+        }}
+        value={w.options.resistanceScale}
+        min={0.2}
+        max={5}
+        step={0.05}
+        unit="×"
+        format={{ decimals: 2 }}
+        onChange={(resistanceScale) =>
+          w.change(w.network!, { ...w.options, resistanceScale })
+        }
+      />
+      <ChipGroup
+        id="airway-state"
+        label={{ en: "Selected airway", es: "Galería seleccionada" }}
+        options={[
+          {
+            id: "open",
+            label: { en: "Open", es: "Abierta" },
+            disabled: !edge,
+          },
+          {
+            id: "closed",
+            label: { en: "Closed", es: "Cerrada" },
+            disabled: !edge,
+          },
+        ]}
+        value={edge && w.closed.has(edge.id) ? "closed" : "open"}
+        onChange={(id) => w.override({ closed: id === "closed" })}
+      />
+      {edge && (
+        <p className="av-rail-note" title={edge.name[w.lang]}>
+          {edge.name[w.lang]}
+        </p>
+      )}
+    </>
+  );
+}
+
+/** Readouts of the rail: the solved network, checked against the selection key. */
+function ReadoutsRail({ w }: { w: WorkbenchState }) {
+  const stateKey = useWorkbenchState()?.stateKey;
+  const r = w.valid ? w.result : null;
+  const deficit = r
+    ? r.shortfalls.reduce(
+        (sum, v, i) =>
+          w.effective!.edges[i].target > 0 ? sum + Math.max(0, v) : sum,
+        0,
+      )
+    : null;
+  return (
+    <>
+      <Readout
+        title={{ en: "Solved network", es: "Red resuelta" }}
+        lane="live"
+        provenance="synthetic"
+        dataKey={stateKey}
+        items={[
+          {
+            label: { en: "Total airflow", es: "Caudal total" },
+            value: r?.totalIntake ?? null,
+            unit: "m³/s",
+            format: { decimals: 2 },
+          },
+          {
+            label: { en: "Fan power", es: "Potencia de ventiladores" },
+            value: r?.fanPowerKW ?? null,
+            unit: "kW",
+            format: { decimals: 2 },
+          },
+          {
+            label: { en: "Target deficit", es: "Déficit de objetivos" },
+            value: deficit,
+            unit: "m³/s",
+            format: { decimals: 2 },
+            better: "lower",
+            good: 1e-6,
+          },
+          {
+            label: { en: "Airways short", es: "Galerías insuficientes" },
+            value: r ? w.shortfalls : null,
+            unit: { en: `of ${w.targets}`, es: `de ${w.targets}` },
+            format: { decimals: 0 },
+          },
+          {
+            label: { en: "Mass residual", es: "Residuo de masa" },
+            value: r?.massResidual ?? null,
+            unit: "m³/s",
+          },
+        ]}
+      />
+      <Verdict
+        title={{ en: "Convergence", es: "Convergencia" }}
+        compact
+        tone={w.busy ? "neutral" : r ? "good" : "bad"}
+        verdict={
+          w.busy
+            ? { en: "Solving", es: "Calculando" }
+            : r
+              ? { en: "Flow balance solved", es: "Balance de flujo resuelto" }
+              : { en: "No valid flow result", es: "Sin resultado válido" }
+        }
+      />
+    </>
+  );
+}
+
+/** Project actions of the rail: the design file, the edit history and the baseline. */
+function ProjectRail({
+  w,
+  setDialog,
+  compare,
+}: {
+  w: WorkbenchState;
+  setDialog: (kind: "new" | "import" | "tables") => void;
+  compare: () => void;
+}) {
+  const b = w.b;
+  return (
+    <div
+      className="av-rail-actions"
+      role="toolbar"
+      aria-label={b("Project actions", "Acciones del proyecto")}
+    >
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        title={b("New design", "Nuevo diseño")}
+        aria-label={b("New design", "Nuevo diseño")}
+        onClick={() => setDialog("new")}
+      >
+        <FilePlus2 size={16} />
+        <span>{b("New", "Nuevo")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Load", "Cargar")}
+        onClick={() => setDialog("import")}
+      >
+        <FolderOpen size={16} />
+        <span>{b("Load", "Cargar")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Save", "Guardar")}
+        onClick={w.exportProject}
+      >
+        <Download size={16} />
+        <span>{b("Save", "Guardar")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        title={b("Network tables", "Tablas de la red")}
+        aria-label={b("Network tables", "Tablas de la red")}
+        onClick={() => setDialog("tables")}
+      >
+        <Table2 size={16} />
+        <span>{b("Tables", "Tablas")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Undo edit", "Deshacer edición")}
+        disabled={!w.history.length}
+        onClick={w.undo}
+      >
+        <Undo2 size={16} />
+        <span>{b("Undo", "Deshacer")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Redo edit", "Rehacer edición")}
+        disabled={!w.future.length}
+        onClick={w.redo}
+      >
+        <Redo2 size={16} />
+        <span>{b("Redo", "Rehacer")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Save baseline", "Guardar referencia")}
+        disabled={!w.valid}
+        onClick={w.setBaselineNow}
+      >
+        <BookmarkPlus size={16} />
+        <span>{b("Baseline", "Referencia")}</span>
+      </button>
+      <button
+        type="button"
+        className="btn av-rail-btn"
+        aria-label={b("Compare to baseline", "Comparar con la referencia")}
+        disabled={!w.safeBaseline}
+        onClick={compare}
+      >
+        <GitCompare size={16} />
+        <span>{b("Compare", "Comparar")}</span>
+      </button>
     </div>
   );
 }
 
-function WorkspaceMode({
+/**
+ * A DOM node that React content keeps alive elsewhere: the learned comparison holds its model runs in its own state,
+ * and a sub-view that is not open is unmounted by the shell's SubTabs. The comparison is rendered once into `node` (a
+ * portal) and the sub-view only mounts that node, so its runs survive a change of sub-view and Focus.
+ */
+function Slot({ node, className }: { node: HTMLElement; className?: string }) {
+  const host = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const parent = host.current;
+    if (!parent) return;
+    parent.appendChild(node);
+    return () => {
+      if (node.parentNode === parent) parent.removeChild(node);
+    };
+  }, [node]);
+  return <div className={`av-slot${className ? ` ${className}` : ""}`} ref={host} />;
+}
+
+function Loaded({
   w,
-  mode,
-  transport: t,
+  transport,
+  setDialog,
 }: {
   w: WorkbenchState;
-  mode: Mode;
   transport: Transport;
+  setDialog: (kind: "new" | "import" | "tables") => void;
 }) {
+  const n = w.network!,
+    b = w.b;
+  // The open group is held in ?view=, the open sub-view of the group in ?sub=, Focus in ?focus=1 (the shell's).
+  const ids = useMemo(() => [...GROUPS.map((g) => g.id), "context"], []);
+  const [open, selectOpen] = useUrlView(ids, "view");
+  const [subRaw, setSubRaw] = useState<string | null>(readSub);
+  const [lastGroup, setLastGroup] = useState<GroupId>("design");
+  // Focus is the shell's (?focus=1); the product only follows it, to lay the group out for the stage.
+  const [focusOn, setFocusOn] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("focus") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const group: GroupId = isGroupId(open) ? open : lastGroup;
+  useEffect(() => {
+    if (isGroupId(open)) setLastGroup(open);
+  }, [open]);
+  const def = groupById(group)!;
+  const sub = def.subs.some((s) => s.id === subRaw) ? subRaw! : def.subs[0].id;
+  const setSub = (id: string) => {
+    setSubRaw(id);
+    replaceQueryParam(SUB_PARAM, id);
+  };
+  const selectGroup = (id: string) => {
+    selectOpen(id);
+    setSubRaw(null);
+    removeQueryParam(SUB_PARAM);
+  };
+  const learnedNode = useMemo(() => document.createElement("div"), []);
+  const sceneNode = useMemo(() => {
+    const el = document.createElement("div");
+    el.className = "av-scene-host";
+    return el;
+  }, []);
+  const s = useInstrument({
+    w,
+    group,
+    sub,
+    setSub,
+    transport,
+    learnedNode,
+    sceneNode,
+    focusOn,
+  });
+  const controls = useMemo(
+    () => stateControls(w.network!, w.options),
+    [w.network, w.options],
+  );
+  const cases: CaseDef[] = [
+    ...w.catalog!.cases.map((c) => ({
+      id: c.network.id,
+      name: c.network.name[w.lang],
+      category: b("Authored planning networks", "Redes de planificación construidas"),
+      kind: "synthetic" as const,
+    })),
+    ...(!w.catalog!.cases.some((c) => c.network.id === n.id)
+      ? [
+          {
+            id: n.id,
+            name: n.name[w.lang],
+            kind: "uploaded" as const,
+            category: b("Your design", "Su diseño"),
+          },
+        ]
+      : []),
+  ];
+  return (
+    <>
+      <CaseWorkbench
+        caseId={n.id}
+        cases={{
+          cases,
+          selectedId: n.id,
+          onSelect: w.choose,
+          layout: "select",
+          deepLink: true,
+          lang: w.lang,
+          ariaLabel: b("Network case", "Caso de red"),
+        }}
+        controls={controls}
+        rail={
+          [
+            {
+              id: "operating",
+              label: { en: "Setpoint", es: "Punto" },
+              content: <OperatingRail w={w} />,
+            },
+            {
+              id: "readouts",
+              label: { en: "Values", es: "Valores" },
+              content: <ReadoutsRail w={w} />,
+            },
+            {
+              id: "project",
+              label: { en: "Project", es: "Proyecto" },
+              content: (
+                <ProjectRail
+                  w={w}
+                  setDialog={setDialog}
+                  compare={s.compareToBaseline}
+                />
+              ),
+            },
+          ] satisfies RailSection[]
+        }
+        railLabel={{ en: "Case and controls", es: "Caso y controles" }}
+        group={open}
+        onGroupChange={selectGroup}
+        focus={{ hud: s.hud, onChange: setFocusOn }}
+        groups={GROUPS.map((g) => ({
+          id: g.id,
+          label: { en: g.en, es: g.es },
+          lane: g.id === "uncertainty" && w.matchesBake ? "replay" : "live",
+          provenance: "synthetic",
+          content: g.id === group ? s.content : null,
+        }))}
+        context={{ content: <CaseContext network={n} /> }}
+        ariaLabel={{ en: "Workbench views", es: "Vistas del banco de trabajo" }}
+      />
+      {open !== "context" && createPortal(s.scene, sceneNode)}
+      {group === "models" && s.learned && createPortal(s.learned, learnedNode)}
+    </>
+  );
+}
+
+function useInstrument({
+  w,
+  group,
+  sub,
+  setSub,
+  transport: t,
+  learnedNode,
+  sceneNode,
+  focusOn,
+}: {
+  w: WorkbenchState;
+  group: GroupId;
+  focusOn: boolean;
+  sub: string;
+  setSub: (id: string) => void;
+  transport: Transport;
+  learnedNode: HTMLElement;
+  sceneNode: HTMLElement;
+}) {
+  const mode = MODE_OF[group];
+  const setToolPage = setSub;
   const n = w.network!,
     effective = w.effective!,
     b = w.b;
@@ -251,16 +591,26 @@ function WorkspaceMode({
     [cut, setCut] = useState(false),
     [cutZ, setCutZ] = useState(Math.max(...n.nodes.map((n) => n.z)));
   const [metric, setMetric] = useState<MineSceneProps["metric"]>(
-      mode === "transport"
-        ? "tracer"
-        : mode === "risk"
-          ? "target"
-          : mode === "design"
-            ? "route"
-            : "flow",
+      DEFAULT_METRIC[group],
     ),
-    [panel, setPanel] = useState(false),
-    [toolPage, setToolPage] = useState("primary");
+    // The tool pane floats over the scene so the scene keeps the instrument (ADR-0071 rule 8): open from the width
+    // where it leaves the scene readable, closed on a phone until asked for.
+    [panel, setPanel] = useState(() => {
+      try {
+        return window.matchMedia("(min-width: 900px)").matches;
+      } catch {
+        return true;
+      }
+    });
+  // A group opens on its own spatial metric, as each mode did.
+  const firstGroup = useRef(true);
+  useEffect(() => {
+    if (firstGroup.current) firstGroup.current = false;
+    else {
+      setMetric(DEFAULT_METRIC[group]);
+      setFlowTool("field");
+    }
+  }, [group]);
   const [source, setSource] = useState(
       n.edges.find((e) => e.kind === "working")?.id ?? n.edges[0].id,
     ),
@@ -301,7 +651,7 @@ function WorkspaceMode({
     setRouteTarget(n.nodes.at(-1)!.id);
     setElevation(Math.min(...n.nodes.map((n) => n.z)));
   }, [n.id]);
-  useEffect(() => () => t.pause(), []);
+  useEffect(() => () => t.pause(), [group]);
   useEffect(() => {
     if (mode === "transport") t.clear();
   }, [
@@ -623,6 +973,52 @@ function WorkspaceMode({
       </>
     ),
   };
+  // Airflow merged the flow and operations modes: its result sub-view holds the fan and sensitivity plots of the
+  // operating question (when one was calculated) above the selected airway's readout.
+  const airflowAnalysis = AnalysisReadout({
+    w,
+    result: displayResult,
+    mode: "operations",
+    analysis,
+  });
+  const airflowInspectPage = {
+    id: "inspect",
+    label: b("Selected result", "Resultado seleccionado"),
+    content: (
+      <>
+        {airflowAnalysis && (
+          <div className="av-pane-readout">{airflowAnalysis}</div>
+        )}
+        <div className="av-pane-readout">
+          <SelectedReadout
+            w={w}
+            result={displayResult}
+            approximation={null}
+            route={routing?.path?.edgeIds ?? []}
+          />
+        </div>
+      </>
+    ),
+  };
+  // Rendered once for the models group into `learnedNode` (see Slot), so its model runs outlive a change of sub-view.
+  const learned =
+    w.valid && w.result ? (
+      <LearnedComparison
+        network={n}
+        options={w.options}
+        reference={w.result}
+        selected={predictionMethod}
+        onSelect={(result, method) => {
+          setPredictedField(
+            result && method
+              ? { network: n, options: w.options, result, method }
+              : null,
+          );
+        }}
+        onAirwaySelect={w.setSelected}
+        lang={w.lang}
+      />
+    ) : null;
   const pages = {
     design: [
       {
@@ -1374,7 +1770,7 @@ function WorkspaceMode({
         label: b("Operating question", "Pregunta operativa"),
         content: (
           <>
-            {mode === "operations" && (
+            {(
               <>
                 <label>
                   {b("Operating question", "Pregunta operativa")}
@@ -1639,23 +2035,7 @@ function WorkspaceMode({
         label: b("Learned comparison", "Comparación aprendida"),
         content: (
           <>
-            {w.valid && w.result && (
-              <LearnedComparison
-                network={n}
-                options={w.options}
-                reference={w.result}
-                selected={predictionMethod}
-                onSelect={(result, method) => {
-                  setPredictedField(
-                    result && method
-                      ? { network: n, options: w.options, result, method }
-                      : null,
-                  );
-                }}
-                onAirwaySelect={w.setSelected}
-                lang={w.lang}
-              />
-            )}
+            <Slot node={learnedNode} />
           </>
         ),
       },
@@ -1664,238 +2044,345 @@ function WorkspaceMode({
       inspectPage,
       viewPage,
     ],
-  }[mode];
-  return (
-    <div className={`av-mode av-mode-${mode}${panel ? " av-panel-open" : ""}`}>
-      <aside
-        className="av-controls"
-        aria-label={b("Tool parameters", "Parámetros de la herramienta")}
-      >
-        <div className="av-control-title">
-          <h2>
-            {mode === "design"
-              ? b("Build the mine", "Construir la mina")
-              : mode === "flow"
-                ? b("Trace the airflow", "Seguir el flujo")
-                : mode === "transport"
-                  ? b("Release & response", "Emisión y respuesta")
-                  : mode === "operations"
-                    ? b("Operating strategy", "Estrategia operativa")
-                    : mode === "models"
-                      ? b(
-                          "Compare learned models",
-                          "Comparar modelos aprendidos",
-                        )
-                      : b("Test the margin", "Evaluar el margen")}
-          </h2>
-          <button
-            className="av-panel-close icon-btn"
-            aria-label={b("Hide tool parameters", "Ocultar parámetros")}
-            onClick={() => setPanel(false)}
-          >
-            ×
-          </button>
+  };
+  const airflowPages = [
+    pages.flow[0],
+    {
+      id: "duty",
+      label: b("Fan duty", "Ventilador"),
+      content: (
+        <>
+          {pages.operations[0].content}
+          {pages.operations[3].content}
+        </>
+      ),
+    },
+    conditionsPage,
+    equipmentPage,
+    airflowInspectPage,
+    viewPage,
+  ];
+  const groupPages = {
+    design: pages.design,
+    airflow: airflowPages,
+    transport: pages.transport,
+    uncertainty: pages.risk,
+    models: pages.models,
+  }[group];
+  const def = groupById(group)!;
+  // The scene is drawn once into `sceneNode` (see Slot) and every sub-view of the group shows it, so a change of
+  // sub-view, of group or the shell's Focus never rebuilds the 3D view or loses its camera.
+  const scene = (
+    <section
+      className="av-instrument"
+      aria-label={b(
+        "Mine analysis instrument",
+        "Instrumento de análisis minero",
+      )}
+    >
+      <div className="av-viewport-bar">
+        <button
+          className="av-panel-toggle"
+          aria-label={b("Show tool parameters", "Mostrar parámetros")}
+          onClick={() => setPanel(!panel)}
+        >
+          <PanelLeft size={16} />
+        </button>
+        <div>
+          <strong title={n.name[w.lang]}>{n.name[w.lang]}</strong>
+          <span>
+            {n.nodes.length} {b("junctions", "uniones")} · {n.edges.length}{" "}
+            {b("airways", "galerías")}
+          </span>
         </div>
-        <ToolPages
-          label={b("Tool section", "Sección de herramientas")}
-          value={toolPage}
-          onChange={setToolPage}
-          pages={pages}
-        />
-      </aside>
-      <section
-        className="av-instrument"
-        aria-label={b(
-          "Mine analysis instrument",
-          "Instrumento de análisis minero",
-        )}
-      >
-        <div className="av-viewport-bar">
+        <div className="av-scene-actions">
           <button
-            className="av-panel-toggle"
-            aria-label={b("Show tool parameters", "Mostrar parámetros")}
-            onClick={() => setPanel(!panel)}
+            onClick={() => {
+              setToolPage("view");
+              setPanel(true);
+            }}
+            aria-label={b("Display settings", "Opciones de visualización")}
           >
-            <PanelLeft size={16} />
+            {b("View", "Vista")}
           </button>
-          <div>
-            <strong>{n.name[w.lang]}</strong>
-            <span>
-              {n.nodes.length} {b("junctions", "uniones")} · {n.edges.length}{" "}
-              {b("airways", "galerías")}
-            </span>
-          </div>
-          <div className="av-scene-actions">
-            <button
-              onClick={() => {
-                setToolPage("view");
-                setPanel(true);
-              }}
-              aria-label={b("Display settings", "Opciones de visualización")}
-            >
-              {b("View", "Vista")}
-            </button>
-            <button
-              onClick={() => {
-                setToolPage(mode === "transport" ? "monitor" : "inspect");
-                setPanel(true);
-              }}
-              aria-label={b(
-                "Inspect calculated results",
-                "Inspeccionar resultados calculados",
-              )}
-            >
-              {b("Results", "Resultados")}
-            </button>
+          <button
+            onClick={() => {
+              setToolPage(mode === "transport" ? "monitor" : "inspect");
+              setPanel(true);
+            }}
+            aria-label={b(
+              "Inspect calculated results",
+              "Inspeccionar resultados calculados",
+            )}
+          >
+            {b("Results", "Resultados")}
+          </button>
 
-            <select
-              aria-label={b("Camera view", "Vista de cámara")}
-              value={view}
-              onChange={(e) => setView(e.target.value as typeof view)}
-            >
-              <option value="space">3D</option>
-              <option value="plan">{b("Plan", "Planta")}</option>
-              <option value="section">{b("Section", "Sección")}</option>
-            </select>
-            <button
-              onClick={() => w.setCameraReset((v) => v + 1)}
-              aria-label={b("Fit mine to view", "Ajustar mina a la vista")}
-            >
-              <Focus size={17} />
-            </button>
-          </div>
-        </div>
-        <div className="av-visual-stage">
-          <Suspense
-            fallback={
-              <p>{b("Loading 3D instrument…", "Cargando instrumento 3D…")}</p>
-            }
+          <select
+            aria-label={b("Camera view", "Vista de cámara")}
+            value={view}
+            onChange={(e) => setView(e.target.value as typeof view)}
           >
-            <MineScene
-              network={effective}
-              result={displayResult}
-              baseline={w.safeBaseline}
-              metric={effectiveMetric}
-              theme={w.theme}
-              lang={w.lang}
-              selected={w.selected}
-              selectedNode={nodeId}
-              tool={mode === "design" ? tool : "select"}
-              onEdge={(id) => {
-                if (mode === "design" && tool === "select")
-                  setToolPage("airway");
-                w.setSelected(id);
-                setNodeId(null);
-              }}
-              onNode={(id) => {
-                if (mode === "design") {
-                  connect(id);
-                  if (tool !== "connect") setToolPage("node");
-                } else setNodeId(id);
-              }}
-              onDraw={draw}
-              onMove={move}
-              editElevation={elevation}
-              snap={snap}
-              separation={separation}
-              widthScale={widthScale}
-              level={w.level}
-              view={view}
-              reset={w.cameraReset}
-              closed={displayedClosed}
-              path={routing?.path?.edgeIds ?? []}
-              frame={mode === "transport" ? transportFrame : undefined}
-              concentrationMax={concentrationMax}
-              labels={labels}
-              cut={cut ? cutZ : null}
-            />
-          </Suspense>
-          <div className="av-viz-readout">
-            <span>
-              {mode === "models" && predictionMethod
-                ? `${predictionMethod} · ${b("approximation", "aproximación")}`
-                : w.busy
-                  ? b("Solving…", "Calculando…")
-                  : w.valid
-                    ? b("Flow balance solved", "Balance de flujo resuelto")
-                    : b(
-                        "No valid flow result",
-                        "Sin resultado de flujo válido",
-                      )}
-            </span>
-            <strong>
-              {fmt(displayResult?.totalIntake)} <small>m³/s</small>
-            </strong>
-            <span>
-              {fmt(displayResult?.fanPowerKW)} kW ·{" "}
-              {displayResult?.shortfalls.filter(
-                (v, i) => effective.edges[i].target > 0 && v > 1e-6,
-              ).length ?? 0}
-              /{w.targets} {b("targets short", "objetivos insuficientes")}
-            </span>
-          </div>
-          <div className="av-legend">
-            <span>
-              {effectiveMetric === "tracer"
-                ? b("Concentration · mg/m³", "Concentración · mg/m³")
-                : effectiveMetric === "path"
-                  ? b("Directed route · amber", "Ruta dirigida · ámbar")
-                  : effectiveMetric === "pressure"
-                    ? b(
-                        "Mean endpoint pressure · Pa",
-                        "Presión media de extremos · Pa",
-                      )
-                    : effectiveMetric === "target"
-                      ? b(
-                          "Flow target: green met / red short",
-                          "Objetivo: verde cumple / rojo insuficiente",
-                        )
-                      : effectiveMetric === "change"
-                        ? b(
-                            "Flow difference from baseline · m³/s",
-                            "Diferencia de caudal con referencia · m³/s",
-                          )
-                        : effectiveMetric === "route"
-                          ? b(
-                              "Intake · return · working · crosscut · fan",
-                              "Entrada · retorno · labor · conexión · ventilador",
-                            )
-                          : effectiveMetric === "velocity"
-                            ? b(
-                                "Signed velocity · m/s",
-                                "Velocidad con signo · m/s",
-                              )
-                            : b(
-                                "Signed flow · m³/s",
-                                "Caudal con signo · m³/s",
-                              )}
-            </span>
-            {effectiveMetric === "tracer" && (
-              <>
-                <i />
-                <span>0 -- {fmt(concentrationMax, 3)}</span>
-              </>
-            )}
-            {!["tracer", "path", "route", "target"].includes(
-              effectiveMetric,
-            ) && (
-              <>
-                <i
-                  style={{
-                    background:
-                      "linear-gradient(90deg,#b69afa,#526b83,#58d8ca)",
-                  }}
-                />
-                <span>
-                  {fmt(-scale.span)} -- 0 -- {fmt(scale.span)} {scale.unit}
-                </span>
-              </>
-            )}
-          </div>
+            <option value="space">3D</option>
+            <option value="plan">{b("Plan", "Planta")}</option>
+            <option value="section">{b("Section", "Sección")}</option>
+          </select>
+          <button
+            onClick={() => w.setCameraReset((v) => v + 1)}
+            aria-label={b("Fit mine to view", "Ajustar mina a la vista")}
+          >
+            <Focus size={17} />
+          </button>
         </div>
-      </section>
+      </div>
+      <div className="av-visual-stage">
+        <Suspense
+          fallback={
+            <p className="caos-pending" data-state="loading">
+              {b("Loading 3D instrument…", "Cargando instrumento 3D…")}
+            </p>
+          }
+        >
+          <MineScene
+            network={effective}
+            result={displayResult}
+            baseline={w.safeBaseline}
+            metric={effectiveMetric}
+            theme={w.theme}
+            lang={w.lang}
+            selected={w.selected}
+            selectedNode={nodeId}
+            tool={mode === "design" ? tool : "select"}
+            onEdge={(id) => {
+              if (mode === "design" && tool === "select")
+                setToolPage("airway");
+              w.setSelected(id);
+              setNodeId(null);
+            }}
+            onNode={(id) => {
+              if (mode === "design") {
+                connect(id);
+                if (tool !== "connect") setToolPage("node");
+              } else setNodeId(id);
+            }}
+            onDraw={draw}
+            onMove={move}
+            editElevation={elevation}
+            snap={snap}
+            separation={separation}
+            widthScale={widthScale}
+            level={w.level}
+            view={view}
+            reset={w.cameraReset}
+            closed={displayedClosed}
+            path={routing?.path?.edgeIds ?? []}
+            frame={mode === "transport" ? transportFrame : undefined}
+            concentrationMax={concentrationMax}
+            labels={labels}
+            cut={cut ? cutZ : null}
+          />
+        </Suspense>
+        <div className="av-viz-readout">
+          <span>
+            {mode === "models" && predictionMethod
+              ? `${predictionMethod} · ${b("approximation", "aproximación")}`
+              : w.busy
+                ? b("Solving…", "Calculando…")
+                : w.valid
+                  ? b("Flow balance solved", "Balance de flujo resuelto")
+                  : b(
+                      "No valid flow result",
+                      "Sin resultado de flujo válido",
+                    )}
+          </span>
+          <strong>
+            {fmt(displayResult?.totalIntake)} <small>m³/s</small>
+          </strong>
+          <span>
+            {fmt(displayResult?.fanPowerKW)} kW ·{" "}
+            {displayResult?.shortfalls.filter(
+              (v, i) => effective.edges[i].target > 0 && v > 1e-6,
+            ).length ?? 0}
+            /{w.targets} {b("targets short", "objetivos insuficientes")}
+          </span>
+        </div>
+        <div className="av-legend">
+          <span>
+            {effectiveMetric === "tracer"
+              ? b("Concentration · mg/m³", "Concentración · mg/m³")
+              : effectiveMetric === "path"
+                ? b("Directed route · amber", "Ruta dirigida · ámbar")
+                : effectiveMetric === "pressure"
+                  ? b(
+                      "Mean endpoint pressure · Pa",
+                      "Presión media de extremos · Pa",
+                    )
+                  : effectiveMetric === "target"
+                    ? b(
+                        "Flow target: green met / red short",
+                        "Objetivo: verde cumple / rojo insuficiente",
+                      )
+                    : effectiveMetric === "change"
+                      ? b(
+                          "Flow difference from baseline · m³/s",
+                          "Diferencia de caudal con referencia · m³/s",
+                        )
+                      : effectiveMetric === "route"
+                        ? b(
+                            "Intake · return · working · crosscut · fan",
+                            "Entrada · retorno · labor · conexión · ventilador",
+                          )
+                        : effectiveMetric === "velocity"
+                          ? b(
+                              "Signed velocity · m/s",
+                              "Velocidad con signo · m/s",
+                            )
+                          : b(
+                              "Signed flow · m³/s",
+                              "Caudal con signo · m³/s",
+                            )}
+          </span>
+          {effectiveMetric === "tracer" && (
+            <>
+              <i />
+              <span>0 -- {fmt(concentrationMax, 3)}</span>
+            </>
+          )}
+          {!["tracer", "path", "route", "target"].includes(
+            effectiveMetric,
+          ) && (
+            <>
+              <i
+                style={{
+                  background:
+                    "linear-gradient(90deg,#b69afa,#526b83,#58d8ca)",
+                }}
+              />
+              <span>
+                {fmt(-scale.span)} -- 0 -- {fmt(scale.span)} {scale.unit}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+  // One tool section of the pane: the open sub-view's content.
+  const page = (id: string) => (
+    <div className="av-tool-page">
+      {groupPages.find((p) => p.id === id)?.content}
     </div>
   );
+  const paneHead = (
+    <div className="av-control-title">
+      <h2>{def.title[w.lang]}</h2>
+      <button
+        type="button"
+        className="av-panel-close icon-btn"
+        aria-label={b("Hide tool parameters", "Ocultar parámetros")}
+        onClick={() => setPanel(false)}
+      >
+        ×
+      </button>
+    </div>
+  );
+  const subTabs = (render: (id: string) => ReactNode) => (
+    <SubTabs
+      ariaLabel={b("Tool section", "Sección de herramientas")}
+      value={sub}
+      onChange={setSub}
+      tabs={def.subs.map((sv) => ({
+        id: sv.id,
+        label: sv[w.lang],
+        content: render(sv.id),
+      }))}
+    />
+  );
+  const paneLabel = b("Tool parameters", "Parámetros de la herramienta");
+  const modeClass = `av-mode av-mode-${group}${panel ? " av-panel-open" : ""}`;
+  // In the App the sub-views are the row of tabs under the group row and the pane floats over the scene; in Focus the
+  // stage is the scene alone, so the row moves into the pane, which clears the shell's label and HUD.
+  const content = focusOn ? (
+    <div className={`${modeClass} av-mode-focus`}>
+      <Slot node={sceneNode} className="av-scene-slot" />
+      <aside className="av-controls" aria-label={paneLabel}>
+        {paneHead}
+        {subTabs(page)}
+      </aside>
+    </div>
+  ) : (
+    subTabs((id) => (
+      <div className={modeClass}>
+        <Slot node={sceneNode} className="av-scene-slot" />
+        <aside className="av-controls" aria-label={paneLabel}>
+          {paneHead}
+          {page(id)}
+        </aside>
+      </div>
+    ))
+  );
+  const frameMain =
+    group === "design"
+      ? {
+          label: { en: "Junctions · airways", es: "Uniones · galerías" },
+          value: `${n.nodes.length} · ${n.edges.length}`,
+        }
+      : group === "airflow"
+        ? {
+            label: { en: "Mass residual · m³/s", es: "Residuo de masa · m³/s" },
+            value: displayResult
+              ? formatNumber(displayResult.massResidual, w.lang, { digits: 2 })
+              : "--",
+          }
+        : group === "transport"
+          ? {
+              label: { en: "Tracer time", es: "Tiempo del trazador" },
+              value: transportFrame
+                ? `${fixed(transportFrame.timeSeconds, 1, w.lang)} s`
+                : "--",
+            }
+          : group === "uncertainty"
+            ? {
+                label: { en: "Resistance CV", es: "CV de resistencia" },
+                value:
+                  w.matchesBake && w.chosenCase?.ensemble
+                    ? `${fixed(w.chosenCase.ensemble.cv * 100, 1, w.lang)} %`
+                    : "--",
+              }
+            : {
+                label: { en: "Field shown", es: "Campo mostrado" },
+                value: predictionMethod ?? (w.lang === "es" ? "numérico" : "numerical"),
+              };
+  const short = displayResult
+    ? displayResult.shortfalls.filter(
+        (v, i) => effective.edges[i].target > 0 && v > 1e-6,
+      ).length
+    : null;
+  const hud = [
+    {
+      label: { en: "Total airflow · m³/s", es: "Caudal total · m³/s" },
+      value: displayResult ? fixed(displayResult.totalIntake, 2, w.lang) : "--",
+    },
+    {
+      label: { en: "Fan power · kW", es: "Potencia · kW" },
+      value: displayResult ? fixed(displayResult.fanPowerKW, 2, w.lang) : "--",
+    },
+    {
+      label: { en: "Targets short", es: "Objetivos insuficientes" },
+      value: short === null ? "--" : `${short} / ${w.targets}`,
+    },
+    frameMain,
+  ];
+  return {
+    scene,
+    content,
+    learned,
+    hud,
+    compareToBaseline: () => {
+      setMetric("change");
+      setFlowTool("field");
+    },
+  };
 }
 
 function EnergySummary({ w }: { w: WorkbenchState }) {
@@ -2019,35 +2506,12 @@ function OperatingInputs({
               ))}
             </select>
           </label>
-          <label className="av-range-label">
-            {b("Fan speed", "Velocidad del ventilador")}
-            <output>{fmt(w.options.speed * 100, 0)}%</output>
-            <input
-              aria-label={b("Fan speed", "Velocidad del ventilador")}
-              type="range"
-              min="0"
-              max="1.5"
-              step=".01"
-              value={w.options.speed}
-              onChange={(e) =>
-                w.change(w.network!, { ...w.options, speed: +e.target.value })
-              }
-            />
-          </label>
-          <Numeric
-            label={b(
-              "Global resistance factor",
-              "Factor global de resistencia",
+          <p className="av-hint">
+            {b(
+              "Fan speed and the global resistance scale are in the Operating point section of the rail.",
+              "La velocidad del ventilador y la escala global de resistencia están en la sección Punto operativo del panel.",
             )}
-            value={w.options.resistanceScale}
-            min={0.2}
-            max={5}
-            step={0.05}
-            change={(v) =>
-              w.change(w.network!, { ...w.options, resistanceScale: v })
-            }
-            unit="×"
-          />
+          </p>
         </>
       )}
       {scope === "edge" && edge && (
@@ -2120,6 +2584,30 @@ function EngineeringReadout({
   analysis: "duty" | "sensitivity" | "baseline";
   route: string[];
 }) {
+  return (
+    AnalysisReadout({ w, result, mode, analysis }) ?? (
+      <SelectedReadout
+        w={w}
+        result={result}
+        approximation={approximation}
+        route={route}
+      />
+    )
+  );
+}
+
+/** The chart of the operating question or of the recorded ensemble, or null when the open view has none to draw. */
+function AnalysisReadout({
+  w,
+  result,
+  mode,
+  analysis,
+}: {
+  w: WorkbenchState;
+  result: Result | null;
+  mode: Mode;
+  analysis: "duty" | "sensitivity" | "baseline";
+}): ReactNode {
   const b = w.b,
     edge = w.edge,
     i = w.selectedIndex,
@@ -2321,6 +2809,24 @@ function EngineeringReadout({
       </div>
     );
   }
+  return null;
+}
+
+function SelectedReadout({
+  w,
+  result,
+  approximation,
+  route,
+}: {
+  w: WorkbenchState;
+  result: Result | null;
+  approximation: string | null;
+  route: string[];
+}) {
+  const b = w.b,
+    edge = w.edge,
+    i = w.selectedIndex,
+    r = result;
   return (
     <div className="av-selected-readout">
       <div>
@@ -2360,8 +2866,8 @@ function EngineeringReadout({
           {b("Mass / pressure residual", "Residuo de masa / presión")}
         </span>
         <strong>
-          {r?.massResidual.toExponential(1) ?? "--"} /{" "}
-          {r?.pressureResidual.toExponential(1) ?? "--"}
+          {formatNumber(r?.massResidual, w.lang, { digits: 2 })} /{" "}
+          {formatNumber(r?.pressureResidual, w.lang, { digits: 2 })}
         </strong>
         <small>m³/s · Pa</small>
       </div>

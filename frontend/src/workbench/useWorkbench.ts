@@ -31,7 +31,6 @@ export default function useWorkbench() {
   const lang = useShellLang();
   const theme = useThemeStore((s) => s.theme);
   const b = (en: string, es: string) => (lang === "en" ? en : es);
-  const [focus, setFocus] = useState(false);
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [network, setNetwork] = useState<Network | null>(null),
     [options, setOptions] = useState<Options>(clone(DEFAULT_OPTIONS)),
@@ -457,8 +456,6 @@ export default function useWorkbench() {
     setHours,
     tariff,
     setTariff,
-    focus,
-    setFocus,
     level,
     setLevel,
     cameraReset,

@@ -70,18 +70,20 @@ export async function openWorkbench(page: Page) {
   await expect(page.locator("canvas")).toBeVisible();
   await balanced(page);
 }
+/** A group of the App (Design, Airflow, Transport, Uncertainty, Learned models, Context), then its first sub-view. */
 export async function mode(page: Page, name: string) {
   await page.getByRole("tab", { name, exact: true }).click();
-  await toolSection(page, "primary");
+  if (name !== "Context" && name !== "Contexto") await toolSection(page, "primary");
 }
+/** One sub-view of the open group, by its id (`primary`, `duty`, `view`, ...); the tool pane is opened first. */
 export async function toolSection(page: Page, section: string) {
   await parameters(page);
   await page
-    .getByRole("combobox", {
-      name: /^(Tool section|Sección de herramientas)$/,
-      exact: true,
-    })
-    .selectOption(section);
+    .locator(`[data-case-workbench] .subtab[data-tab="${section}"]`)
+    .click();
+  await expect(
+    page.locator(`[data-case-workbench] .subtab.active[data-tab="${section}"]`),
+  ).toBeVisible();
 }
 export async function modelSection(page: Page, section: string) {
   await toolSection(page, "primary");
@@ -100,12 +102,35 @@ export async function parameters(page: Page) {
       .click();
   await expect(controls).toBeVisible();
 }
+/** A section of the rail, by id: `operating` (the Setpoint chip), `readouts` (Values) or `project`. */
+export async function railSection(
+  page: Page,
+  id: "operating" | "readouts" | "project",
+) {
+  const tab = page.locator(`[id$="-rs-${id}"]`).filter({ visible: true });
+  if ((await tab.getAttribute("aria-selected")) !== "true") await tab.click();
+  await expect(tab).toHaveAttribute("aria-selected", "true");
+}
+/** A button of the Project section of the rail (New design, Load, Save, Undo edit, ...). */
+export async function projectButton(page: Page, name: string) {
+  await railSection(page, "project");
+  await page.getByRole("button", { name, exact: true }).click();
+}
+/** The fan speed of the rail's operating point (a registered Knob). */
+export async function fanSpeed(page: Page, value: number) {
+  await railSection(page, "operating");
+  await page
+    .locator('.caos-knob[data-control="speed"] input')
+    .filter({ visible: true })
+    .fill(String(value));
+}
 export async function numeric(page: Page, name: string, value: number) {
   const input = page.getByRole("spinbutton", { name, exact: true });
   await input.fill(String(value));
   await input.press("Enter");
 }
 export async function downloaded<T>(page: Page, button: string): Promise<T> {
+  await railSection(page, "project");
   const pending = page.waitForEvent("download");
   await page.getByRole("button", { name: button, exact: true }).click();
   const file = await pending;
@@ -117,7 +142,7 @@ export async function importProject(
   network: Network,
   options: Options = defaults,
 ) {
-  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await projectButton(page, "Load");
   await page.getByLabel(/Saved project or network JSON/).setInputFiles({
     name: "verification-project.json",
     mimeType: "application/json",
@@ -141,10 +166,12 @@ export async function noDocumentOverflow(page: Page) {
     height: document.documentElement.scrollHeight,
     viewportWidth: innerWidth,
     viewportHeight: innerHeight,
+    focus: Boolean(document.querySelector("[data-focus-shell]")),
   }));
   expect(dimensions.width).toBeLessThanOrEqual(dimensions.viewportWidth + 1);
-  // Shell 0.8.0 (ADR-0071 rule 1): the page is exactly the viewport from 900 px up; below it the contained page is
-  // released and the document scrolls as a whole, so only the width is held there.
-  if (dimensions.viewportWidth >= 900)
+  // Shell 0.8.0 (ADR-0071 rule 1): the page is exactly the viewport from 900 px up, and the shell's Focus stage is the
+  // viewport at every width (ADR-0070); below 900 px the contained page of the App is released and the document
+  // scrolls as a whole, so only its width is held there.
+  if (dimensions.viewportWidth >= 900 || dimensions.focus)
     expect(dimensions.height).toBeLessThanOrEqual(dimensions.viewportHeight + 1);
 }

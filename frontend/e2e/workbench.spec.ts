@@ -5,8 +5,10 @@ import {
   analyticalNetwork,
   balanced,
   defaults,
+  fanSpeed,
   importProject,
   mode,
+  projectButton,
   toolSection,
   modelSection,
   numeric,
@@ -25,7 +27,7 @@ test("draw, connect, move, add a fan, split, undo and recover the actual edited 
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await openWorkbench(page);
-  await page.getByRole("button", { name: "New design", exact: true }).click();
+  await projectButton(page, "New design");
   await page.getByLabel("Project name").fill("Browser authored mine");
   await page
     .getByRole("button", { name: "Create design", exact: true })
@@ -79,9 +81,9 @@ test("draw, connect, move, add a fan, split, undo and recover the actual edited 
   expect(split.network.nodes).toHaveLength(4);
   expect(split.network.edges).toHaveLength(4);
   expect(split.network.edges.filter((edge) => edge.fan)).toHaveLength(1);
-  await page.getByRole("button", { name: "Undo edit", exact: true }).click();
+  await projectButton(page, "Undo edit");
   expect((await project(page)).network.edges).toHaveLength(3);
-  await page.getByRole("button", { name: "Redo edit", exact: true }).click();
+  await projectButton(page, "Redo edit");
   await expect
     .poll(async () =>
       page.evaluate(() => localStorage.getItem("aerovia.project.v1")),
@@ -144,7 +146,7 @@ test("pointer orbit changes the projection and an axis drag commits a real node 
   await expect
     .poll(async () => (await project(page)).network.nodes[1])
     .not.toEqual(network.nodes[1]);
-  await page.getByRole("button", { name: "Undo edit", exact: true }).click();
+  await projectButton(page, "Undo edit");
   expect((await project(page)).network.nodes).toEqual(network.nodes);
 });
 
@@ -153,14 +155,11 @@ test("flow controls change actual flow and power and closure has a recoverable m
 }) => {
   await openWorkbench(page);
   await importProject(page, analyticalNetwork());
-  await mode(page, "Airflow & paths");
+  await mode(page, "Airflow");
   const intake = () =>
     page.locator(".av-viz-readout > strong").innerText().then(uiNumber);
   expect(await intake()).toBeCloseTo(10, 2);
-  await toolSection(page, "conditions");
-  await page
-    .getByRole("slider", { name: "Fan speed", exact: true })
-    .fill("0.5");
+  await fanSpeed(page, 0.5);
   await expect.poll(intake).toBeCloseTo(5, 2);
   await expect(page.locator(".av-viz-readout")).toContainText("0.16 kW");
   await toolSection(page, "equipment");
@@ -180,13 +179,10 @@ test("JSON imports preserve current inputs on failure and round-trip an edited o
   page,
 }) => {
   await openWorkbench(page);
-  await mode(page, "Airflow & paths");
-  await toolSection(page, "conditions");
-  await page
-    .getByRole("slider", { name: "Fan speed", exact: true })
-    .fill("0.83");
+  await mode(page, "Airflow");
+  await fanSpeed(page, 0.83);
   const original = await project(page);
-  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await projectButton(page, "Load");
   await page.getByLabel(/Saved project or network JSON/).setInputFiles({
     name: "malformed.json",
     mimeType: "application/json",
@@ -213,7 +209,7 @@ test("two CSV uploads map units and languages, while malformed joins leave the c
     'Node ID,Easting,Northing,Elevation,pressure_pa\n"surface-in",0,0,0,100\nend,100,0,-10,0';
   const good =
     'ID,Start,End,Area,R,nameEn,nameEs\na,"surface-in",end,100,0.2,"Intake, north","Entrada, norte"';
-  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await projectButton(page, "Load");
   await page.getByLabel("Junction CSV", { exact: true }).setInputFiles({
     name: "nodes.csv",
     mimeType: "text/csv",
@@ -235,7 +231,7 @@ test("two CSV uploads map units and languages, while malformed joins leave the c
   );
   await page.getByRole("button", { name: "Close", exact: true }).click();
   expect((await project(page)).network).toEqual(before.network);
-  await page.getByRole("button", { name: "Load", exact: true }).click();
+  await projectButton(page, "Load");
   await page.getByLabel("Junction CSV", { exact: true }).setInputFiles({
     name: "nodes.csv",
     mimeType: "text/csv",
@@ -261,9 +257,7 @@ test("two CSV uploads map units and languages, while malformed joins leave the c
     en: "Intake, north",
     es: "Entrada, norte",
   });
-  await page
-    .getByRole("button", { name: "Network tables", exact: true })
-    .click();
+  await projectButton(page, "Network tables");
   const pending = page.waitForEvent("download");
   await page.getByRole("button", { name: "Airway CSV", exact: true }).click();
   const csv = await readFile((await (await pending).path())!, "utf8");
@@ -275,7 +269,8 @@ test("optimization, operating curve and sensitivity are calculated and applied t
   page,
 }) => {
   await openWorkbench(page);
-  await mode(page, "Fan operations");
+  await mode(page, "Airflow");
+  await toolSection(page, "duty");
   await page
     .getByRole("button", {
       name: "Find minimum speed meeting targets",
@@ -300,7 +295,7 @@ test("optimization, operating curve and sensitivity are calculated and applied t
   await expect(
     page.getByRole("img", { name: /Fan speed sweep/ }),
   ).toBeVisible();
-  await toolSection(page, "primary");
+  await toolSection(page, "duty");
   await page
     .getByRole("combobox", { name: /^Operating question/ })
     .selectOption("sensitivity");
@@ -312,7 +307,7 @@ test("optimization, operating curve and sensitivity are calculated and applied t
   const intervention = page.locator(".av-sensitivity-bars button").first();
   const selectedName = await intervention.locator("span").innerText();
   await intervention.click();
-  await mode(page, "Airflow & paths");
+  await mode(page, "Airflow");
   await toolSection(page, "inspect");
   await expect(page.locator(".av-selected-readout h3")).toHaveText(
     selectedName,
@@ -383,11 +378,8 @@ test("recorded uncertainty selects an airway and disappears when the operating i
     item.ensemble.flowP50[lastIndex],
     2,
   );
-  await mode(page, "Airflow & paths");
-  await toolSection(page, "conditions");
-  await page
-    .getByRole("slider", { name: "Fan speed", exact: true })
-    .fill("0.8");
+  await mode(page, "Airflow");
+  await fanSpeed(page, 0.8);
   await balanced(page);
   await mode(page, "Uncertainty");
   await expect(plot).toHaveCount(0);
@@ -407,7 +399,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
   page,
 }) => {
   await openWorkbench(page);
-  await mode(page, "Learned screening");
+  await mode(page, "Learned models");
   await modelSection(page, "run");
   await page
     .getByRole("button", { name: "Run both models", exact: true })
@@ -494,7 +486,7 @@ test("learned fields are labeled approximations and reject a changed topology wi
   );
   await assertDisplayedPrediction();
   await importProject(page, analyticalNetwork());
-  await mode(page, "Learned screening");
+  await mode(page, "Learned models");
   await modelSection(page, "run");
   await page
     .getByRole("button", { name: "Run both models", exact: true })
@@ -594,8 +586,9 @@ test("energy and cost use actual solved fan power and preserve the captured comp
 }) => {
   await openWorkbench(page);
   await importProject(page, analyticalNetwork());
-  await mode(page, "Fan operations");
-  await toolSection(page, "energy");
+  await mode(page, "Airflow");
+  await toolSection(page, "duty");
+  await toolSection(page, "duty");
   await numeric(page, "Operating hours", 8000);
   await numeric(page, "Electricity tariff", 0.2);
   const energy = page.getByRole("region", {
@@ -609,32 +602,29 @@ test("energy and cost use actual solved fan power and preserve the captured comp
       .locator("strong");
   expect(uiNumber(await value("Annual energy").innerText())).toBe(10);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(2000);
-  await toolSection(page, "primary");
+  await toolSection(page, "duty");
   await page
     .getByRole("combobox", { name: "Operating question", exact: true })
     .selectOption("baseline");
   await page
     .getByRole("button", { name: "Capture current baseline", exact: true })
     .click();
-  await toolSection(page, "conditions");
-  await page
-    .getByRole("slider", { name: "Fan speed", exact: true })
-    .fill("0.5");
+  await fanSpeed(page, 0.5);
   await balanced(page);
-  await toolSection(page, "energy");
+  await toolSection(page, "duty");
   expect(uiNumber(await value("Annual energy").innerText())).toBe(1.25);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(250);
   expect(uiNumber(await value("Cost change from baseline").innerText())).toBe(
     -1750,
   );
-  await toolSection(page, "primary");
+  await toolSection(page, "duty");
   await page
     .getByRole("button", { name: "Show spatial flow differences", exact: true })
     .click();
   await expect(page.locator(".av-legend")).toContainText(
     "Flow difference from baseline",
   );
-  await toolSection(page, "energy");
+  await toolSection(page, "duty");
   await numeric(page, "Operating hours", 0);
   expect(uiNumber(await value("Annual energy").innerText())).toBe(0);
   expect(uiNumber(await value("Annual cost").innerText())).toBe(0);
@@ -668,7 +658,7 @@ test("isolating a working level changes actual scene hit testing without alterin
   });
   await openWorkbench(page);
   await importProject(page, network);
-  await mode(page, "Airflow & paths");
+  await mode(page, "Airflow");
   await toolSection(page, "view");
   await page.getByRole("checkbox", { name: "Labels", exact: true }).check();
   await page

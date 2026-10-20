@@ -2,6 +2,7 @@ import { test } from "./helpers";
 import { expect } from "@playwright/test";
 import {
   balanced,
+  fanSpeed,
   mode,
   toolSection,
   modelSection,
@@ -231,7 +232,11 @@ for (const mobile of [false, true])
       await tabs.nth(i).click();
       const svg = dialog.locator("svg");
       await expect(svg).toHaveCount(1);
-      await svg.scrollIntoViewIfNeeded();
+      // The modal injects its SVG after the tab opens; a busy page can replace it once more under the locator.
+      await expect(async () => {
+        await expect(svg).toHaveCount(1);
+        await svg.scrollIntoViewIfNeeded({ timeout: 2000 });
+      }).toPass({ timeout: 10000 });
       const escaped = await svg.evaluate((element) => {
         const bounds = element.getBoundingClientRect();
         return [...element.querySelectorAll("text")]
@@ -302,25 +307,27 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
   await page.setViewportSize({ width: 390, height: 844 });
   await openWorkbench(page);
   await noDocumentOverflow(page);
-  await mode(page, "Airflow & paths");
+  await mode(page, "Airflow");
   await parameters(page);
   await toolSection(page, "conditions");
-  await page
-    .getByRole("slider", { name: "Fan speed", exact: true })
-    .fill("0.7");
+  await fanSpeed(page, 0.7);
   await balanced(page);
   const controls = page.locator(".av-controls");
   await controls.locator(".av-panel-close").click();
   const before = await project(page);
   expect(before.options.speed).toBe(0.7);
-  await page
-    .getByRole("button", { name: "Toggle focus view", exact: true })
-    .click();
-  await expect(page.locator(".av-workbench")).toHaveClass(/av-focus/);
+  // The shell's Focus (ADR-0070): the stage is the viewport at every width, the group and sub-view stay.
+  await page.locator("[data-focus-enter]").click();
+  await expect(page.locator("[data-focus-shell]")).toBeVisible();
   await noDocumentOverflow(page);
-  await page
-    .getByRole("button", { name: "Toggle focus view", exact: true })
-    .click();
+  await expect(
+    page.locator('.caos-focus-rail .caos-knob[data-control="speed"] input'),
+  ).toHaveValue("0.7");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("[data-focus-shell]")).toHaveCount(0);
+  await expect(
+    page.locator('[data-case-workbench] .subtab.active[data-tab="conditions"]'),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Toggle light / dark", exact: true })
     .click();
@@ -329,7 +336,7 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
     .click();
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expect(
-    page.getByRole("tab", { name: "Flujo y rutas", exact: true }),
+    page.getByRole("tab", { name: "Flujo de aire", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
   await noDocumentOverflow(page);
   await page.screenshot({
@@ -359,6 +366,22 @@ test("mobile tool panels, focus view and appearance changes preserve the enginee
   await navigation.getByRole("link", { name: "App", exact: true }).click();
   await balanced(page);
   expect((await project(page)).options).toEqual(before.options);
+});
+
+test("a Focus link opens the stage at once, on the open path /app, and the page never scrolls", async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/app?case=room-pillar&view=airflow&sub=duty&focus=1");
+    await expect(page.locator("[data-focus-shell]")).toBeVisible();
+    await expect(page.locator("canvas")).toBeVisible();
+    await balanced(page);
+    await noDocumentOverflow(page);
+  }
 });
 
 for (const viewport of [
@@ -426,19 +449,25 @@ for (const viewport of [
             rows,
           };
         });
-        expect(
-          layout.panelContent,
-          `${context}: the chosen task page must show all of its controls without scrolling`,
-        ).toBeLessThanOrEqual(layout.panelHeight + 1);
+        // On a phone the shell's Focus stage is 54 dvh, so its tool pane is a small scrolling overlay there by necessity.
+        if (!(focus && viewport.width < 900))
+          expect(
+            layout.panelContent,
+            `${context}: the chosen task page must show all of its controls without scrolling`,
+          ).toBeLessThanOrEqual(layout.panelHeight + 1);
         expect(
           layout.rows.every((rows) => rows === 1),
           `${context}: navigation and tabs remain a single row`,
         ).toBe(true);
+        // The shell's Focus stage is the viewport less the rail (0.8 and more from 900 px up) and, on a phone, the 54 dvh
+        // the shell gives the stage above the rail.
         if (focus || viewport.width > 600)
           expect(
             layout.ratio,
             `${context}: measure the actual canvas, not its surrounding panel`,
-          ).toBeGreaterThanOrEqual(focus ? 0.65 : 0.5);
+          ).toBeGreaterThanOrEqual(
+            focus ? (viewport.width >= 900 ? 0.8 : 0.5) : 0.5,
+          );
       }
       for (const lang of ["en", "es"] as const) {
         if (lang === "es")
@@ -448,14 +477,13 @@ for (const viewport of [
         const b = (en: string, es: string) => (lang === "es" ? es : en);
         for (const name of [
           b("Design", "Diseño"),
-          b("Airflow & paths", "Flujo y rutas"),
-          b("Tracer transport", "Transporte"),
-          b("Fan operations", "Operación"),
+          b("Airflow", "Flujo de aire"),
+          b("Transport", "Transporte"),
           b("Uncertainty", "Incertidumbre"),
-          b("Learned screening", "Modelos aprendidos"),
+          b("Learned models", "Modelos aprendidos"),
         ]) {
           await mode(page, name);
-          if (name === b("Learned screening", "Modelos aprendidos")) {
+          if (name === b("Learned models", "Modelos aprendidos")) {
             await modelSection(page, "run");
             await page
               .getByRole("button", {
@@ -471,14 +499,10 @@ for (const viewport of [
               await fits(`${lang}/${theme}/${name}/model-${section}`);
             }
           }
-          const picker = page.getByRole("combobox", {
-            name: b("Tool section", "Sección de herramientas"),
-            exact: true,
-          });
-          const sections = await picker
-            .locator("option")
-            .evaluateAll((options) =>
-              options.map((option) => (option as HTMLOptionElement).value),
+          const sections = await page
+            .locator("[data-case-workbench] .subtab")
+            .evaluateAll((tabs) =>
+              tabs.map((tab) => tab.getAttribute("data-tab") ?? ""),
             );
           expect(sections.length).toBeLessThanOrEqual(6);
           for (const section of sections) {
@@ -486,16 +510,12 @@ for (const viewport of [
             await fits(`${lang}/${theme}/${name}/${section}`);
           }
         }
-        await page
-          .getByRole("button", {
-            name: b("Toggle focus view", "Alternar vista enfocada"),
-            exact: true,
-          })
-          .click();
-        await expect(page.locator(".av-workbench")).toHaveClass(/av-focus/);
+        // The shell's Focus (ADR-0070) on the group the loop ended on.
+        await page.locator("[data-focus-enter]").click();
+        await expect(page.locator("[data-focus-shell]")).toBeVisible();
         await fits(`${lang}/${theme}/focus`, true);
         await page.keyboard.press("Escape");
-        await expect(page.locator(".av-workbench")).not.toHaveClass(/av-focus/);
+        await expect(page.locator("[data-focus-shell]")).toHaveCount(0);
       }
     });
   }

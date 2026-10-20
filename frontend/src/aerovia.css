@@ -58,25 +58,11 @@
   position: absolute;
   font: 10px var(--font-mono);
   color: var(--color-fg-subtle);
-  opacity: 0.7;
   transform: translate(-100%, 0);
   white-space: nowrap;
 }
-/* The wrapper of the App route: it fills what the shell's page leaves, and the shell's SurfacePage inside it owns the
-   head, the tab row and the open panel (shell 0.8.0). */
-.av-workbench {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  overflow: hidden;
-  min-height: 0;
-  min-width: 0;
-}
-.av-workbench > [data-surface] {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-.av-workbench button,
+.av-mode button:not(.subtab),
+.av-toast button,
 .av-dialog button {
   display: inline-flex;
   align-items: center;
@@ -91,22 +77,23 @@
   font-size: 0.78rem;
   cursor: pointer;
 }
-.av-workbench button:hover,
+.av-mode button:not(.subtab):hover,
+.av-toast button:hover,
 .av-dialog button:hover {
   border-color: var(--color-accent);
   background: var(--color-surface-2);
 }
-.av-workbench button:disabled {
+.av-mode button:not(.subtab):disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.av-workbench button[aria-pressed="true"] {
+.av-mode button[aria-pressed="true"] {
   color: var(--color-accent);
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
 }
-.av-workbench select,
-.av-workbench input:not([type="range"]):not([type="checkbox"]),
+.av-mode select,
+.av-mode input:not([type="range"]):not([type="checkbox"]),
 .av-dialog select,
 .av-dialog input {
   background: var(--color-bg);
@@ -119,28 +106,14 @@
   min-width: 0;
   max-width: 100%;
 }
-.av-workbench input[type="range"] {
+.av-mode input[type="range"] {
   min-width: 30px;
   width: 100%;
   accent-color: var(--color-accent);
   cursor: pointer;
 }
-.av-workbench input[type="checkbox"] {
+.av-mode input[type="checkbox"] {
   accent-color: var(--color-accent);
-}
-.av-project-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-width: 0;
-  flex: 0 0 auto;
-}
-.av-project-row > .av-case {
-  flex: 1;
-  min-width: 0;
-}
-.av-project-row > .av-case select {
-  width: min(100%, 410px);
 }
 .av-actions {
   display: flex;
@@ -148,27 +121,83 @@
   align-items: center;
   min-width: 0;
 }
+/* A group of the App: the scene takes the whole instrument and the tool pane floats over its left edge, so the scene
+   keeps at least half the viewport at every width (ADR-0071 rule 8) and the pane is one SubTabs row of the group. */
 .av-mode {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
-  display: grid;
-  grid-template-columns: 274px minmax(0, 1fr);
-  gap: 0.7rem;
+  display: flex;
   position: relative;
 }
 .av-controls {
+  position: absolute;
+  z-index: 12;
+  top: 2.6rem;
+  left: 0.5rem;
+  max-height: calc(100% - 3.1rem);
+  width: min(300px, calc(100% - 1rem));
   min-width: 0;
   min-height: 0;
-  overflow: visible;
+  overflow: auto;
+  overscroll-behavior: contain;
   padding: 0.7rem;
   border: 1px solid var(--color-border);
   border-radius: 9px;
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  box-shadow: 0 10px 34px #0005;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
   scrollbar-width: thin;
+}
+.av-mode:not(.av-panel-open) .av-controls {
+  display: none;
+}
+/* The scene's own overlays step aside for the open pane. */
+.av-panel-open .av-viz-readout,
+.av-panel-open .av-stream-status {
+  left: calc(min(300px, 100% - 1rem) + 1rem);
+}
+.av-mode > .av-scene-slot,
+.av-scene-host {
+  flex: 1 1 auto;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+.av-tool-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  min-height: 0;
+}
+.av-slot {
+  min-width: 0;
+}
+.av-panel-toggle,
+.av-panel-close {
+  flex: 0 0 auto;
+}
+.av-rail-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.av-rail-btn {
+  justify-content: flex-start;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  min-width: 0;
+}
+.av-rail-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-fg-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .av-pane-readout {
   min-width: 0;
@@ -327,6 +356,7 @@
 }
 .av-instrument {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
@@ -637,41 +667,41 @@
   color: var(--color-fg-subtle);
   max-width: 75ch;
 }
-.av-workbench .plot {
+.av-mode .plot {
   display: flex;
   flex-direction: column;
   min-height: 0;
   height: 100%;
   min-width: 0;
 }
-.av-workbench .plot-heading {
+.av-mode .plot-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
 }
-.av-workbench .plot h3 {
+.av-mode .plot h3 {
   font-size: 0.73rem;
   margin: 0;
 }
-.av-workbench .plot-heading span {
+.av-mode .plot-heading span {
   font-size: 0.67rem;
 }
-.av-workbench .plot svg {
+.av-mode .plot svg {
   flex: 1;
   min-height: 0;
   width: 100%;
   overflow: visible;
 }
-.av-workbench .plot text {
+.av-mode .plot text {
   fill: var(--color-fg-subtle);
   font: 10px var(--font-mono);
 }
-.av-workbench .plot-grid {
+.av-mode .plot-grid {
   stroke: var(--color-border);
   stroke-width: 1;
 }
-.av-workbench .plot-legend {
+.av-mode .plot-legend {
   display: flex;
   gap: 0.6rem;
   font-size: 0.65rem;
@@ -705,37 +735,6 @@
 }
 .av-sensitivity-bars strong {
   flex: 0 0 auto;
-}
-.av-panel-toggle,
-.av-panel-close {
-  display: none !important;
-}
-.av-focus .av-mode {
-  grid-template-columns: minmax(0, 1fr);
-}
-.av-focus {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  padding: 0.6rem;
-  background: var(--color-bg);
-}
-.av-focus .av-controls {
-  display: none;
-}
-.av-focus .av-panel-toggle,
-.av-focus .av-panel-close {
-  display: inline-flex !important;
-}
-.av-focus .av-panel-open .av-controls {
-  display: flex;
-  position: absolute;
-  z-index: 12;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 290px;
-  box-shadow: 0 15px 40px #0005;
 }
 .av-toast {
   position: fixed;
@@ -835,9 +834,6 @@
   overflow: auto;
 }
 @media (min-width: 1800px) {
-  .av-mode {
-    grid-template-columns: 292px minmax(0, 1fr);
-  }
   .av-analysis-dock {
     height: 140px;
   }
@@ -846,9 +842,6 @@
   }
 }
 @media (max-width: 1100px) {
-  .av-mode {
-    grid-template-columns: 245px minmax(0, 1fr);
-  }
   .av-viewport-bar span {
     display: none;
   }
@@ -872,42 +865,6 @@
   }
 }
 @media (max-width: 760px) {
-  .av-project-row {
-    gap: 0.3rem;
-  }
-  .av-project-row .av-actions span {
-    display: none;
-  }
-  .av-project-row .av-actions button {
-    padding: 0.35rem;
-    flex: 0 0 auto;
-  }
-  .av-project-row .av-actions {
-    overflow-x: auto;
-    flex: 1;
-  }
-  .av-project-row > .av-case {
-    flex: 0 1 45%;
-    max-width: 45%;
-  }
-  .av-mode {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .av-controls {
-    display: none;
-  }
-  .av-panel-toggle,
-  .av-panel-close {
-    display: inline-flex !important;
-  }
-  .av-panel-open .av-controls {
-    display: flex;
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: min(290px, 90%);
-    z-index: 12;
-    box-shadow: 0 10px 40px #0007;
-  }
   .av-viewport-bar {
     padding: 0.4rem;
   }
@@ -1000,9 +957,69 @@
   .av-mode {
     min-height: 72dvh;
   }
-  /* The surface head shrinks to its content, so the project row would run past the screen: it keeps to the viewport
-     less the page padding, and its own actions scroll (see the 760 px rules). */
-  .av-project-row {
-    max-width: calc(100vw - 2.5rem);
+}
+/* Focus mode (shell FocusShell): the scene covers the whole stage, the shell's label and HUD lie over it, and what a
+   reader can use clears that chrome: the pane docks on the right below the Focus actions, and the scene's bar floats at
+   the bottom edge. */
+.caos-cw-focus .av-mode {
+  position: absolute;
+  inset: 0;
+}
+.caos-cw-focus .av-instrument {
+  border: 0;
+  border-radius: 0;
+}
+.caos-cw-focus .av-viewport-bar {
+  position: absolute;
+  z-index: 11;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(6px);
+}
+.caos-cw-focus .av-viewport-bar > div:first-of-type {
+  visibility: hidden;
+}
+.caos-cw-focus .av-controls {
+  top: 4.4rem;
+  left: auto;
+  right: 0.5rem;
+  max-height: calc(100% - 4.4rem - 3.4rem);
+  width: min(500px, calc(100% - 1rem));
+}
+.caos-cw-focus .av-panel-open .av-viz-readout,
+.caos-cw-focus .av-panel-open .av-stream-status {
+  left: 1rem;
+}
+.caos-cw-focus .av-viz-readout {
+  top: auto;
+  bottom: 6.4rem;
+}
+.caos-cw-focus .av-stream-status {
+  bottom: 3.4rem;
+}
+.caos-cw-focus .av-legend {
+  top: auto;
+  bottom: 3.4rem;
+  right: 3.6rem;
+}
+@media (max-width: 899px) {
+  .caos-cw-focus .av-mode {
+    min-height: 0;
+  }
+  /* on a phone the shell lays its four readouts along the bottom of the stage: the bar sits above them */
+  .caos-cw-focus .av-viewport-bar {
+    bottom: 3.4rem;
+  }
+  .caos-cw-focus .av-viz-readout,
+  .caos-cw-focus .av-stream-status {
+    bottom: 6.4rem;
+  }
+  .caos-cw-focus .av-viz-readout {
+    bottom: 9.4rem;
+  }
+  .caos-cw-focus .av-controls {
+    max-height: calc(100% - 4.4rem - 6.8rem);
   }
 }
