@@ -40,24 +40,27 @@ for (const route of ROUTES) {
     await page.goto(`/${route}`);
     await expect(page.locator("[data-doc-page]")).toHaveCount(1);
     await expect(page.locator("[data-doc-page] h1")).toHaveCount(1);
-    // No inline "References" row survives inside a section. The Benchmark's two live tools (content/BenchmarkTools.tsx, the
-    // Benchmark page unit's file) still draw their own row outside any DocSection: recorded, not hidden.
-    await expect(page.locator("[data-doc-section] .th-refs")).toHaveCount(0);
-    if (route !== "benchmark")
-      await expect(page.locator(".th-refs")).toHaveCount(0);
+    // No inline "References" row survives, inside a section or outside one: the Benchmark's two live tools
+    // (content/BenchmarkTools.tsx) are DocSections whose references join the block at the end of the open topic.
+    await expect(page.locator(".th-refs")).toHaveCount(0);
 
     const checkOpenState = async (label: string) => {
+      // an evidence topic fetches its artifact first: wait for its section before reading the page
+      const onExecutive = await page
+        .locator('[data-tab="executive"][aria-selected="true"]')
+        .count();
+      if (!onExecutive)
+        await expect(page.locator("[data-doc-section]").first()).toBeAttached();
       const blocks = page.locator("[data-doc-references]");
       const n = await blocks.count();
       const sections = await page.locator("[data-doc-section]").count();
       if (sections === 0) {
-        // The executive view, and the Benchmark topics that hold only a live tool (BenchmarkTools.tsx: no DocSection yet),
-        // register nothing, so the shell draws no block there.
+        // The executive view registers nothing, so the shell draws no block there.
         const executive = await page
           .locator('[data-tab="executive"][aria-selected="true"]')
           .count();
         expect(
-          executive > 0 || route === "benchmark",
+          executive > 0,
           `${route} ${label}: a topic without a DocSection`,
         ).toBe(true);
         expect(n, `${route} ${label}: no section, no references block`).toBe(0);

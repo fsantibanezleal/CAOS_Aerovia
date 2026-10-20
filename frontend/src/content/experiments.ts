@@ -174,6 +174,10 @@ export const experimentSections: ScientificSection[] = [
     ],
     refs: ["sklearnleakage", "sklearnmetrics", "gilmer2017"],
     diagram: "split",
+    diagramCaption: [
+      "The held-out split by network. The graph model is fitted and validated on 11 known networks; the room-and-pillar grid family (room-pillar) is excluded from its training and validation and kept for the test, with one disclosed nominal calibration. The dashed path with a cross is the forbidden anti-pattern: using test outcomes to fit scaling, select epochs or retune thresholds.",
+      "La separación reservada por red. El modelo de grafos se ajusta y valida con 11 redes conocidas; la familia de malla de cámaras y pilares (room-pillar) se excluye de su entrenamiento y validación y se reserva para la prueba, con una calibración nominal declarada. El trazo discontinuo con cruz es el antipatrón prohibido: usar resultados de prueba para escalar, elegir épocas o ajustar umbrales.",
+    ],
   },
   {
     id: "robustness-runtime",

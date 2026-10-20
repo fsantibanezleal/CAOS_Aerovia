@@ -6,6 +6,15 @@ import { metric, methodName } from "./BenchmarkTools";
 
 type Quantity = "flowMAE" | "flowRMSE" | "pressureMAE" | "pressureResidualMax";
 
+/**
+ * The row headers do not stick to the left edge (and the corner does not either). content.css gave `tbody th` and the
+ * corner `position: sticky; left: 0` so a case name stayed in view while the table scrolled sideways, but a sticky header
+ * paints over whatever scrolls under it: at 390 px the first column of cell buttons ended under the case name, and the
+ * shell gate (G5) found 11 of them covered by the pointer. The case is still named by every button's own `aria-label`.
+ */
+const ROW_HEADER: React.CSSProperties = { position: "static" };
+const CORNER: React.CSSProperties = { left: "auto" };
+
 /** One recorded test cell per network/regime; values are never interpolated. */
 export default function MatrixHeatmap({
   science,
@@ -86,7 +95,7 @@ export default function MatrixHeatmap({
       >
         <thead>
           <tr>
-            <th>{es ? "Caso" : "Case"}</th>
+            <th style={CORNER}>{es ? "Caso" : "Case"}</th>
             {science.regimes.map((regime) => (
               <th key={regime.id}>{regime.name[es ? "es" : "en"]}</th>
             ))}
@@ -95,7 +104,9 @@ export default function MatrixHeatmap({
         <tbody>
           {catalog.cases.map((item) => (
             <tr key={item.network.id}>
-              <th scope="row">{item.network.name[es ? "es" : "en"]}</th>
+              <th scope="row" style={ROW_HEADER}>
+                {item.network.name[es ? "es" : "en"]}
+              </th>
               {science.regimes.map((regime) => {
                 const row = indexed.get(`${item.network.id}:${regime.id}`);
                 const value = row?.[quantity];

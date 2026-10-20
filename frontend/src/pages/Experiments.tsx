@@ -6,7 +6,7 @@ import {
 } from "@fasl-work/caos-app-shell";
 import { DeepSection, DocBody, tr } from "../content/primitives";
 import { experimentSections } from "../content/experiments";
-import { useCatalog } from "../content/artifacts";
+import { useCatalog, type CatalogArtifact } from "../content/artifacts";
 import { caseQuestions, regimeDefinitions } from "../content/cases";
 
 const tabLabels: Record<string, readonly [string, string]> = {
@@ -17,6 +17,113 @@ const tabLabels: Record<string, readonly [string, string]> = {
   "learning-protocol": ["Learning", "Aprendizaje"],
   "robustness-runtime": ["Robustness", "Robustez"],
 };
+
+/** The data area: the case library and the external sources, with the redistribution class of each. Licence identifiers are
+ * marked `translate="no"`, so a Spanish page does not read "Apache-2.0" as a decimal (shell gate G11). */
+export function DatasetTables({
+  data,
+  loading = false,
+  error = null,
+}: {
+  data: CatalogArtifact | null;
+  loading?: boolean;
+  error?: string | null;
+}) {
+  const es = useShellLang() === "es";
+  return (
+    <>
+      <h3>{es ? "Biblioteca y permisos" : "Library and permissions"}</h3>
+      {loading ? (
+        <p role="status">
+          {es ? "Cargando registro verificado…" : "Loading verified registry…"}
+        </p>
+      ) : error ? (
+        <p role="alert">
+          {es
+            ? "No se pudo cargar la evidencia:"
+            : "Evidence could not be loaded:"}{" "}
+          {error}
+        </p>
+      ) : (
+        data && (
+          <table>
+            <thead>
+              <tr>
+                <th>{es ? "Caso" : "Case"}</th>
+                <th>{es ? "Uniones / galerías" : "Nodes / airways"}</th>
+                <th>{es ? "Pregunta" : "Question"}</th>
+                <th>{es ? "Origen / uso" : "Source / use"}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.cases.map((c) => (
+                <tr key={c.network.id}>
+                  <th scope="row">{c.network.name[es ? "es" : "en"]}</th>
+                  <td>
+                    {c.network.nodes.length} / {c.network.edges.length}
+                  </td>
+                  <td>
+                    {caseQuestions[c.network.id]
+                      ? tr(caseQuestions[c.network.id].question, es)
+                      : c.network.description[es ? "es" : "en"]}
+                  </td>
+                  <td>
+                    {es
+                      ? "Creado; incluido; cálculo local y evidencia."
+                      : "Authored; bundled; local computation and replay."}{" "}
+                    <span translate="no">{c.network.provenance.license}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
+      )}
+      <table>
+        <thead>
+          <tr>
+            <th>{es ? "Fuente externa" : "External source"}</th>
+            <th>{es ? "Redistribución" : "Redistribution"}</th>
+            <th>{es ? "Papel" : "Role"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>McPherson / SRK</td>
+            <td>{es ? "Solo enlace al editor" : "Publisher link only"}</td>
+            <td>{es ? "Teoría de ventilación" : "Ventilation theory"}</td>
+          </tr>
+          <tr>
+            <td>NIST / NIOSH / Clawpack</td>
+            <td>
+              {es
+                ? "Referencias enlazadas; sin datos de mina copiados"
+                : "Linked references; no mine data copied"}
+            </td>
+            <td>
+              {es
+                ? "Métodos y límites de transporte"
+                : "Transport methods and scope"}
+            </td>
+          </tr>
+          <tr>
+            <td>{es ? "Proyecto importado" : "Imported project"}</td>
+            <td>
+              {es
+                ? "Permanece local; licencia del usuario"
+                : "Remains local; user-supplied license"}
+            </td>
+            <td>
+              {es
+                ? "Análisis de nuevas entradas; fuera del benchmark público"
+                : "New-input analysis; outside public benchmark"}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
+  );
+}
 
 export default function Experiments() {
   const es = useShellLang() === "es";
@@ -45,119 +152,7 @@ export default function Experiments() {
             content: (
               <DeepSection section={section}>
                 {section.id === "datasets" && (
-                  <>
-                    <h3>
-                      {es ? "Biblioteca y permisos" : "Library and permissions"}
-                    </h3>
-                    {loading ? (
-                      <p role="status">
-                        {es
-                          ? "Cargando registro verificado…"
-                          : "Loading verified registry…"}
-                      </p>
-                    ) : error ? (
-                      <p role="alert">
-                        {es
-                          ? "No se pudo cargar la evidencia:"
-                          : "Evidence could not be loaded:"}{" "}
-                        {error}
-                      </p>
-                    ) : (
-                      data && (
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>{es ? "Caso" : "Case"}</th>
-                              <th>
-                                {es ? "Uniones / galerías" : "Nodes / airways"}
-                              </th>
-                              <th>{es ? "Pregunta" : "Question"}</th>
-                              <th>{es ? "Origen / uso" : "Source / use"}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {data.cases.map((c) => (
-                              <tr key={c.network.id}>
-                                <th scope="row">
-                                  {c.network.name[es ? "es" : "en"]}
-                                </th>
-                                <td>
-                                  {c.network.nodes.length} /{" "}
-                                  {c.network.edges.length}
-                                </td>
-                                <td>
-                                  {caseQuestions[c.network.id]
-                                    ? tr(
-                                        caseQuestions[c.network.id].question,
-                                        es,
-                                      )
-                                    : c.network.description[es ? "es" : "en"]}
-                                </td>
-                                <td>
-                                  {es
-                                    ? "Creado; incluido; cálculo local y evidencia."
-                                    : "Authored; bundled; local computation and replay."}{" "}
-                                  {c.network.provenance.license}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )
-                    )}
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{es ? "Fuente externa" : "External source"}</th>
-                          <th>{es ? "Redistribución" : "Redistribution"}</th>
-                          <th>{es ? "Papel" : "Role"}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>McPherson / SRK</td>
-                          <td>
-                            {es
-                              ? "Solo enlace al editor"
-                              : "Publisher link only"}
-                          </td>
-                          <td>
-                            {es
-                              ? "Teoría de ventilación"
-                              : "Ventilation theory"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>NIST / NIOSH / Clawpack</td>
-                          <td>
-                            {es
-                              ? "Referencias enlazadas; sin datos de mina copiados"
-                              : "Linked references; no mine data copied"}
-                          </td>
-                          <td>
-                            {es
-                              ? "Métodos y límites de transporte"
-                              : "Transport methods and scope"}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {es ? "Proyecto importado" : "Imported project"}
-                          </td>
-                          <td>
-                            {es
-                              ? "Permanece local; licencia del usuario"
-                              : "Remains local; user-supplied license"}
-                          </td>
-                          <td>
-                            {es
-                              ? "Análisis de nuevas entradas; fuera del benchmark público"
-                              : "New-input analysis; outside public benchmark"}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </>
+                  <DatasetTables data={data} loading={loading} error={error} />
                 )}
                 {section.id === "regime-design" && (
                   <table>
