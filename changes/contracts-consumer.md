@@ -1,7 +1,7 @@
 - The TypeScript types of every document and message are generated from the contract schemas
   (`frontend/src/lib/contract.gen.ts`, by `frontend/scripts/gen-contract-types.mjs` with openapi-typescript 7.13.0).
   `npm run build` runs the generator in `--check` mode first, so a schema change without a regeneration stops the build.
-  The app's own type names (`contracts.ts`, `content/artifacts.ts`, `learned/types.ts`) are aliases of the generated
+  The app's own type names (`frontend/src/contracts.ts`, `frontend/src/content/artifacts.ts`, `frontend/src/learned/types.ts`) are aliases of the generated
   types. The generator loads TypeScript 5.9.3 under the name `zz-typescript5`, because openapi-typescript needs the
   compiler API that the native TypeScript 7 of the type check does not have.
 - Each view that reads a committed document shows what the readiness document says about it, as one line inside its
