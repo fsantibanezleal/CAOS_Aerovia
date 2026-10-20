@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "engine-worker.schema.json",
+  "title": "Aerovia solver worker messages",
+  "description": "Contract engine-worker 1.0.0: the messages of the solver Web Worker. The request {id, kind, network, options} is posted by frontend/src/useEngine.ts and read by frontend/src/engine/worker.ts dispatch; the response {id, kind, result} or {id, kind, error} comes back and is matched by id. kind is solve (an aerovia.result/v1), optimize (feasible, speed, result, evaluations), sensitivity (one point per open branch) or curve (21 speed points). Types: frontend/src/contracts.ts EngineRequest and EngineResponse. Nothing is committed: the row has no documents.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    }
+  ],
+  "$defs": {
+    "kind": {
+      "enum": [
+        "solve",
+        "optimize",
+        "sensitivity",
+        "curve"
+      ]
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "network",
+        "options"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "network": {
+          "$ref": "network.schema.json#/$defs/network"
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        }
+      }
+    },
+    "optimization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feasible",
+        "speed",
+        "result",
+        "evaluations"
+      ],
+      "properties": {
+        "feasible": {
+          "type": "boolean"
+        },
+        "speed": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1.5
+        },
+        "result": {
+          "$ref": "catalog.schema.json#/$defs/result"
+        },
+        "evaluations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "sensitivityPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edgeId",
+        "elasticity",
+        "powerDelta",
+        "flowDelta"
+      ],
+      "properties": {
+        "edgeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "elasticity": {
+          "type": "number"
+        },
+        "powerDelta": {
+          "type": "number"
+        },
+        "flowDelta": {
+          "type": "number"
+        }
+      }
+    },
+    "curvePoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "speed",
+        "flow",
+        "power",
+        "pressure",
+        "targetRatio"
+      ],
+      "properties": {
+        "speed": {
+          "type": "number",
+          "minimum": 0
+        },
+        "flow": {
+          "type": "number"
+        },
+        "power": {
+          "type": "number"
+        },
+        "pressure": {
+          "type": "number"
+        },
+        "targetRatio": {
+          "type": "number"
+        }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/kind"
+        },
+        "result": {},
+        "error": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "result"
+          ],
+          "not": {
+            "required": [
+              "error"
+            ]
+          }
+        },
+        {
+          "required": [
+            "error"
+          ],
+          "not": {
+            "required": [
+              "result"
+            ]
+          }
+        }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "result"
+            ],
+            "properties": {
+              "kind": {
+                "const": "solve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "catalog.schema.json#/$defs/result"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "result"
+            ],
+            "properties": {
+              "kind": {
+                "const": "optimize"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "$ref": "#/$defs/optimization"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "result"
+            ],
+            "properties": {
+              "kind": {
+                "const": "sensitivity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/sensitivityPoint"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "result"
+            ],
+            "properties": {
+              "kind": {
+                "const": "curve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "result": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/curvePoint"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

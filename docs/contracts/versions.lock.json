@@ -1,0 +1,87 @@
+{
+  "network": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/network.schema.json",
+    "sha256": "823fcdd686241602666fe7ea800179ee955e964fd1050485737c65f3d2a2fef7"
+  },
+  "catalog": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/catalog.schema.json",
+    "sha256": "6d45ae00dd4090ff9549b8103a74260860d265aa0b91aa0be3eb069788596021"
+  },
+  "reference-checks": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/reference-checks.schema.json",
+    "sha256": "ab230e9fb5e1c7c18a21d98be3979958ee7f5bad2044816e5bfe6d20bdec5ad9"
+  },
+  "science": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/science.schema.json",
+    "sha256": "24baf51e075aebfa24cf23bbacf0524dcc4af8420e816d9cefb394d1fabd0d10"
+  },
+  "branch-table": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/branch-table.schema.json",
+    "sha256": "a35f89b9b8a892e0cb20197d599fcccc581ceb57420e1b36be8ca9d084a7bfc3"
+  },
+  "artifact-manifest": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/artifact-manifest.schema.json",
+    "sha256": "1fc2676796c7e7d70530062254df40ad4c637a54f55d1ad433e4778be068a24b"
+  },
+  "browser-evidence": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/browser-evidence.schema.json",
+    "sha256": "28800ae0f6bd9baeeda79601767f2d1e99f5aecd54572f8e0b0e48f0ceaab605"
+  },
+  "model-manifest": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/model-manifest.schema.json",
+    "sha256": "24aff609517ac5564c57046968fb0d701fa6cb92c0369b34cb997d9ea8151d69"
+  },
+  "model-registry": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/model-registry.schema.json",
+    "sha256": "f82e3625ac4031d7c0d62ea7b059903667e14286f3e37354d54072c2e6c21ac9"
+  },
+  "onnx-parity": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/onnx-parity.schema.json",
+    "sha256": "896df24a2900f3ec207c621c8310365dfefbfb0ed2764615c8c28723e5e2005a"
+  },
+  "model-io": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/model-io.schema.json",
+    "sha256": "c17cf92454f6ebf152bd0396480996abfea10d8b029cc0ec78eb0d62835ccdde"
+  },
+  "checkpoint": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/checkpoint.schema.json",
+    "sha256": "72fcc699bfd4234129d916e9191e43e6daebe5f5aed8063df65e8e1674ee3590"
+  },
+  "engine-worker": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/engine-worker.schema.json",
+    "sha256": "c7176ea19c89c6167df1502faf8064f69bb0db871c3c124b405aa199293c93ae"
+  },
+  "transport": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/transport.schema.json",
+    "sha256": "0638dafe3f16a5cd4205f703774edbc137c627377f9744314505b243574e7f4b"
+  },
+  "project": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/project.schema.json",
+    "sha256": "fbb85aef84bb7643373dddead294a4d38112f681fc53c1934f1d197d9260d065"
+  },
+  "release-identity": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/release-identity.schema.json",
+    "sha256": "3d11825412c289d3600ef1fac54f1ce813ff322b344a9c9b5642d7b6b6958b89"
+  },
+  "readiness": {
+    "version": "1.0.0",
+    "schema": "docs/contracts/schemas/readiness.schema.json",
+    "sha256": "1dd32b2a0b4a09a9f9a160d2f33223c30855ee6ad04e810dfed3ea8f22cded8a"
+  }
+}

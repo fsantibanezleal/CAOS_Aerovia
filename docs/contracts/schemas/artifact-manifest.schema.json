@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "artifact-manifest.schema.json",
+  "title": "Aerovia artifact manifest",
+  "description": "Contract artifact-manifest 1.0.0: data/artifacts/manifest.json, written by aerovia_pipeline/io.py write_manifest, amended by surrogate_export.py (science.json) and frontend/scripts/verify-learned-browser.mjs. Exact SHA-256 and byte length of every published artifact; verify_artifacts and frontend/scripts/prepare-data.mjs read it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "createdAt",
+    "files",
+    "engineVersion",
+    "sourceSha256",
+    "device",
+    "caseCount"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.manifest/v1"
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "catalog.json"
+      ],
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_./-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/fileIdentity"
+      },
+      "description": "Path relative to data/artifacts to its identity; catalog.json is always listed, the manifest itself never."
+    },
+    "engineVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "device": {
+      "enum": [
+        "cpu",
+        "cuda",
+        "cpu-reference"
+      ]
+    },
+    "caseCount": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "fileIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "aerovia.checkpoint/v1",
+  "version": "1.0.0",
+  "methodId": "topology-mlp",
+  "caseIds": [
+    "room-pillar"
+  ],
+  "edges": 42,
+  "architecture": {
+    "hidden": 128,
+    "steps": 4
+  },
+  "seed": 20261112,
+  "epoch": 350,
+  "datasetHashes": {
+    "room-pillar": "1f2a0f9bd47427ac711faa8cea9254e95f863c55daaec26f6f409487a64e3850"
+  },
+  "runtime": {
+    "device": "cuda",
+    "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "torch": "2.13.0+cu126",
+    "cuda": "12.6",
+    "precision": "float32",
+    "tf32": false,
+    "threads": 1,
+    "deterministicAlgorithms": true
+  },
+  "validationLoss": 1.1835630175482947e-05,
+  "stateDict": {
+    "network.0.weight": {
+      "shape": [
+        4,
+        42
+      ],
+      "dtype": "float32"
+    },
+    "network.0.bias": {
+      "shape": [
+        4
+      ],
+      "dtype": "float32"
+    },
+    "network.2.weight": {
+      "shape": [
+        42,
+        4
+      ],
+      "dtype": "float32"
+    },
+    "network.2.bias": {
+      "shape": [
+        42
+      ],
+      "dtype": "float32"
+    }
+  }
+}

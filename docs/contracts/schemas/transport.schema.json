@@ -1,0 +1,406 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "transport.schema.json",
+  "title": "Aerovia tracer transport messages and replay",
+  "description": "Contract transport 1.0.0: the transport worker and the replay download. The worker request {network, options, request} is posted by frontend/src/workbench/useTransport.ts and read by transport.worker.ts, which answers {result} (aerovia.transport/v1, frontend/src/engine/transport.ts) or {error}. The Export time series button downloads aerovia.transport-replay/v1 (frontend/src/workbench/Workbench.tsx): version, network, options, request and result, which the e2e test replays; no reader in the repository. Limits are TRANSPORT_LIMITS in transport.ts. Rules the schema cannot state: the result frames have one value per cell, branch or node; mass balance error stays under the solver tolerance. Nothing is committed: the row has no documents.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/workerRequest"
+    },
+    {
+      "$ref": "#/$defs/workerResponse"
+    },
+    {
+      "$ref": "#/$defs/replay"
+    }
+  ],
+  "$defs": {
+    "release": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "edgeId",
+            "startSeconds",
+            "kind",
+            "massMg"
+          ],
+          "properties": {
+            "edgeId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "position": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "startSeconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "kind": {
+              "const": "pulse"
+            },
+            "massMg": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000.0
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "edgeId",
+            "startSeconds",
+            "kind",
+            "durationSeconds",
+            "rateMgPerSecond"
+          ],
+          "properties": {
+            "edgeId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "position": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "startSeconds": {
+              "type": "number",
+              "minimum": 0
+            },
+            "kind": {
+              "const": "continuous"
+            },
+            "durationSeconds": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 86400
+            },
+            "rateMgPerSecond": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000000000.0
+            }
+          }
+        }
+      ]
+    },
+    "flowChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeSeconds",
+        "options"
+      ],
+      "properties": {
+        "timeSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 86400
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        }
+      }
+    },
+    "flowState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeSeconds",
+        "options",
+        "result"
+      ],
+      "properties": {
+        "timeSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        },
+        "result": {
+          "$ref": "catalog.schema.json#/$defs/result"
+        }
+      }
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "durationSeconds",
+        "releases"
+      ],
+      "properties": {
+        "durationSeconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 86400
+        },
+        "frameCount": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 301
+        },
+        "cellsPerEdge": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "releases": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/release"
+          }
+        },
+        "schedule": {
+          "type": "array",
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/flowChange"
+          }
+        },
+        "edgeLengths": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "decayPerSecond": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "maxStepSeconds": {
+          "type": "number",
+          "minimum": 1e-08,
+          "maximum": 86400
+        }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeSeconds",
+        "flowStateIndex",
+        "concentrations",
+        "cellConcentrations",
+        "nodeConcentrations",
+        "injectedMassMg",
+        "storedMassMg",
+        "escapedMassMg",
+        "removedMassMg",
+        "massBalanceErrorMg"
+      ],
+      "properties": {
+        "timeSeconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "flowStateIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "concentrations": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "cellConcentrations": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "nodeConcentrations": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "injectedMassMg": {
+          "type": "number"
+        },
+        "storedMassMg": {
+          "type": "number"
+        },
+        "escapedMassMg": {
+          "type": "number"
+        },
+        "removedMassMg": {
+          "type": "number"
+        },
+        "massBalanceErrorMg": {
+          "type": "number"
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "completed",
+        "frames",
+        "flowStates",
+        "edgeLengths",
+        "edgeVolumes",
+        "cellsPerEdge",
+        "steps",
+        "elapsedMs",
+        "warnings"
+      ],
+      "properties": {
+        "schema": {
+          "const": "aerovia.transport/v1"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/frame"
+          }
+        },
+        "flowStates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/flowState"
+          }
+        },
+        "edgeLengths": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "edgeVolumes": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "cellsPerEdge": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "workerRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network",
+        "options",
+        "request"
+      ],
+      "properties": {
+        "network": {
+          "$ref": "network.schema.json#/$defs/network"
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        },
+        "request": {
+          "$ref": "#/$defs/options"
+        }
+      }
+    },
+    "workerResponse": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "result"
+          ],
+          "properties": {
+            "result": {
+              "$ref": "#/$defs/result"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "error"
+          ],
+          "properties": {
+            "error": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "version",
+        "network",
+        "options",
+        "request",
+        "result"
+      ],
+      "properties": {
+        "schema": {
+          "const": "aerovia.transport-replay/v1"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d{2}\\.\\d{3}$"
+        },
+        "network": {
+          "$ref": "network.schema.json#/$defs/network"
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        },
+        "request": {
+          "$ref": "#/$defs/options"
+        },
+        "result": {
+          "$ref": "#/$defs/result"
+        }
+      }
+    }
+  }
+}

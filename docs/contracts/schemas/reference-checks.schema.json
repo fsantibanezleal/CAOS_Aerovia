@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reference-checks.schema.json",
+  "title": "Aerovia reference checks",
+  "description": "Contract reference-checks 1.0.0: data/artifacts/reference-checks.json, written by cli.py (bake only): matched resistance realizations with the independent SciPy answer, so the browser solver can be compared with the reference (frontend/src/engine.test.ts). One fixture per parity sample; the options carry per-branch resistance overrides.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "fixtures"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.reference-checks/v1"
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "networkId",
+          "sampleIndex",
+          "options",
+          "result",
+          "batchMaxAbsFlow"
+        ],
+        "properties": {
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sampleIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 8191
+          },
+          "options": {
+            "$ref": "network.schema.json#/$defs/options"
+          },
+          "result": {
+            "$ref": "catalog.schema.json#/$defs/result"
+          },
+          "batchMaxAbsFlow": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

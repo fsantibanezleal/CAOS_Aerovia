@@ -1,0 +1,422 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "catalog.schema.json",
+  "title": "Aerovia solver catalog",
+  "description": "Contract catalog 1.0.0: data/artifacts/catalog.json, written by data-pipeline/aerovia_pipeline/cli.py (solve and bake): each source network with its operating options, the independent SciPy answer (aerovia.result/v1) and, for a bake, the resistance ensemble. $defs.result is shared with reference-checks, science and the worker contracts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "createdAt",
+    "sourceSha256",
+    "cases",
+    "benchmark"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.catalog/v1"
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "network",
+          "options",
+          "sourceSha256",
+          "optionsSha256",
+          "result"
+        ],
+        "properties": {
+          "network": {
+            "$ref": "network.schema.json#/$defs/network"
+          },
+          "options": {
+            "$ref": "network.schema.json#/$defs/options"
+          },
+          "sourceSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "optionsSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "result": {
+            "$ref": "#/$defs/result"
+          },
+          "ensemble": {
+            "$ref": "#/$defs/ensemble"
+          }
+        }
+      },
+      "minItems": 1,
+      "description": "One entry per network. ensemble is present only when the catalog was baked (the solve command writes none)."
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python",
+        "numpy",
+        "scipy",
+        "engineVersion",
+        "referenceMethod",
+        "referenceElapsedMs",
+        "totalElapsedMs",
+        "caseCount",
+        "nodeCount",
+        "edgeCount",
+        "maxMassResidual",
+        "maxPressureResidual"
+      ],
+      "properties": {
+        "python": {
+          "type": "string",
+          "minLength": 1
+        },
+        "numpy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scipy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "engineVersion": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "referenceMethod": {
+          "type": "string",
+          "minLength": 1
+        },
+        "referenceElapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalElapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "caseCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "nodeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "edgeCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxMassResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxPressureResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "device": {
+          "enum": [
+            "cpu",
+            "cuda"
+          ]
+        },
+        "hardware": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backend": {
+          "type": "string",
+          "minLength": 1
+        },
+        "samplesPerCase": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ensembleSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ensembleElapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "ensembleFailures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parityMaxAbsFlow": {
+          "type": "number",
+          "minimum": 0
+        },
+        "paritySamples": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "Run-level timings and versions; the device, ensemble and parity fields exist only for a bake."
+    }
+  },
+  "$defs": {
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "converged",
+        "iterations",
+        "massResidual",
+        "pressureResidual",
+        "flows",
+        "pressures",
+        "velocities",
+        "fanPowerKW",
+        "totalIntake",
+        "targetRatio",
+        "shortfalls",
+        "elapsedMs"
+      ],
+      "properties": {
+        "schema": {
+          "const": "aerovia.result/v1"
+        },
+        "converged": {
+          "type": "boolean"
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "massResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pressureResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "flows": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "pressures": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "velocities": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "fanPowerKW": {
+          "type": "number",
+          "minimum": 0
+        },
+        "totalIntake": {
+          "type": "number"
+        },
+        "targetRatio": {
+          "type": "number"
+        },
+        "shortfalls": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "One solve (aerovia.result/v1): flows by edge, pressures by node, derived scalars. message appears when the residual acceptance fails or an analysis marks a result infeasible."
+    },
+    "ensemble": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "samples",
+        "acceptedSamples",
+        "seed",
+        "cv",
+        "distribution",
+        "device",
+        "hardware",
+        "backend",
+        "dtype",
+        "elapsedMs",
+        "iterations",
+        "batchSize",
+        "flowP05",
+        "flowP50",
+        "flowP95",
+        "targetProbability",
+        "powerP05",
+        "powerP50",
+        "powerP95",
+        "failures",
+        "failedSampleIndices",
+        "unsupportedFanSamples",
+        "maxMassResidual",
+        "maxPressureResidual",
+        "paritySamples",
+        "parityMaxAbsFlow",
+        "parityMethod"
+      ],
+      "properties": {
+        "schema": {
+          "const": "aerovia.ensemble/v1"
+        },
+        "samples": {
+          "type": "integer",
+          "minimum": 8,
+          "maximum": 8192
+        },
+        "acceptedSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "cv": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.75
+        },
+        "distribution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "device": {
+          "enum": [
+            "cpu",
+            "cuda"
+          ]
+        },
+        "hardware": {
+          "type": "string",
+          "minLength": 1
+        },
+        "backend": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dtype": {
+          "enum": [
+            "float32",
+            "float64"
+          ]
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "batchSize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "flowP05": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "flowP50": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "flowP95": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "targetProbability": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "powerP05": {
+          "type": "number",
+          "minimum": 0
+        },
+        "powerP50": {
+          "type": "number",
+          "minimum": 0
+        },
+        "powerP95": {
+          "type": "number",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failedSampleIndices": {
+          "type": "array",
+          "items": {}
+        },
+        "unsupportedFanSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxMassResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxPressureResidual": {
+          "type": "number",
+          "minimum": 0
+        },
+        "paritySamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parityMaxAbsFlow": {
+          "type": "number",
+          "minimum": 0
+        },
+        "parityMethod": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "The resistance-uncertainty ensemble of one case (aerovia.ensemble/v1), baked on the device; flowP05 <= flowP50 <= flowP95 per branch (tests/contracts/test_catalog.py)."
+    }
+  }
+}

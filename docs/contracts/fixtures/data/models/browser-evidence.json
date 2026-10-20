@@ -1,0 +1,45 @@
+{
+  "schema": "aerovia.browser-model-evidence/v1",
+  "createdAt": "2026-09-10T03:49:16.570Z",
+  "sourceSha256": "205668688c71f57d4b357da8572c3fc0f45dc2ba4c3d0a1ecccd4453d7da13e5",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+  "rows": [
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "modelSha256": "4a8bc0dcd4cdf3af0420110cffc00813db379ee0a361ce02127a7d4570d4d6fb",
+      "sample": 0,
+      "rawFlowMaxAbs": 0.0,
+      "flowMaxAbs": 0.0,
+      "pressureMaxAbs": 0.0,
+      "inferenceMs": 0.19999999925494194,
+      "totalMs": 23.899999998509884
+    },
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "modelSha256": "4a8bc0dcd4cdf3af0420110cffc00813db379ee0a361ce02127a7d4570d4d6fb",
+      "sample": 1,
+      "rawFlowMaxAbs": 0.0,
+      "flowMaxAbs": 0.0,
+      "pressureMaxAbs": 0.0,
+      "inferenceMs": 0.10000000149011612,
+      "totalMs": 0.30000000074505806
+    }
+  ],
+  "controls": [
+    {
+      "methodId": "topology-mlp",
+      "networkId": "room-pillar",
+      "closure": "closure",
+      "extrapolation": "resistance",
+      "fanOffFlow": 0
+    }
+  ],
+  "modelCount": 1,
+  "flowTolerance": 0.001,
+  "pressureTolerance": 0.05,
+  "maxFlowAbs": 0.0,
+  "maxPressureAbs": 0.0,
+  "runtime": "actual browser ONNX Runtime Web WASM; identical exported float32 fixtures; no nonlinear solver inside inference"
+}

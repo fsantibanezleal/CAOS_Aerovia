@@ -1,0 +1,26 @@
+{
+  "schema": "aerovia.model-manifest/v1",
+  "sourceSha256": "205668688c71f57d4b357da8572c3fc0f45dc2ba4c3d0a1ecccd4453d7da13e5",
+  "files": {
+    "browser-evidence.json": {
+      "sha256": "ad947b73667c79430fb58ec844dde6a2c16c73e86ea1fd5528c1411fb3c2eb66",
+      "bytes": 1472
+    },
+    "parity-fixtures.json": {
+      "sha256": "4d3e49bcd985fa79fecc86eb062d8c11dbb6413b833778a85ddb19003b43df84",
+      "bytes": 9244
+    },
+    "registry.json": {
+      "sha256": "63b83854de71c28e3fd58bdc38b96d01fef68a5965f6e771089e7d822336dbc5",
+      "bytes": 10398
+    },
+    "topology-mlp/room-pillar.onnx": {
+      "sha256": "4a8bc0dcd4cdf3af0420110cffc00813db379ee0a361ce02127a7d4570d4d6fb",
+      "bytes": 4997
+    },
+    "topology-mlp/room-pillar.pt": {
+      "sha256": "72819c2c68b8d586e9d37267fe8fd3d7fdd6cc6988722b923080c5dafb18c62d",
+      "bytes": 3489
+    }
+  }
+}

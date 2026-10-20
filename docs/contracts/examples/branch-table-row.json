@@ -1,0 +1,17 @@
+{
+  "edge_id": "decline-intake",
+  "kind": "intake",
+  "from_node": "atmosphere-in",
+  "to_node": "r0c0",
+  "area_m2": 32.0,
+  "resistance_Pa_s2_m6": 0.045,
+  "target_m3_s": 0.0,
+  "flow_m3_s": 86.39692110520824,
+  "velocity_m_s": 2.6999037845377574,
+  "shortfall_m3_s": 0.0,
+  "closed": false,
+  "flow_p05_m3_s": 83.55369746933613,
+  "flow_p50_m3_s": 86.45698299258457,
+  "flow_p95_m3_s": 90.22346905885303,
+  "target_probability": 1.0
+}

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "onnx-parity.schema.json",
+  "title": "Aerovia ONNX parity fixtures",
+  "description": "Contract onnx-parity 1.0.0: data/models/parity-fixtures.json, written by surrogate_export.py: the float32 inputs and the outputs ONNX Runtime produced for each exported model, with the tolerances the browser run must meet (frontend/scripts/verify-learned-browser.mjs).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "flowTolerance",
+    "pressureTolerance",
+    "fixtures"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.onnx-parity/v1"
+    },
+    "flowTolerance": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "pressureTolerance": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "methodId",
+          "networkId",
+          "input",
+          "rawFlows",
+          "flows",
+          "pressures"
+        ],
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "enum": [
+              "graph-surrogate",
+              "topology-mlp"
+            ]
+          },
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "rawFlows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "flows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "pressures": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "description": "Rows are samples: input has one log resistance ratio per branch, rawFlows and flows one value per branch, pressures one per node."
+      },
+      "minItems": 1
+    }
+  }
+}

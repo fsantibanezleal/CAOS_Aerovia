@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "model-manifest.schema.json",
+  "title": "Aerovia model manifest",
+  "description": "Contract model-manifest 1.0.0: data/models/manifest.json, written by surrogate_export.py and amended by verify-learned-browser.mjs (browser-evidence.json): the identity of every model file. surrogate_validate.py validate_models and frontend/scripts/prepare-data.mjs read it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "sourceSha256",
+    "files"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.model-manifest/v1"
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "registry.json",
+        "parity-fixtures.json"
+      ],
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_./-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/fileIdentity"
+      },
+      "description": "Path relative to data/models to its identity: the registry, the parity fixtures, every checkpoint and ONNX file, and the browser evidence once published; the manifest itself never."
+    }
+  },
+  "$defs": {
+    "fileIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

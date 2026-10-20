@@ -1,0 +1,1191 @@
+{
+  "schema": "aerovia.catalog/v1",
+  "createdAt": "2026-09-10T01:48:50Z",
+  "sourceSha256": "205668688c71f57d4b357da8572c3fc0f45dc2ba4c3d0a1ecccd4453d7da13e5",
+  "cases": [
+    {
+      "network": {
+        "schema": "aerovia.network/v1",
+        "id": "room-pillar",
+        "name": {
+          "en": "Room-and-pillar district",
+          "es": "Distrito de cámaras y pilares"
+        },
+        "description": {
+          "en": "An interconnected five-by-five roadway grid contains six regulated cross-passages. Low-resistance short circuits can starve the far production strip.",
+          "es": "Una malla de cinco por cinco galerías tiene seis cruces regulados. Los cortocircuitos de baja resistencia pueden reducir el caudal de la franja productiva lejana."
+        },
+        "provenance": {
+          "kind": "authored",
+          "source": "Aerovia authored engineering case library; reproducible with scripts/pipeline.py create",
+          "license": "Apache-2.0"
+        },
+        "nodes": [
+          {
+            "id": "atmosphere-in",
+            "x": -170,
+            "y": -140,
+            "z": 0,
+            "boundary": 0
+          },
+          {
+            "id": "atmosphere-out",
+            "x": 850,
+            "y": 720,
+            "z": 0,
+            "boundary": 0
+          },
+          {
+            "id": "r0c0",
+            "x": 0,
+            "y": 0,
+            "z": -180
+          },
+          {
+            "id": "r0c1",
+            "x": 160,
+            "y": 0,
+            "z": -182
+          },
+          {
+            "id": "r0c2",
+            "x": 320,
+            "y": 0,
+            "z": -184
+          },
+          {
+            "id": "r0c3",
+            "x": 480,
+            "y": 0,
+            "z": -186
+          },
+          {
+            "id": "r0c4",
+            "x": 640,
+            "y": 0,
+            "z": -188
+          },
+          {
+            "id": "r1c0",
+            "x": 0,
+            "y": 145,
+            "z": -183
+          },
+          {
+            "id": "r1c1",
+            "x": 160,
+            "y": 145,
+            "z": -185
+          },
+          {
+            "id": "r1c2",
+            "x": 320,
+            "y": 145,
+            "z": -187
+          },
+          {
+            "id": "r1c3",
+            "x": 480,
+            "y": 145,
+            "z": -189
+          },
+          {
+            "id": "r1c4",
+            "x": 640,
+            "y": 145,
+            "z": -191
+          },
+          {
+            "id": "r2c0",
+            "x": 0,
+            "y": 290,
+            "z": -186
+          },
+          {
+            "id": "r2c1",
+            "x": 160,
+            "y": 290,
+            "z": -188
+          },
+          {
+            "id": "r2c2",
+            "x": 320,
+            "y": 290,
+            "z": -190
+          },
+          {
+            "id": "r2c3",
+            "x": 480,
+            "y": 290,
+            "z": -192
+          },
+          {
+            "id": "r2c4",
+            "x": 640,
+            "y": 290,
+            "z": -194
+          },
+          {
+            "id": "r3c0",
+            "x": 0,
+            "y": 435,
+            "z": -189
+          },
+          {
+            "id": "r3c1",
+            "x": 160,
+            "y": 435,
+            "z": -191
+          },
+          {
+            "id": "r3c2",
+            "x": 320,
+            "y": 435,
+            "z": -193
+          },
+          {
+            "id": "r3c3",
+            "x": 480,
+            "y": 435,
+            "z": -195
+          },
+          {
+            "id": "r3c4",
+            "x": 640,
+            "y": 435,
+            "z": -197
+          },
+          {
+            "id": "r4c0",
+            "x": 0,
+            "y": 580,
+            "z": -192
+          },
+          {
+            "id": "r4c1",
+            "x": 160,
+            "y": 580,
+            "z": -194
+          },
+          {
+            "id": "r4c2",
+            "x": 320,
+            "y": 580,
+            "z": -196
+          },
+          {
+            "id": "r4c3",
+            "x": 480,
+            "y": 580,
+            "z": -198
+          },
+          {
+            "id": "r4c4",
+            "x": 640,
+            "y": 580,
+            "z": -200
+          }
+        ],
+        "edges": [
+          {
+            "id": "decline-intake",
+            "from": "atmosphere-in",
+            "to": "r0c0",
+            "kind": "intake",
+            "name": {
+              "en": "Decline Intake",
+              "es": "Rampa de admisión"
+            },
+            "resistance": 0.045,
+            "area": 32,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "district-fan",
+            "from": "r4c4",
+            "to": "atmosphere-out",
+            "kind": "fan",
+            "name": {
+              "en": "District Fan",
+              "es": "Ventilador del distrito"
+            },
+            "resistance": 0.03,
+            "area": 32,
+            "target": 0,
+            "level": 0,
+            "fan": {
+              "pressure": 2700,
+              "coefficient": 0.012,
+              "efficiency": 0.79
+            }
+          },
+          {
+            "id": "east-0-0",
+            "from": "r0c0",
+            "to": "r0c1",
+            "kind": "intake",
+            "name": {
+              "en": "East 0 0",
+              "es": "Galería este · fila 1 · tramo 1"
+            },
+            "resistance": 0.12,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-0-0",
+            "from": "r0c0",
+            "to": "r1c0",
+            "kind": "return",
+            "name": {
+              "en": "North 0 0",
+              "es": "Cruce norte · fila 1 · columna 1"
+            },
+            "resistance": 0.16,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-0-1",
+            "from": "r0c1",
+            "to": "r0c2",
+            "kind": "intake",
+            "name": {
+              "en": "East 0 1",
+              "es": "Galería este · fila 1 · tramo 2"
+            },
+            "resistance": 0.12,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-0-1",
+            "from": "r0c1",
+            "to": "r1c1",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 0 1",
+              "es": "Cruce norte · fila 1 · columna 2"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-0-2",
+            "from": "r0c2",
+            "to": "r0c3",
+            "kind": "intake",
+            "name": {
+              "en": "East 0 2",
+              "es": "Galería este · fila 1 · tramo 3"
+            },
+            "resistance": 0.12,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-0-2",
+            "from": "r0c2",
+            "to": "r1c2",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 0 2",
+              "es": "Cruce norte · fila 1 · columna 3"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-0-3",
+            "from": "r0c3",
+            "to": "r0c4",
+            "kind": "intake",
+            "name": {
+              "en": "East 0 3",
+              "es": "Galería este · fila 1 · tramo 4"
+            },
+            "resistance": 0.12,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-0-3",
+            "from": "r0c3",
+            "to": "r1c3",
+            "kind": "return",
+            "name": {
+              "en": "North 0 3",
+              "es": "Cruce norte · fila 1 · columna 4"
+            },
+            "resistance": 0.23500000000000001,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-0-4",
+            "from": "r0c4",
+            "to": "r1c4",
+            "kind": "return",
+            "name": {
+              "en": "North 0 4",
+              "es": "Cruce norte · fila 1 · columna 5"
+            },
+            "resistance": 0.26,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-1-0",
+            "from": "r1c0",
+            "to": "r1c1",
+            "kind": "intake",
+            "name": {
+              "en": "East 1 0",
+              "es": "Galería este · fila 2 · tramo 1"
+            },
+            "resistance": 0.16,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-1-0",
+            "from": "r1c0",
+            "to": "r2c0",
+            "kind": "return",
+            "name": {
+              "en": "North 1 0",
+              "es": "Cruce norte · fila 2 · columna 1"
+            },
+            "resistance": 0.16,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-1-1",
+            "from": "r1c1",
+            "to": "r1c2",
+            "kind": "intake",
+            "name": {
+              "en": "East 1 1",
+              "es": "Galería este · fila 2 · tramo 2"
+            },
+            "resistance": 0.16,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-1-1",
+            "from": "r1c1",
+            "to": "r2c1",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 1 1",
+              "es": "Cruce norte · fila 2 · columna 2"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-1-2",
+            "from": "r1c2",
+            "to": "r1c3",
+            "kind": "intake",
+            "name": {
+              "en": "East 1 2",
+              "es": "Galería este · fila 2 · tramo 3"
+            },
+            "resistance": 0.16,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-1-2",
+            "from": "r1c2",
+            "to": "r2c2",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 1 2",
+              "es": "Cruce norte · fila 2 · columna 3"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-1-3",
+            "from": "r1c3",
+            "to": "r1c4",
+            "kind": "intake",
+            "name": {
+              "en": "East 1 3",
+              "es": "Galería este · fila 2 · tramo 4"
+            },
+            "resistance": 0.16,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-1-3",
+            "from": "r1c3",
+            "to": "r2c3",
+            "kind": "return",
+            "name": {
+              "en": "North 1 3",
+              "es": "Cruce norte · fila 2 · columna 4"
+            },
+            "resistance": 0.23500000000000001,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-1-4",
+            "from": "r1c4",
+            "to": "r2c4",
+            "kind": "return",
+            "name": {
+              "en": "North 1 4",
+              "es": "Cruce norte · fila 2 · columna 5"
+            },
+            "resistance": 0.26,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-2-0",
+            "from": "r2c0",
+            "to": "r2c1",
+            "kind": "intake",
+            "name": {
+              "en": "East 2 0",
+              "es": "Galería este · fila 3 · tramo 1"
+            },
+            "resistance": 0.2,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-2-0",
+            "from": "r2c0",
+            "to": "r3c0",
+            "kind": "return",
+            "name": {
+              "en": "North 2 0",
+              "es": "Cruce norte · fila 3 · columna 1"
+            },
+            "resistance": 0.16,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-2-1",
+            "from": "r2c1",
+            "to": "r2c2",
+            "kind": "intake",
+            "name": {
+              "en": "East 2 1",
+              "es": "Galería este · fila 3 · tramo 2"
+            },
+            "resistance": 0.2,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-2-1",
+            "from": "r2c1",
+            "to": "r3c1",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 2 1",
+              "es": "Cruce norte · fila 3 · columna 2"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-2-2",
+            "from": "r2c2",
+            "to": "r2c3",
+            "kind": "intake",
+            "name": {
+              "en": "East 2 2",
+              "es": "Galería este · fila 3 · tramo 3"
+            },
+            "resistance": 0.2,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-2-2",
+            "from": "r2c2",
+            "to": "r3c2",
+            "kind": "crosscut",
+            "name": {
+              "en": "North 2 2",
+              "es": "Cruce norte · fila 3 · columna 3"
+            },
+            "resistance": 9,
+            "area": 15,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-2-3",
+            "from": "r2c3",
+            "to": "r2c4",
+            "kind": "working",
+            "name": {
+              "en": "East 2 3",
+              "es": "Galería este · fila 3 · tramo 4"
+            },
+            "resistance": 1.3,
+            "area": 18,
+            "target": 22,
+            "level": 0
+          },
+          {
+            "id": "north-2-3",
+            "from": "r2c3",
+            "to": "r3c3",
+            "kind": "return",
+            "name": {
+              "en": "North 2 3",
+              "es": "Cruce norte · fila 3 · columna 4"
+            },
+            "resistance": 0.23500000000000001,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-2-4",
+            "from": "r2c4",
+            "to": "r3c4",
+            "kind": "return",
+            "name": {
+              "en": "North 2 4",
+              "es": "Cruce norte · fila 3 · columna 5"
+            },
+            "resistance": 0.26,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-3-0",
+            "from": "r3c0",
+            "to": "r3c1",
+            "kind": "intake",
+            "name": {
+              "en": "East 3 0",
+              "es": "Galería este · fila 4 · tramo 1"
+            },
+            "resistance": 0.24,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-3-0",
+            "from": "r3c0",
+            "to": "r4c0",
+            "kind": "return",
+            "name": {
+              "en": "North 3 0",
+              "es": "Cruce norte · fila 4 · columna 1"
+            },
+            "resistance": 0.16,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-3-1",
+            "from": "r3c1",
+            "to": "r3c2",
+            "kind": "intake",
+            "name": {
+              "en": "East 3 1",
+              "es": "Galería este · fila 4 · tramo 2"
+            },
+            "resistance": 0.24,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-3-1",
+            "from": "r3c1",
+            "to": "r4c1",
+            "kind": "return",
+            "name": {
+              "en": "North 3 1",
+              "es": "Cruce norte · fila 4 · columna 2"
+            },
+            "resistance": 0.185,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-3-2",
+            "from": "r3c2",
+            "to": "r3c3",
+            "kind": "intake",
+            "name": {
+              "en": "East 3 2",
+              "es": "Galería este · fila 4 · tramo 3"
+            },
+            "resistance": 0.24,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-3-2",
+            "from": "r3c2",
+            "to": "r4c2",
+            "kind": "return",
+            "name": {
+              "en": "North 3 2",
+              "es": "Cruce norte · fila 4 · columna 3"
+            },
+            "resistance": 0.21000000000000002,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-3-3",
+            "from": "r3c3",
+            "to": "r3c4",
+            "kind": "working",
+            "name": {
+              "en": "East 3 3",
+              "es": "Galería este · fila 4 · tramo 4"
+            },
+            "resistance": 1.5,
+            "area": 18,
+            "target": 22,
+            "level": 0
+          },
+          {
+            "id": "north-3-3",
+            "from": "r3c3",
+            "to": "r4c3",
+            "kind": "return",
+            "name": {
+              "en": "North 3 3",
+              "es": "Cruce norte · fila 4 · columna 4"
+            },
+            "resistance": 0.23500000000000001,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "north-3-4",
+            "from": "r3c4",
+            "to": "r4c4",
+            "kind": "return",
+            "name": {
+              "en": "North 3 4",
+              "es": "Cruce norte · fila 4 · columna 5"
+            },
+            "resistance": 0.26,
+            "area": 20,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-4-0",
+            "from": "r4c0",
+            "to": "r4c1",
+            "kind": "intake",
+            "name": {
+              "en": "East 4 0",
+              "es": "Galería este · fila 5 · tramo 1"
+            },
+            "resistance": 0.28,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-4-1",
+            "from": "r4c1",
+            "to": "r4c2",
+            "kind": "intake",
+            "name": {
+              "en": "East 4 1",
+              "es": "Galería este · fila 5 · tramo 2"
+            },
+            "resistance": 0.28,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-4-2",
+            "from": "r4c2",
+            "to": "r4c3",
+            "kind": "intake",
+            "name": {
+              "en": "East 4 2",
+              "es": "Galería este · fila 5 · tramo 3"
+            },
+            "resistance": 0.28,
+            "area": 18,
+            "target": 0,
+            "level": 0
+          },
+          {
+            "id": "east-4-3",
+            "from": "r4c3",
+            "to": "r4c4",
+            "kind": "working",
+            "name": {
+              "en": "East 4 3",
+              "es": "Galería este · fila 5 · tramo 4"
+            },
+            "resistance": 1.7000000000000002,
+            "area": 18,
+            "target": 22,
+            "level": 0
+          }
+        ]
+      },
+      "options": {
+        "speed": 1,
+        "resistanceScale": 1,
+        "overrides": {}
+      },
+      "sourceSha256": "9fa109e05bcc97d5489a8c1bcabf5d06ee950daf378424917cf301750a6dc0b5",
+      "optionsSha256": "3b48e6efef8cbe40025d1c613ddbac95d1d23798189e68f066b1bd5533c7ce57",
+      "result": {
+        "schema": "aerovia.result/v1",
+        "converged": true,
+        "iterations": 8,
+        "massResidual": 7.105427357601002e-15,
+        "pressureResidual": 9.64774926615064e-11,
+        "flows": [
+          86.39692110520824,
+          86.39692110520824,
+          39.22485376654582,
+          47.17206733866241,
+          34.349584723199996,
+          4.875269043345821,
+          30.690489510249133,
+          3.659095212950867,
+          15.16284494695326,
+          15.527644563295873,
+          15.16284494695326,
+          16.300364766880584,
+          30.871702571781825,
+          17.351844691314344,
+          3.823789118912061,
+          17.533585237362963,
+          3.4773546669022455,
+          13.853291391570702,
+          19.207938409088136,
+          29.01613633852396,
+          10.395828136719093,
+          20.475874435062735,
+          11.271542164293205,
+          2.948075091337949,
+          11.632357779530004,
+          3.1165390516654465,
+          11.194350974142345,
+          19.645945214475795,
+          40.21048731266631,
+          11.682098093213797,
+          8.79377634184894,
+          12.0077323698426,
+          2.6224408147091456,
+          11.245064092966343,
+          3.8792073285417024,
+          18.121733799312924,
+          12.769275508129217,
+          58.33222111197924,
+          8.79377634184894,
+          11.416217156558085,
+          15.295424485099785,
+          28.064699993229006
+        ],
+        "pressures": [
+          0.0,
+          0.0,
+          -335.8992589406795,
+          -520.5299573014947,
+          -662.1172337802343,
+          -775.1459713456603,
+          -802.735395371895,
+          -691.9318888612038,
+          -734.444191506541,
+          -782.6180337771788,
+          -831.806291581316,
+          -862.5124807620704,
+          -844.4218120100923,
+          -866.036460539732,
+          -891.4459930920193,
+          -918.5083425942169,
+          -1081.4158844461813,
+          -911.5036414309649,
+          -944.2567812372373,
+          -978.861334037021,
+          -1009.2096859862019,
+          -1501.8055398259264,
+          -923.8765218070387,
+          -945.5290624651681,
+          -982.0214664315615,
+          -1047.5274692817904,
+          -2386.494024988699
+        ],
+        "velocities": [
+          2.6999037845377574,
+          2.6999037845377574,
+          2.179158542585879,
+          2.3586033669331203,
+          1.9083102623999997,
+          0.3250179362230547,
+          1.7050271950138407,
+          0.24393968086339113,
+          0.8423802748307367,
+          0.7763822281647936,
+          0.758142247347663,
+          0.9055758203822547,
+          1.5435851285890911,
+          0.9639913717396857,
+          0.25491927459413743,
+          0.9740880687423868,
+          0.2318236444601497,
+          0.7696272995317056,
+          0.9603969204544068,
+          1.450806816926198,
+          0.5775460075955051,
+          1.0237937217531368,
+          0.6261967869051781,
+          0.19653833942252993,
+          0.646242098862778,
+          0.20776927011102977,
+          0.6219083874523526,
+          0.9822972607237898,
+          2.0105243656333154,
+          0.6490054496229888,
+          0.439688817092447,
+          0.6670962427690333,
+          0.13112204073545727,
+          0.6247257829425746,
+          0.1939603664270851,
+          1.006762988850718,
+          0.6384637754064608,
+          2.916611055598962,
+          0.4885431301027189,
+          0.6342342864754492,
+          0.8497458047277658,
+          1.5591499996238336
+        ],
+        "fanPowerKW": 285.48461246117716,
+        "totalIntake": 86.39692110520824,
+        "targetRatio": 0.5088341351882885,
+        "shortfalls": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          10.805649025857655,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          3.878266200687076,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "elapsedMs": 12.21350000196253
+      },
+      "ensemble": {
+        "schema": "aerovia.ensemble/v1",
+        "samples": 256,
+        "acceptedSamples": 256,
+        "seed": 20260911,
+        "cv": 0.15,
+        "distribution": "independent lognormal resistance, mean equal to entered resistance; fan coefficient fixed",
+        "device": "cuda",
+        "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
+        "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
+        "dtype": "float64",
+        "elapsedMs": 11.599800000112737,
+        "iterations": 5,
+        "batchSize": 256,
+        "flowP05": [
+          83.55369746933613,
+          83.55369746933613,
+          36.583073714104984,
+          44.087441719470306,
+          31.875430542294914,
+          4.229624447427841,
+          28.498073440657915,
+          3.0518306919244678,
+          13.893256200196499,
+          13.746078805626201,
+          13.893256200196499,
+          14.183137753841226,
+          28.90247348613312,
+          15.51487273567748,
+          3.2755649657304344,
+          15.987260287163089,
+          3.059575087280919,
+          12.275726409977903,
+          17.289088350884484,
+          27.054375432193456,
+          9.098241773327164,
+          19.39209199682387,
+          10.090613181166958,
+          2.581891340449376,
+          10.405452240418121,
+          2.6904207736981443,
+          9.720673065107915,
+          17.689983338471677,
+          37.73624091483854,
+          10.710884973470389,
+          7.987558293545465,
+          10.831329114385776,
+          1.5975855135718287,
+          9.874666550590682,
+          2.6278706312506896,
+          16.059706493499544,
+          10.797310202725797,
+          55.30545301325576,
+          7.987558293545465,
+          10.47986250934688,
+          13.965709459759212,
+          25.623666771325293
+        ],
+        "flowP50": [
+          86.45698299258457,
+          86.45698299258457,
+          39.28669855535952,
+          47.323340948283374,
+          34.38806242780696,
+          4.866961515988562,
+          30.718180313127114,
+          3.6634510363417743,
+          15.230343590230852,
+          15.526738035288531,
+          15.230343590230852,
+          16.266571241205508,
+          31.057828663342878,
+          17.317943315774954,
+          3.8357306274121026,
+          17.515367982756064,
+          3.501864702798592,
+          13.847340396848406,
+          19.21467328735261,
+          28.908607620590075,
+          10.444051243421459,
+          20.603816719577544,
+          11.277927078580259,
+          2.9453487957641356,
+          11.682319855791363,
+          3.0969689504509064,
+          11.183982571241726,
+          19.513389010740518,
+          40.1847062184288,
+          11.767249758467969,
+          8.8272727523458,
+          12.08951087282039,
+          2.7298687112202207,
+          11.299646773016075,
+          3.8858224217754183,
+          18.18061126053371,
+          12.754232553955172,
+          58.46986760209025,
+          8.8272727523458,
+          11.449215271711719,
+          15.390609778099144,
+          28.181486539157426
+        ],
+        "flowP95": [
+          90.22346905885303,
+          90.22346905885301,
+          42.20090910177087,
+          50.303389076537364,
+          37.017769275616374,
+          5.555430973949228,
+          33.093168957698765,
+          4.308237541760341,
+          16.432955868218773,
+          17.146460753383348,
+          16.432955868218773,
+          18.660960713961387,
+          33.19427353215944,
+          19.42715677032585,
+          4.360728138539536,
+          19.358103987710095,
+          3.961664557740333,
+          15.600589634077433,
+          21.069827972589927,
+          31.261829059556604,
+          11.689998822806464,
+          22.146849087587633,
+          12.565332797219835,
+          3.381821878906762,
+          12.918402519671375,
+          3.532597964191041,
+          12.95872240883661,
+          21.511175602809818,
+          43.29208493121483,
+          12.972568147243514,
+          9.666529233587102,
+          13.30772222787275,
+          3.7077429079185316,
+          12.550892939066257,
+          5.236959851605409,
+          20.335465045558024,
+          14.54593860762077,
+          61.55226447722568,
+          9.666529233587102,
+          12.69062040787986,
+          17.117252366445047,
+          30.902027039741593
+        ],
+        "targetProbability": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "powerP05": 276.70291269510074,
+        "powerP50": 285.66944286804994,
+        "powerP95": 297.2025744792548,
+        "failures": 0,
+        "failedSampleIndices": [],
+        "unsupportedFanSamples": 0,
+        "maxMassResidual": 2.4868995751603507e-14,
+        "maxPressureResidual": 5.101696842757519e-12,
+        "paritySamples": 8,
+        "parityMaxAbsFlow": 1.1802114840975264e-11,
+        "parityMethod": "SciPy independent mixed flow/pressure least_squares on identical saved draws"
+      }
+    }
+  ],
+  "benchmark": {
+    "python": "3.12.10",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "engineVersion": "0.1.0",
+    "referenceMethod": "SciPy least_squares trust-region reflective, analytical mixed flow/pressure Jacobian, float64",
+    "referenceElapsedMs": 12.21350000196253,
+    "totalElapsedMs": 4033.711799998855,
+    "caseCount": 1,
+    "nodeCount": 27,
+    "edgeCount": 42,
+    "maxMassResidual": 7.105427357601002e-15,
+    "maxPressureResidual": 9.64774926615064e-11,
+    "device": "cuda",
+    "hardware": "NVIDIA GeForce RTX 4070 Laptop GPU",
+    "backend": "PyTorch 2.13.0+cu126; CUDA 12.6; float64",
+    "samplesPerCase": 256,
+    "ensembleSamples": 256,
+    "ensembleElapsedMs": 11.599800000112737,
+    "ensembleFailures": 0,
+    "parityMaxAbsFlow": 1.1802114840975264e-11,
+    "paritySamples": 8
+  }
+}
