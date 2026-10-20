@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  BarChart,
   Callout,
   Cite,
   DocPage,
@@ -23,9 +24,11 @@ import {
   ConfusionMatrix,
   HeldoutLive,
   ReferenceLive,
+  degradationBars,
   metric,
   scientific,
   methodName,
+  type DegradationQuantity,
 } from "../content/BenchmarkTools";
 
 function EvidenceState({
@@ -131,7 +134,10 @@ export default function Benchmark() {
               id: "matrix",
               label: es ? "Matriz y errores" : "Matrix and errors",
               content: scientificPanel((artifact, data) => (
-                <MatrixEvidence science={artifact} catalog={data} />
+                <>
+                  <MatrixEvidence science={artifact} catalog={data} />
+                  <ComparisonLimits />
+                </>
               )),
             },
             {
@@ -167,7 +173,7 @@ export default function Benchmark() {
   );
 }
 
-function NumericalEvidence({ catalog }: { catalog: CatalogArtifact }) {
+export function NumericalEvidence({ catalog }: { catalog: CatalogArtifact }) {
   const es = useShellLang() === "es";
   const b = catalog.benchmark;
   return (
@@ -262,7 +268,8 @@ function NumericalEvidence({ catalog }: { catalog: CatalogArtifact }) {
               {es ? "Motor y hardware" : "Backend and hardware"}
             </th>
             <td>
-              {b.device} · {b.hardware} · {b.backend}
+              {b.device} · {b.hardware} ·{" "}
+              <span translate="no">{b.backend}</span>
             </td>
           </tr>
         </tbody>
@@ -338,7 +345,7 @@ function MetricsTable({
   );
 }
 
-function MatrixEvidence({
+export function MatrixEvidence({
   science,
   catalog,
 }: {
@@ -534,7 +541,7 @@ function MatrixEvidence({
   );
 }
 
-function RobustnessEvidence({
+export function RobustnessEvidence({
   science,
   catalog,
 }: {
@@ -542,9 +549,7 @@ function RobustnessEvidence({
   catalog: CatalogArtifact;
 }) {
   const es = useShellLang() === "es";
-  const [quantity, setQuantity] = useState<
-    "flowMAE" | "flowRMSE" | "pressureMAE"
-  >("flowMAE");
+  const [quantity, setQuantity] = useState<DegradationQuantity>("flowMAE");
   const rows = science.benchmark.degradation;
   const holdout = science.benchmark.familyHoldout;
   const labels = {
@@ -591,20 +596,14 @@ function RobustnessEvidence({
               ))}
             </select>
           </label>
-          <Plot
+          <BarChart
             title={labels[quantity]}
-            xlabel={es ? "σ de error logarítmico" : "Log-input error σ"}
-            ylabel={quantity === "pressureMAE" ? "Pa" : "m³/s"}
-            series={(["topology-mlp", "graph-surrogate"] as const).map(
-              (method, i) => ({
-                label: methodName(method, es),
-                color: i ? "var(--color-warn)" : "var(--color-accent)",
-                values: rows
-                  .filter((r) => r.methodId === method)
-                  .sort((a, b) => a.noiseSigma - b.noiseSigma)
-                  .map((r) => ({ x: r.noiseSigma, y: r[quantity] })),
-              }),
-            )}
+            data={degradationBars(rows, quantity)}
+            axis={{
+              label: labels[quantity],
+              unit: quantity === "pressureMAE" ? "Pa" : "m³/s",
+              format: { digits: 3 },
+            }}
           />
           <table>
             <thead>
@@ -620,7 +619,7 @@ function RobustnessEvidence({
               {rows.map((r) => (
                 <tr key={`${r.methodId}-${r.noiseSigma}`}>
                   <th scope="row">{methodName(r.methodId, es)}</th>
-                  <td>{r.noiseSigma}</td>
+                  <td>{metric(r.noiseSigma, 3)}</td>
                   <td>{r.samples}</td>
                   <td>{metric(r[quantity])}</td>
                   <td>{r.outsideDomain}</td>
@@ -750,7 +749,7 @@ function RobustnessEvidence({
   );
 }
 
-function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
+export function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
   const es = useShellLang() === "es";
   const [selected, setSelected] = useState(catalog.cases[0].network.id);
   const item = catalog.cases.find((c) => c.network.id === selected)!;
@@ -791,6 +790,35 @@ function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
         {e.acceptedSamples} / {e.samples} · CV {metric(e.cv)} ·{" "}
         {es ? "semilla" : "seed"} {e.seed} · {e.device}
       </p>
+      <h3>
+        {es ? "Conjunto registrado por caso" : "Recorded ensemble by case"}
+      </h3>
+      <table>
+        <thead>
+          <tr>
+            <th>{es ? "Caso" : "Case"}</th>
+            <th>{es ? "Aceptadas / solicitadas" : "Accepted / requested"}</th>
+            <th>{es ? "Fallos" : "Failures"}</th>
+            <th>CV</th>
+            <th>{es ? "Semilla" : "Seed"}</th>
+            <th>{es ? "Motor" : "Device"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {catalog.cases.map((c) => (
+            <tr key={c.network.id}>
+              <th scope="row">{c.network.name[es ? "es" : "en"]}</th>
+              <td>
+                {c.ensemble.acceptedSamples} / {c.ensemble.samples}
+              </td>
+              <td>{c.ensemble.failures}</td>
+              <td>{metric(c.ensemble.cv)}</td>
+              <td>{c.ensemble.seed}</td>
+              <td>{c.ensemble.device}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <Plot
         title={es ? "Cuantiles por galería" : "Quantiles by airway"}
         xlabel={es ? "Índice de galería" : "Airway index"}
@@ -868,7 +896,7 @@ function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
   );
 }
 
-function ProvenanceEvidence({
+export function ProvenanceEvidence({
   science,
   catalog,
 }: {
@@ -934,7 +962,9 @@ function ProvenanceEvidence({
             <th scope="row">
               {es ? "Licencia del conjunto" : "Dataset license"}
             </th>
-            <td>{science.provenance.license}</td>
+            <td>
+              <span translate="no">{science.provenance.license}</span>
+            </td>
           </tr>
           <tr>
             <th scope="row">
@@ -1100,6 +1130,40 @@ function ProvenanceEvidence({
           {es
             ? "Los métodos usan una solución nominal de calibración declarada. Aprender del simulador no equivale a entrenar sobre mediciones de mina. Los tiempos CUDA, CPU y navegador pertenecen a operaciones diferentes y no se combinan en una promesa de aceleración."
             : "Methods use a disclosed nominal calibration solution. Learning from the simulator is not training on mine measurements. CUDA, CPU and browser timings belong to different operations and are not combined into a speedup promise."}
+        </p>
+      </Callout>
+    </DocSection>
+  );
+}
+
+/**
+ * The limits of the comparison (area `caveat`): one honest callout whose sentences are the page's own, from the lede, the
+ * comparison section and the provenance scope, gathered where a reader weighs the matrix.
+ */
+export function ComparisonLimits() {
+  const es = useShellLang() === "es";
+  return (
+    <DocSection
+      id="content-comparison-limits"
+      title={{
+        en: "Limits of the comparison",
+        es: "Límites de la comparación",
+      }}
+      area="caveat"
+      refs={benchmarkSectionRefs.limits}
+    >
+      <Callout
+        variant="honest"
+        title={
+          es
+            ? "Qué no establece esta comparación"
+            : "What this comparison does not establish"
+        }
+      >
+        <p>
+          {es
+            ? "Las redes son escenarios de ingeniería creados: estos resultados son evidencia computacional, no validación medida de mina. Los modelos aproximados no se aceptan como solucionadores exactos por producir arreglos finitos. Todas las filas usan escenarios creados y etiquetas numéricas; no datos medidos de mina. Aprender del simulador no equivale a entrenar sobre mediciones de mina."
+            : "The source networks are authored engineering scenarios, so these results establish computational evidence rather than measured-mine validation. Approximate models are not accepted as exact solvers merely because they return finite arrays. All rows use authored scenarios and numerical labels; no measured mine data. Learning from the simulator is not training on mine measurements."}
         </p>
       </Callout>
     </DocSection>

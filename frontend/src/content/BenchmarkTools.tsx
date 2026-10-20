@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   Callout,
   Cite,
+  DocSection,
   Equation,
-  Refs,
   useLangStore,
   useShellLang,
+  type BarDatum,
 } from "@fasl-work/caos-app-shell";
 import { Play } from "lucide-react";
 import Plot from "../components/Plot";
@@ -19,6 +20,7 @@ import {
   type SurrogateResponse,
 } from "../learned";
 import type { CaseArtifact, CatalogArtifact } from "./artifacts";
+import { benchmarkSectionRefs } from "./citations/benchmark";
 
 export const methods: LearnedMethod[] = ["topology-mlp", "graph-surrogate"];
 const colors = {
@@ -33,9 +35,12 @@ export const metric = (value: number | null | undefined, digits = 4) =>
         { maximumFractionDigits: digits },
       )
     : "--";
+/** A value in scientific notation, with the decimal comma of a Spanish page (shell gate G11). */
 export const scientific = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value)
-    ? value.toExponential(3)
+    ? useLangStore.getState().lang === "es"
+      ? value.toExponential(3).replace(".", ",")
+      : value.toExponential(3)
     : "--";
 export const methodName = (id: string, es: boolean) =>
   id === "topology-mlp"
@@ -59,17 +64,56 @@ export const methodName = (id: string, es: boolean) =>
             : id;
 const difference = (a: number[], b: number[]) => a.map((v, i) => v - b[i]);
 
+/** The quantities of the degradation curve, as the committed rows (science.json benchmark.degradation) name them. */
+export type DegradationQuantity = "flowMAE" | "flowRMSE" | "pressureMAE";
+type DegradationRow = NonNullable<
+  ScienceArtifact["benchmark"]["degradation"]
+>[number];
+/** A number written in the language of the page: a comma decimal in Spanish (shell gate G11). */
+const written = (value: number) => ({
+  en: value.toLocaleString("en-US", { maximumFractionDigits: 3 }),
+  es: value.toLocaleString("es-CL", { maximumFractionDigits: 3 }),
+});
+/**
+ * The degradation curve as bars for the shell's BarChart: one bar per committed (method, noise sigma) row, the noise
+ * levels in increasing order inside each method. Values are the committed rows' own; none is interpolated or derived.
+ */
+export function degradationBars(
+  rows: readonly DegradationRow[],
+  quantity: DegradationQuantity,
+): BarDatum[] {
+  return methods.flatMap((method) =>
+    rows
+      .filter((row) => row.methodId === method)
+      .sort((a, b) => a.noiseSigma - b.noiseSigma)
+      .map((row) => {
+        const sigma = written(row.noiseSigma);
+        return {
+          id: `${method}-${row.noiseSigma}`,
+          label: {
+            en: `${methodName(method, false)} · σ ${sigma.en}`,
+            es: `${methodName(method, true)} · σ ${sigma.es}`,
+          },
+          value: row[quantity],
+          tone: method === "topology-mlp" ? "accent" : "warn",
+        } satisfies BarDatum;
+      }),
+  );
+}
+
 export function ReferenceLive({ catalog }: { catalog: CatalogArtifact }) {
   const es = useShellLang() === "es";
   const [selected, setSelected] = useState(catalog.cases[0].network.id);
   const item = catalog.cases.find((c) => c.network.id === selected)!;
   return (
-    <section>
-      <h2>
-        {es
-          ? "Volver a calcular la referencia en el navegador"
-          : "Recompute the reference in this browser"}
-      </h2>
+    <DocSection
+      id="content-reference-live"
+      title={{
+        en: "Recompute the reference in this browser",
+        es: "Volver a calcular la referencia en el navegador",
+      }}
+      refs={benchmarkSectionRefs.reference}
+    >
       <p>
         {es
           ? "Seleccione un caso registrado y ejecute el solucionador real sobre sus opciones exactas. El gráfico muestra diferencias por galería frente a la solución SciPy publicada. Esto prueba concordancia numérica sobre la misma entrada; no utiliza valores de referencia como salida del motor."
@@ -91,11 +135,7 @@ export function ReferenceLive({ catalog }: { catalog: CatalogArtifact }) {
         </select>
       </label>
       <ReferenceRun key={selected} item={item} />
-      <Refs
-        ids={["scipytrf", "mcpherson1993"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 function ReferenceRun({ item }: { item: CaseArtifact }) {
@@ -262,12 +302,15 @@ export function HeldoutLive({
       </p>
     );
   return (
-    <section>
-      <h2>
-        {es
-          ? "Inferencia real sobre entrada reservada"
-          : "Real inference on a held-out input"}
-      </h2>
+    <DocSection
+      id="content-heldout-live"
+      title={{
+        en: "Real inference on a held-out input",
+        es: "Inferencia real sobre entrada reservada",
+      }}
+      area="live"
+      refs={benchmarkSectionRefs.heldout}
+    >
       <p>
         {es
           ? "Estas entradas pertenecen a la partición de prueba registrada, no a puntos usados para seleccionar el checkpoint. El botón ejecuta el motor clásico y ambos modelos exportados en este navegador. Todos reciben la misma red, resistencias y velocidad; sus errores se comparan con la misma referencia numérica guardada."
@@ -277,6 +320,7 @@ export function HeldoutLive({
       <label>
         {es ? "Entrada reservada" : "Held-out input"}{" "}
         <select
+          data-control="heldout-input"
           aria-label={es ? "Entrada reservada" : "Held-out input"}
           value={fixture.sampleId}
           onChange={(event) => setSelected(event.target.value)}
@@ -291,11 +335,7 @@ export function HeldoutLive({
         </select>
       </label>
       <HeldoutRun key={fixture.sampleId} item={item} fixture={fixture} />
-      <Refs
-        ids={["sklearnleakage", "sklearnmetrics", "onnxweb"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 function HeldoutRun({
@@ -401,7 +441,12 @@ function HeldoutRun({
         {metric(fixture.options.speed * 100, 1)}% ·{" "}
         {es ? "Entrada de prueba" : "Test input"} {fixture.sampleIndex}
       </p>
-      <button type="button" disabled={busy} onClick={() => void run()}>
+      <button
+        type="button"
+        data-control="heldout-run"
+        disabled={busy}
+        onClick={() => void run()}
+      >
         <Play size={14} />
         {busy
           ? es

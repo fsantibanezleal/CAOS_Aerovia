@@ -13,4 +13,9 @@ export const benchmarkSectionRefs: Record<string, string[]> = {
   robustness: ["numpylognormal", "sklearnleakage", "gilmer2017"],
   uncertainty: ["numpylognormal", "pytorchsolve", "scipytrf"],
   provenance: ["sklearnleakage", "pytorchsolve", "onnxweb"],
+  // the Benchmark's two live tools and the limits callout (content/BenchmarkTools.tsx, pages/Benchmark.tsx): their former
+  // inline "References" rows now join the block at the end of the open topic
+  reference: ["scipytrf", "mcpherson1993"],
+  heldout: ["sklearnleakage", "sklearnmetrics", "onnxweb"],
+  limits: ["sklearnleakage", "sklearnmetrics"],
 };
