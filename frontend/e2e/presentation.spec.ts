@@ -232,7 +232,11 @@ for (const mobile of [false, true])
       await tabs.nth(i).click();
       const svg = dialog.locator("svg");
       await expect(svg).toHaveCount(1);
-      await svg.scrollIntoViewIfNeeded();
+      // The modal injects its SVG after the tab opens; a busy page can replace it once more under the locator.
+      await expect(async () => {
+        await expect(svg).toHaveCount(1);
+        await svg.scrollIntoViewIfNeeded({ timeout: 2000 });
+      }).toPass({ timeout: 10000 });
       const escaped = await svg.evaluate((element) => {
         const bounds = element.getBoundingClientRect();
         return [...element.querySelectorAll("text")]
