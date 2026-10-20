@@ -1,4 +1,4 @@
-import type { ScientificSection } from "./primitives";
+import type { Bilingual, ScientificSection } from "./primitives";
 
 export const implementationSections: ScientificSection[] = [
   {
@@ -29,12 +29,12 @@ export const implementationSections: ScientificSection[] = [
     ],
     symbols: [
       [
-        "A source identity binds the actual bytes or canonical structured input to an artifact.",
-        "Una identidad vincula bytes reales o entrada estructurada canónica al artefacto.",
+        "Source identity: binds the actual bytes or canonical structured input to an artifact.",
+        "Identidad de origen: vincula bytes reales o entrada estructurada canónica al artefacto.",
       ],
       [
-        "An option identity includes speed, resistance scaling and individual overrides.",
-        "La identidad de opciones incluye velocidad, escalamiento y cambios individuales.",
+        "Option identity: includes speed, resistance scaling and individual overrides.",
+        "Identidad de opciones: incluye velocidad, escalamiento y cambios individuales.",
       ],
     ],
     assumption: [
@@ -272,4 +272,337 @@ export const implementationSections: ScientificSection[] = [
     refs: ["githubpages", "mdnworkers", "onnxweb"],
     diagram: "pipeline",
   },
+  {
+    id: "routing-engine",
+    area: "engine",
+    title: [
+      "Directed airflow paths and recirculation",
+      "Rutas dirigidas de aire y recirculación",
+    ],
+    paragraphs: [
+      [
+        "The route analysis reads the directed graph of the actual steady airflow solution. From a selected source it finds the nodes a parcel of air can reach, a path with the smallest sum of nominal airway transit times and the internal directed recirculation components. A change of resistance, fan state or closure can change the graph, the path and the weights. This is an air-network operation: it is not a pedestrian access route, an evacuation route, an approved ventilation plan or the earliest detectable tracer arrival, which the transport tool calculates separately as a dispersive concentration history.",
+        "El análisis de rutas lee el grafo dirigido de la solución estacionaria real. Desde un origen elegido encuentra los nudos alcanzables por una parcela de aire, una ruta con la menor suma de tiempos nominales de tránsito y las componentes internas de recirculación. Cambiar resistencia, estado del ventilador o cierre puede cambiar grafo, ruta y pesos. Es una operación de la red de aire: no representa acceso peatonal, evacuación, un plan de ventilación aprobado ni la llegada más temprana de un trazador detectable, que el transporte calcula aparte como historia de concentración dispersiva.",
+      ],
+      [
+        "For each solved branch the sign of Q gives the direction: positive flow runs from the declared start to the declared end, negative flow the other way, and zero flow or a closed branch has no active edge. Velocity is the absolute flow over the current area, and the nominal transit time is the airway volume over the absolute flow. Length is an explicit value or the endpoint distance, as in transport; coincident endpoints require an explicit length, lengths below 1e-6 m are rejected and explicit lengths cannot exceed 1e7 m. Exactly zero flow is the only inactive criterion, so a very small solved flow stays active with a very large transit time and must not be read as strong ventilation.",
+        "En cada rama resuelta el signo de Q da la dirección: caudal positivo va del inicio al final declarados, negativo en sentido contrario, y caudal cero o rama cerrada no tiene arista activa. La velocidad es el caudal absoluto sobre el área vigente y el tiempo nominal es el volumen de la labor sobre el caudal absoluto. La longitud es un valor explícito o la distancia entre extremos, como en transporte; extremos coincidentes exigen longitud explícita, se rechazan longitudes menores que 1e-6 m y las explícitas no pueden superar 1e7 m. Solo el caudal exactamente cero es inactivo: un caudal resuelto muy pequeño sigue activo con un tiempo muy grande y no debe leerse como ventilación intensa.",
+      ],
+      [
+        "Dijkstra's algorithm minimizes the sum of these nonnegative times over at most 120 nodes and 240 edges, with no graph-library runtime dependency. A pressure boundary ends the traversal unless it is the selected source, which matches the clean external reservoir of transport. Tarjan's strongly connected components on the active edges, with every boundary node excluded, report each component of more than one node as internal recirculation: a topological finding that does not rate exchange efficiency, contaminant trapping or safety. An unreachable destination returns no path; a destination equal to the source returns an empty path of zero length and time; an unsupported equilibrium returns a failed status and no route, never a route invented from topology.",
+        "El algoritmo de Dijkstra minimiza la suma de estos tiempos no negativos sobre a lo más 120 nodos y 240 aristas, sin dependencia de una biblioteca de grafos en ejecución. Una frontera de presión termina el recorrido salvo que sea el origen, lo que coincide con el reservorio exterior limpio del transporte. Las componentes fuertemente conexas de Tarjan sobre las aristas activas, sin los nudos de frontera, informan como recirculación interna cada componente de más de un nudo: un hallazgo topológico que no califica eficiencia de intercambio, atrapamiento de contaminante ni seguridad. Un destino inalcanzable no devuelve ruta; si destino y origen coinciden, la ruta es vacía con longitud y tiempo cero; un equilibrio no soportado devuelve estado fallido y ninguna ruta, nunca una ruta inventada desde la topología.",
+      ],
+    ],
+    equations: [
+      {
+        tex: String.raw`\tau_e=\frac{A_eL_e}{|Q_e|}=\frac{L_e}{u_e},\qquad \min_{\pi}\sum_{e\in\pi}\tau_e`,
+        caption: [
+          "τ_e is the nominal transit time of an active airway (s), A_e its area (m²), L_e its length (m), Q_e the signed flow (m³/s) and u_e = |Q_e|/A_e the mean velocity (m/s); π is a directed path. A geometrically longer route can have the smaller sum when it carries enough flow.",
+          "τ_e es el tiempo nominal de tránsito de una labor activa (s), A_e su área (m²), L_e su longitud (m), Q_e el caudal con signo (m³/s) y u_e = |Q_e|/A_e la velocidad media (m/s); π es una ruta dirigida. Una ruta geométricamente más larga puede tener la menor suma si conduce suficiente caudal.",
+        ],
+      },
+    ],
+    symbols: [
+      [
+        "outgoingFraction: the share of one branch's flow among the outgoing flows of its upstream node, not the probability that a person chooses it.",
+        "outgoingFraction: participación del caudal de una rama entre las salidas de su nudo aguas arriba, no la probabilidad de que una persona la elija.",
+      ],
+      [
+        "minimumFlow: the smallest flow magnitude on the chosen path, not a maximum-flow network capacity.",
+        "minimumFlow: el menor caudal en la ruta elegida, no una capacidad máxima de la red.",
+      ],
+    ],
+    assumption: [
+      "The route is a graph metric of nominal volume over flow along the signed flow. It does not describe evacuation, access or a concentration history, and a previously highlighted path is not current once an option changes until the analysis is recalculated.",
+      "La ruta es una métrica de grafo de volumen sobre caudal siguiendo el caudal con signo. No describe evacuación, acceso ni historia de concentración, y una ruta destacada antes no es vigente tras cambiar una opción hasta recalcular.",
+    ],
+    refs: ["networkxpaths"],
+  },
+  {
+    id: "reproduction-record",
+    area: "reproducibility",
+    title: [
+      "Executed run and how a result is reproduced",
+      "Ejecución registrada y cómo se reproduce un resultado",
+    ],
+    paragraphs: [
+      [
+        "The canonical catalog was generated on 2026-09-10 at 01:48:50 UTC, and this record reports an executed run, not an estimated benchmark. The commands were python scripts/pipeline.py create, then bake with the CUDA device, 256 samples, seed 20260909 and a coefficient of variation of 0.15 into data/artifacts, then verify of those artifacts, then the Python test suite. The draws are seeded and the same arrays go to the CPU or the CUDA batch. The manifest records the SHA-256 and byte count of every artifact, the engine version, the source identity and the actual device, so a reader can recompute each hash and compare it. The current manifest is authoritative if a later rebake changes timing or identity.",
+        "El catálogo canónico se generó el 2026-09-10 a las 01:48:50 UTC, y este registro informa una ejecución real, no un benchmark estimado. Los comandos fueron python scripts/pipeline.py create, luego bake con dispositivo CUDA, 256 muestras, semilla 20260909 y coeficiente de variación 0,15 hacia data/artifacts, luego verify de esos artefactos y la suite de pruebas de Python. Los sorteos tienen semilla y los mismos arreglos van al lote de CPU o de CUDA. El manifiesto registra el SHA-256 y los bytes de cada artefacto, la versión del motor, la identidad de origen y el dispositivo real, de modo que un lector puede recalcular cada hash y compararlo. El manifiesto vigente prevalece si una regeneración posterior cambia tiempos o identidad.",
+      ],
+      [
+        "CPU tests ran in an isolated Python v3.13. CUDA processing ran in a separate Python 3.12.10 environment with NumPy 2.5.3, SciPy 1.18.1 and PyTorch 2.13.0+cu126, executing float64 batched linear systems under CUDA v12.6 on an NVIDIA GeForce RTX 4070 Laptop GPU. The environment was populated from package wheels, imports no other project's packages, requires no machine-specific source path, and pip check reported no broken requirements. The Python suite passed 51 tests covering analytic truth, four speeds over all authored cases, graph failures, import and export integrity, pinned downloads, chunked ensembles, transactional artifact promotion and agreement with the reference.",
+        "Las pruebas de CPU corrieron en un Python v3.13 aislado. El proceso CUDA corrió en un entorno separado de Python 3.12.10 con NumPy 2.5.3, SciPy 1.18.1 y PyTorch 2.13.0+cu126, resolviendo sistemas lineales por lotes en float64 con CUDA v12.6 en una NVIDIA GeForce RTX 4070 Laptop GPU. El entorno se armó desde paquetes binarios, no importa paquetes de otro proyecto, no requiere una ruta de código propia de la máquina y pip check no informó requisitos rotos. La suite de Python aprobó 51 pruebas que cubren verdad analítica, cuatro velocidades en todos los casos creados, fallos de grafo, integridad de importación y exportación, descargas fijadas, conjuntos por tramos, promoción transaccional de artefactos y concordancia con la referencia.",
+      ],
+      [
+        "The run covered 12 authored cases with 509 nodes and 656 airways, 3072 resistance realizations (256 per case) and no failed realization. Ninety-six independent matched-draw SciPy references (8 per case) agree with the CUDA batch within 1.18e-11 m³/s of branch flow. The maximum deterministic residuals are 5.69e-14 m³/s of internal mass and 9.65e-11 Pa of branch pressure, and the sampled ones 9.95e-14 m³/s and 2.74e-8 Pa. The 12 SciPy baseline solves took 270.64 ms in total and the CUDA batches 1561.81 ms; the pipeline timer, including independent parity and exports, read 4033.71 ms. A deliberately failing later case leaves a previously accepted catalog byte for byte unchanged.",
+        "La ejecución cubrió 12 casos creados con 509 nudos y 656 labores, 3072 realizaciones de resistencia (256 por caso) y ninguna realización fallida. Noventa y seis referencias SciPy independientes con las mismas muestras (8 por caso) concuerdan con el lote CUDA dentro de 1,18e-11 m³/s de caudal por rama. Los residuos deterministas máximos son 5,69e-14 m³/s de masa interna y 9,65e-11 Pa de presión por rama, y los muestreados 9,95e-14 m³/s y 2,74e-8 Pa. Las 12 soluciones base de SciPy tomaron 270,64 ms en total y los lotes CUDA 1561,81 ms; el cronómetro del proceso, con paridad independiente y exportaciones, marcó 4033,71 ms. Un caso posterior que falla a propósito deja un catálogo aceptado antes idéntico byte a byte.",
+      ],
+    ],
+    equations: [],
+    assumption: [
+      "The timer starts after the Python imports and is not a cold-start benchmark; these small networks do not establish a universal GPU speedup. Numerical verification does not establish field calibration, measured savings or suitability for direct ventilation control.",
+      "El cronómetro parte tras las importaciones de Python y no es un benchmark de arranque en frío; estas redes pequeñas no establecen una aceleración universal de la GPU. La verificación numérica no establece calibración de terreno, ahorros medidos ni idoneidad para control directo de la ventilación.",
+    ],
+    refs: ["numpylognormal", "pytorchsolve", "scipytrf"],
+  },
 ];
+
+type Row3 = readonly [Bilingual, Bilingual, Bilingual];
+export type ContractTable = {
+  caption: Bilingual;
+  head: Row3;
+  rows: readonly Row3[];
+};
+const same = (value: string): Bilingual => [value, value];
+const HEAD: Row3 = [
+  ["Field", "Campo"],
+  ["Unit and range", "Unidad y rango"],
+  ["Meaning", "Significado"],
+];
+
+/**
+ * The network document `aerovia.network/v1` and its options, as docs/data-contract/data-contract.md defines them (the
+ * schema is `frontend/src/contracts.ts`, the canonical inputs `data/cases.json`). Two tables, one per contract section:
+ * the document's identity, limits and equipment, then the geometric and hydraulic fields with their units.
+ */
+export const contractTables: Record<string, ContractTable> = {
+  ingestion: {
+    caption: [
+      "Network document aerovia.network/v1: identity, provenance, limits and equipment.",
+      "Documento de red aerovia.network/v1: identidad, procedencia, límites y equipos.",
+    ],
+    head: HEAD,
+    rows: [
+      [
+        same("schema"),
+        same("aerovia.network/v1"),
+        [
+          "Schema identity of the document, checked first.",
+          "Identidad del esquema del documento, verificada primero.",
+        ],
+      ],
+      [
+        same("id"),
+        ["1 to 80 portable characters", "1 a 80 caracteres portables"],
+        [
+          "Starts alphanumeric; the rest is alphanumeric or _ . : -",
+          "Parte con alfanumérico; el resto es alfanumérico o _ . : -",
+        ],
+      ],
+      [
+        same("name, description"),
+        [
+          "en and es text, at most 4000 characters each",
+          "texto en y es, hasta 4000 caracteres cada uno",
+        ],
+        ["Nonempty bilingual strings.", "Textos bilingües no vacíos."],
+      ],
+      [
+        same("provenance.kind"),
+        ["authored or imported", "authored o imported"],
+        [
+          "Distinguishes authored examples from user imports.",
+          "Distingue ejemplos creados de importaciones del usuario.",
+        ],
+      ],
+      [
+        same("provenance.source, .license"),
+        ["nonempty text", "texto no vacío"],
+        ["Source and reuse licence.", "Fuente y licencia de reutilización."],
+      ],
+      [
+        same("nodes"),
+        ["2 to 120 unique IDs", "2 a 120 identificadores únicos"],
+        ["Junctions of the network.", "Uniones de la red."],
+      ],
+      [
+        same("edges"),
+        [
+          "1 to 240 unique directed IDs",
+          "1 a 240 identificadores dirigidos únicos",
+        ],
+        [
+          "Airways, with existing and distinct endpoint IDs.",
+          "Galerías, con extremos existentes y distintos.",
+        ],
+      ],
+      [
+        same("edges[].kind"),
+        same("intake, return, working, crosscut, fan"),
+        ["Airway role.", "Rol de la galería."],
+      ],
+      [
+        same("edges[].fan"),
+        ["required exactly when kind is fan", "exigido solo si kind es fan"],
+        [
+          "Fan curve parameters of a fan airway.",
+          "Parámetros de la curva de un ventilador.",
+        ],
+      ],
+      [
+        same("fan.pressure"),
+        same("Pa, [0, 1e5]"),
+        ["Nominal shutoff pressure.", "Presión nominal de bloqueo."],
+      ],
+      [
+        same("fan.coefficient"),
+        same("Pa·s²/m⁶, [0, 1e4]"),
+        ["Quadratic coefficient.", "Coeficiente cuadrático."],
+      ],
+      [
+        same("fan.efficiency"),
+        ["fraction, [0.05, 1]", "fracción, [0,05; 1]"],
+        [
+          "Electrical conversion efficiency.",
+          "Eficiencia de conversión eléctrica.",
+        ],
+      ],
+      [
+        ["browser import file", "archivo de importación del navegador"],
+        ["2,000,000 bytes", "2000000 bytes"],
+        [
+          "One network or one exported project; the offline pipeline accepts 5 MiB and at most 100 cases.",
+          "Una red o un proyecto exportado; el proceso local acepta 5 MiB y hasta 100 casos.",
+        ],
+      ],
+    ],
+  },
+  geometry: {
+    caption: [
+      "Geometric and hydraulic fields of the network document, and the solve options, with their SI units and admitted ranges.",
+      "Campos geométricos e hidráulicos del documento de red, y opciones de cálculo, con sus unidades SI y rangos admitidos.",
+    ],
+    head: HEAD,
+    rows: [
+      [
+        same("nodes[].x, .y, .z"),
+        ["m, finite within ±1e6", "m, finitos dentro de ±1e6"],
+        [
+          "x and y horizontal, z elevation (negative below the surface).",
+          "x e y horizontales, z cota (negativa bajo la superficie).",
+        ],
+      ],
+      [
+        same("nodes[].boundary"),
+        ["Pa, within ±1e6, optional", "Pa, dentro de ±1e6, opcional"],
+        [
+          "Fixed pressure; at least one node needs it.",
+          "Presión fija; al menos un nudo la requiere.",
+        ],
+      ],
+      [
+        same("edges[].area"),
+        ["m², [0.1, 1000]", "m², [0,1; 1000]"],
+        [
+          "Cross-section; controls mean velocity and transport volume.",
+          "Sección; controla velocidad media y volumen de transporte.",
+        ],
+      ],
+      [
+        same("edges[].resistance"),
+        same("Pa·s²/m⁶, [1e−6, 1e6]"),
+        [
+          "Quadratic resistance, independent of the geometry.",
+          "Resistencia cuadrática, independiente de la geometría.",
+        ],
+      ],
+      [
+        same("edges[].target"),
+        [
+          "m³/s; 0 disables, positive values [1e−6, 10000]",
+          "m³/s; 0 desactiva, positivos [1e−6; 10000]",
+        ],
+        ["Airflow target of the airway.", "Caudal objetivo de la galería."],
+      ],
+      [
+        same("edges[].level"),
+        same("[−100, 100]"),
+        ["Presentation grouping only.", "Solo agrupación de presentación."],
+      ],
+      [
+        same("options.speed"),
+        ["[0, 1.5]", "[0; 1,5]"],
+        ["Fan speed ratio.", "Razón de velocidad del ventilador."],
+      ],
+      [
+        same("options.resistanceScale"),
+        ["[0.05, 20]", "[0,05; 20]"],
+        [
+          "Global factor on every resistance.",
+          "Factor global sobre toda resistencia.",
+        ],
+      ],
+    ],
+  },
+};
+
+/** The topics of the page, in the order of their groups: each holds whole sections, so no section is split or dropped. */
+export type ImplementationTopicDef = {
+  id: string;
+  label: Bilingual;
+  sections: string[];
+};
+export type ImplementationGroupDef = {
+  id: string;
+  label: Bilingual;
+  topics: ImplementationTopicDef[];
+};
+// The shell holds six peer tabs at most (ADR-0071 rule 5) and the page needs eight topics, so they sit in two groups of
+// four, split by the reader's question: how the inputs and the engines work, then what backs a result and how it is released.
+export const implementationGroups: ImplementationGroupDef[] = [
+  {
+    id: "engines",
+    label: ["Inputs and engines", "Entradas y motores"],
+    topics: [
+      {
+        id: "inputs",
+        label: ["Inputs and geometry", "Entradas y geometría"],
+        sections: ["ingestion", "geometry"],
+      },
+      {
+        id: "solvers",
+        label: ["Solvers", "Solucionadores"],
+        sections: ["browser-engine", "reference-engine"],
+      },
+      {
+        id: "transport-engine",
+        label: ["Transport", "Transporte"],
+        sections: ["transport-engine"],
+      },
+      {
+        id: "routing",
+        label: ["Routes", "Rutas"],
+        sections: ["routing-engine"],
+      },
+    ],
+  },
+  {
+    id: "evidence",
+    label: ["Evidence and release", "Evidencia y publicación"],
+    topics: [
+      {
+        id: "cuda-ensemble",
+        label: ["CUDA batches", "Lotes CUDA"],
+        sections: ["cuda-ensemble"],
+      },
+      {
+        id: "reproducibility",
+        label: ["Reproducibility", "Reproducibilidad"],
+        sections: ["reproduction-record"],
+      },
+      {
+        id: "models",
+        label: ["Models", "Modelos"],
+        sections: ["learned-pipeline"],
+      },
+      {
+        id: "deployment",
+        label: ["Deployment", "Despliegue"],
+        sections: ["release-runtime"],
+      },
+    ],
+  },
+];
+export const implementationTopics: ImplementationTopicDef[] =
+  implementationGroups.flatMap((group) => group.topics);
