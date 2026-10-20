@@ -1,0 +1,2 @@
+- Methodology: every method topic's diagram carries a caption in English and Spanish (what the reader sees and how to read it, transcribed from the diagram's own labels and the method text), so the shell's `method` area reaches its figure floor in both languages (ADR-0017 section 2.1).
+- Methodology: the two symbol notes of "Pressure and flow" are written as `term: definition` glossary rows; as bare sentences they became a term column as wide as the page and made the page 630 px wide at 390 px (gate G5).

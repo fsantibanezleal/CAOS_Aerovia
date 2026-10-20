@@ -65,6 +65,10 @@ export const learnedMethods: ScientificSection[] = [
     ],
     refs: ["sklearnleakage", "sklearnmetrics", "pytorchsolve", "onnxweb"],
     diagram: "mlp",
+    diagramCaption: [
+      "The schematic shows a multilayer model that learns an input-to-response map within its training scope, with the connectivity of the network as an input. A prediction remains approximate and is compared with a held-out numerical reference and with the physical residuals.",
+      "El esquema muestra un modelo multicapa que aprende la respuesta a partir de las entradas dentro de su dominio de entrenamiento, con la conectividad de la red como entrada. Una predicción es aproximada y se compara con una referencia numérica reservada y con los residuos físicos.",
+    ],
   },
   {
     id: "graph-surrogate",
@@ -129,5 +133,9 @@ export const learnedMethods: ScientificSection[] = [
     ],
     refs: ["gilmer2017", "battaglia2018", "ashraf2024", "sklearnleakage"],
     diagram: "graph",
+    diagramCaption: [
+      "The schematic shows message passing, where shared local rules are applied over the nodes and edges of a network and information is exchanged along their connections. A prediction remains approximate and is compared with a held-out numerical reference and with the physical residuals.",
+      "El esquema muestra el paso de mensajes, donde reglas locales compartidas se aplican sobre los nodos y las ramas de una red e intercambian información por sus conexiones. Una predicción es aproximada y se compara con una referencia numérica reservada y con los residuos físicos.",
+    ],
   },
 ];
