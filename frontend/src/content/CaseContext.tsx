@@ -1,13 +1,24 @@
 import {
   Callout,
   Cite,
+  DocReferences,
   Equation,
-  Refs,
+  firstAppearance,
   useShellLang,
 } from "@fasl-work/caos-app-shell";
 import type { Network } from "../contracts";
 import { caseQuestions, regimeDefinitions } from "./cases";
 import { tr } from "./primitives";
+
+/** The citations of the write-up, section by section, as the text cites them. */
+const SECTION_REFS = [
+  ["mcpherson1993"],
+  ["mcpherson1993"],
+  ["mcpherson1993", "scipytrf"],
+  ["nioshmfire", "nistcontam"],
+  ["mcpherson1993"],
+  ["mcpherson1993", "clawpackadvection"],
+] as const;
 
 export default function CaseContext({ network }: { network: Network }) {
   const es = useShellLang() === "es";
@@ -19,14 +30,7 @@ export default function CaseContext({ network }: { network: Network }) {
       <section>
         <h3>{es ? "El problema" : "The problem"}</h3>
         <p>{detail ? tr(detail.question, es) : network.description[lang]}</p>
-        <p>
-          {detail ? tr(detail.design, es) : network.description[lang]}{" "}
-          <Cite id="mcpherson1993" />
-        </p>
-        <Refs
-          ids={["mcpherson1993"]}
-          label={es ? "Referencias" : "References"}
-        />
+        <p>{detail ? tr(detail.design, es) : network.description[lang]}</p>
       </section>
       <section>
         <h3>{es ? "Componentes y variables" : "Components and variables"}</h3>
@@ -36,12 +40,9 @@ export default function CaseContext({ network }: { network: Network }) {
           {network.edges.length}{" "}
           {es
             ? "galerías. Presión en Pa, caudal en m³/s, área en m² y coordenadas en metros. Velocidad, resistencia y objetivo son entradas distintas."
-            : "airways. Pressure is in Pa, flow in m³/s, area in m² and coordinates in meters. Speed, resistance and target are distinct inputs."}
+            : "airways. Pressure is in Pa, flow in m³/s, area in m² and coordinates in meters. Speed, resistance and target are distinct inputs."}{" "}
+          <Cite id="mcpherson1993" />
         </p>
-        <Refs
-          ids={["mcpherson1993"]}
-          label={es ? "Referencias" : "References"}
-        />
       </section>
       <section>
         <h3>{es ? "Formalización" : "Formalization"}</h3>
@@ -52,10 +53,6 @@ export default function CaseContext({ network }: { network: Network }) {
               ? "B_I es incidencia interna; Q caudal; Δp diferencia de presión; H₀,k curva del ventilador; s velocidad común; R resistencia; A área; u velocidad media."
               : "B_I is internal incidence; Q is flow; Δp pressure difference; H₀,k fan curve; s common speed; R resistance; A area; u mean velocity."
           }
-        />
-        <Refs
-          ids={["mcpherson1993", "scipytrf"]}
-          label={es ? "Referencias" : "References"}
         />
       </section>
       <section>
@@ -79,10 +76,6 @@ export default function CaseContext({ network }: { network: Network }) {
               : "Steady constant-density model. Transport is cell-based passive tracer; no CFD, fire or safety approval."}
           </p>
         </Callout>
-        <Refs
-          ids={["nioshmfire", "nistcontam"]}
-          label={es ? "Referencias" : "References"}
-        />
       </section>
       <section>
         <h3>{es ? "Qué muestra cada régimen" : "What each regime shows"}</h3>
@@ -104,10 +97,6 @@ export default function CaseContext({ network }: { network: Network }) {
             ))}
           </tbody>
         </table>
-        <Refs
-          ids={["mcpherson1993"]}
-          label={es ? "Referencias" : "References"}
-        />
       </section>
       <section>
         <h3>
@@ -127,11 +116,8 @@ export default function CaseContext({ network }: { network: Network }) {
             ? "Compare el mismo objeto entre escena, lecturas y gráficos. Para transporte, seleccione tiempo calculado y revise concentración junto con masa almacenada y escapada."
             : "Compare the same object across scene, readouts and charts. For transport, select a calculated time and inspect concentration together with stored and escaped mass."}
         </p>
-        <Refs
-          ids={["mcpherson1993", "clawpackadvection"]}
-          label={es ? "Referencias" : "References"}
-        />
       </section>
+      <DocReferences ids={firstAppearance(SECTION_REFS)} />
     </article>
   );
 }
