@@ -7,13 +7,13 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "predev": "node scripts/prepare-data.mjs",
+    "predev": "node scripts/prepare-data.mjs && node scripts/copy-data.mjs",
     "dev": "vite --host 127.0.0.1 --port 5908 --strictPort",
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e/tsconfig.json",
     "contracts:types": "node scripts/gen-contract-types.mjs",
     "contracts:check": "node scripts/gen-contract-types.mjs --check",
     "test": "vitest run",
-    "build": "node scripts/gen-contract-types.mjs --check && npm run typecheck && node scripts/prepare-data.mjs && vite build",
+    "build": "node scripts/gen-contract-types.mjs --check && npm run typecheck && node scripts/prepare-data.mjs && node scripts/copy-data.mjs && vite build",
     "postbuild": "node scripts/generate-manifest.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4908 --strictPort",

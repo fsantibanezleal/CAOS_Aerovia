@@ -1,6 +1,7 @@
 import type { InferenceSession } from 'onnxruntime-web/wasm';
 import { MASS_TOLERANCE, PRESSURE_TOLERANCE, validateNetwork, validateOptions } from '../engine';
 import { checkDomain } from './domain';
+import { ArtifactUnavailable, loadReadiness, modelUnavailable, requireAvailable } from '../readiness/readiness';
 import { SCHEMAS } from '../lib/contract.types';
 import type { LearnedMethod, ModelRegistry, ModelEntry, Network, Options, Prediction, Result, ScienceArtifact, SurrogateResponse } from './types';
 export * from './types';
@@ -21,10 +22,11 @@ async function readJson<T>(relative: string, schema: string): Promise<T> {
 }
 
 export function loadRegistry(): Promise<ModelRegistry> {
-  return registryPromise ??= readJson<ModelRegistry>('models/registry.json', SCHEMAS.modelRegistry).catch(error => { registryPromise = undefined; throw error; });
+  // the readiness document says first whether the registry is there at all (a row it lists as missing carries its reason)
+  return registryPromise ??= requireAvailable(['model-registry']).then(() => readJson<ModelRegistry>('models/registry.json', SCHEMAS.modelRegistry)).catch(error => { registryPromise = undefined; throw error; });
 }
 export function loadScience(): Promise<ScienceArtifact> {
-  return sciencePromise ??= readJson<ScienceArtifact>('science.json', SCHEMAS.science).catch(error => { sciencePromise = undefined; throw error; });
+  return sciencePromise ??= requireAvailable(['science']).then(() => readJson<ScienceArtifact>('science.json', SCHEMAS.science)).catch(error => { sciencePromise = undefined; throw error; });
 }
 
 async function getSession(entry: ModelEntry): Promise<InferenceSession> {
@@ -105,6 +107,9 @@ export async function predictSurrogate(network: Network, supplied: Options, meth
     const entry = registry.entries.find(item => item.networkId === network.id && item.methodId === methodId);
     const domain = checkDomain(network, options, entry);
     if (!domain.supported || !entry || !domain.features) return { status: 'out-of-domain', reason: domain.reason, methodId, diagnostics: {} };
+    // a model file the readiness document lists as absent is not offered while the other models work
+    const absent = modelUnavailable(await loadReadiness(), entry.onnx.file);
+    if (absent) throw new ArtifactUnavailable(absent.id, absent.reason);
     if (!reference || reference.flows.length !== network.edges.length || reference.pressures.length !== network.nodes.length || !reference.converged)
       throw new Error('A converged numerical reference for the identical inputs is required for an error comparison.');
     const checkedReference = resultFromArrays(network, options, reference.flows, reference.pressures, 0);
@@ -124,6 +129,6 @@ export async function predictSurrogate(network: Network, supplied: Options, meth
     return { status: 'supported', reason: domain.reason, methodId, modelVersion: entry.version, prediction,
       diagnostics: { inferenceMs, totalMs: performance.now() - started, modelBytes: entry.onnx.bytes, backend: 'ONNX Runtime Web / WASM CPU / one thread' } };
   } catch (error) {
-    return { status: error instanceof TypeError ? 'unavailable' : 'failed', reason: error instanceof Error ? error.message : 'Learned model inference failed.', methodId, diagnostics: { totalMs: performance.now() - started } };
+    return { status: error instanceof TypeError || error instanceof ArtifactUnavailable ? 'unavailable' : 'failed', reason: error instanceof Error ? error.message : 'Learned model inference failed.', methodId, diagnostics: { totalMs: performance.now() - started } };
   }
 }

@@ -1,7 +1,10 @@
+import { useShellLang } from "@fasl-work/caos-app-shell";
 import { useEffect, useState } from "react";
 import { readBenchmark } from "../components/VerificationSummary";
 import { validateNetwork, validateOptions } from "../engine/validation";
 import type { Catalog, CatalogCase, CatalogEnsemble } from "../lib/contract.types";
+import { STATE_LABEL } from "../readiness/ReadinessNote";
+import { ArtifactUnavailable, requireAvailable } from "../readiness/readiness";
 
 /**
  * A case of the catalog as this reader accepts it: the type is the schema's (catalog.schema.json), narrowed in the one
@@ -115,11 +118,13 @@ export function useCatalog(): LoadState<CatalogArtifact> {
     data: null,
     error: null,
   });
+  const lang = useShellLang();
   useEffect(() => {
     let active = true;
-    catalogCache.promise ??= fetch(
-      `${import.meta.env.BASE_URL}data/catalog.json`,
-    )
+    // The readiness document says first whether the catalog is there at all; a row it lists as missing is reported
+    // with its reason instead of a failed request.
+    catalogCache.promise ??= requireAvailable(["catalog"])
+      .then(() => fetch(`${import.meta.env.BASE_URL}data/catalog.json`))
       .then(async (response) => {
         if (!response.ok)
           throw new Error(
@@ -141,9 +146,11 @@ export function useCatalog(): LoadState<CatalogArtifact> {
             loading: false,
             data: null,
             error:
-              error instanceof Error
-                ? error.message
-                : "Scientific catalog unavailable.",
+              error instanceof ArtifactUnavailable
+                ? `${STATE_LABEL.missing[lang]}: ${error.reason[lang]}`
+                : error instanceof Error
+                  ? error.message
+                  : "Scientific catalog unavailable.",
           });
       },
     );

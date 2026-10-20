@@ -7,6 +7,8 @@ import {
 import { DeepSection, DocBody, tr } from "../content/primitives";
 import { experimentSections } from "../content/experiments";
 import { useCatalog, type CatalogArtifact } from "../content/artifacts";
+import { ReadinessNote } from "../readiness/ReadinessNote";
+import { VIEW_ROWS } from "../readiness/readiness";
 import { caseQuestions, regimeDefinitions } from "../content/cases";
 
 const tabLabels: Record<string, readonly [string, string]> = {
@@ -33,6 +35,7 @@ export function DatasetTables({
   return (
     <>
       <h3>{es ? "Biblioteca y permisos" : "Library and permissions"}</h3>
+      <ReadinessNote ids={VIEW_ROWS.experiments} />
       {loading ? (
         <p role="status">
           {es ? "Cargando registro verificado…" : "Loading verified registry…"}

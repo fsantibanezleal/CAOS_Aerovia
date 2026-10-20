@@ -18,6 +18,8 @@ import {
   type BenchmarkRow,
 } from "../learned";
 import { useCatalog, type CatalogArtifact } from "../content/artifacts";
+import { ReadinessNote } from "../readiness/ReadinessNote";
+import { VIEW_ROWS } from "../readiness/readiness";
 import { DocBody } from "../content/primitives";
 import { benchmarkSectionRefs } from "../content/citations/benchmark";
 import {
@@ -104,6 +106,7 @@ export default function Benchmark() {
       }
     >
       <DocBody>
+        <ReadinessNote ids={VIEW_ROWS.benchmark} />
         <SubTabs
           orientation="vertical"
           ariaLabel={es ? "Evidencia comparativa" : "Comparative evidence"}
