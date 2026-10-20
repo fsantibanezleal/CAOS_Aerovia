@@ -36,6 +36,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install the web dependencies (the SVG guard and the web baseline read the installed shell)
         run: cd frontend && npm ci
+      - name: Install the schema validator and numpy and scipy (the SDD guard and the planted-defect suite; test_runtime.py imports the pipeline)
+        run: pip install jsonschema==4.26.0 numpy==2.5.3 scipy==1.18.1
       - name: The workflows parse
         run: |
           pip install pyyaml==6.0.3
@@ -55,12 +57,18 @@ jobs:
           base="$BEFORE"
           if [ -z "${base//0/}" ]; then base=origin/develop; fi  # a new branch or a manual run has no before SHA
           python scripts/check_contract_versions.py --base "$base"
+      - name: Every guard rejects a planted defect (spec area, cheap, standard library and pytest only)
+        run: pip install pytest==9.1.1 && python -m pytest tests/adversarial -q
       - name: The contract catalog, every row complete and every path it names present (ADR-0080)
         run: python scripts/check_contracts.py docs/contracts/catalog.md --repo-root .
       - name: The readiness document is current with the catalog and the committed evidence (ADR-0080)
         run: python scripts/check_readiness.py
       - name: Every committed document valid against its schema file (ADR-0080)
         run: pip install jsonschema==4.26.0 && python scripts/check_documents.py
+      - name: The SDD technology table is the pinned dependencies (spec area)
+        run: python scripts/check_tech_matrix.py
+      - name: The SDD, every requirement with a real gate (ADR-0075)
+        run: python scripts/check_sdd.py
       - name: Rows still served by a provider (listed while building; none on main)
         run: |
           set +e
