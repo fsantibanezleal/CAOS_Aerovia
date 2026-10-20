@@ -71,9 +71,12 @@ for (const { lang, theme } of appearances)
         for (let i = 0, count = await tabs.count(); i < count; i++) {
           await tabs.nth(i).click();
           await expect(tabs.nth(i)).toHaveAttribute("aria-selected", "true");
-          await expect(page.getByRole("tabpanel")).toBeVisible();
+          // The first visible panel in document order is the page's own: since U5 the Introduction nests the executive
+          // view's sub-tabs inside it, so the bare role resolves to two panels.
+          const panel = page.getByRole("tabpanel").first();
+          await expect(panel).toBeVisible();
           await expect(page.locator(".katex-error")).toHaveCount(0);
-          await expect(page.getByRole("tabpanel")).not.toBeEmpty();
+          await expect(panel).not.toBeEmpty();
           await noDocumentOverflow(page);
         }
         if (await tabs.count()) await tabs.first().click();
