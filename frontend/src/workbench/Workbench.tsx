@@ -63,6 +63,9 @@ import type { EditTool, MineSceneProps } from "../scene/MineScene";
 import { fieldScale, type Metric } from "../scene/field";
 import { regimeDefinitions } from "../content/cases";
 import CaseContext from "../content/CaseContext";
+import { ReadinessNote, STATE_LABEL } from "../readiness/ReadinessNote";
+import { networkAbsent, VIEW_ROWS } from "../readiness/readiness";
+import { useReadiness } from "../readiness/useReadiness";
 import useWorkbench, { type WorkbenchState } from "./useWorkbench";
 import useTransport from "./useTransport";
 import ProjectDialog from "./ProjectDialog";
@@ -431,6 +434,7 @@ function Loaded({
 }) {
   const n = w.network!,
     b = w.b;
+  const readiness = useReadiness();
   // The open group is held in ?view=, the open sub-view of the group in ?sub=, Focus in ?focus=1 (the shell's).
   const ids = useMemo(() => [...GROUPS.map((g) => g.id), "context"], []);
   const [open, selectOpen] = useUrlView(ids, "view");
@@ -482,7 +486,12 @@ function Loaded({
   const cases: CaseDef[] = [
     ...w.catalog!.cases.map((c) => ({
       id: c.network.id,
-      name: c.network.name[w.lang],
+      // a network the readiness document lists as absent from the case library says so in the selector
+      name:
+        c.network.name[w.lang] +
+        (networkAbsent(readiness ?? null, c.network.id)
+          ? ` (${STATE_LABEL.missing[w.lang].toLowerCase()})`
+          : ""),
       category: b("Authored planning networks", "Redes de planificación construidas"),
       kind: "synthetic" as const,
     })),
@@ -547,7 +556,14 @@ function Loaded({
           provenance: "synthetic",
           content: g.id === group ? s.content : null,
         }))}
-        context={{ content: <CaseContext network={n} /> }}
+        context={{
+          content: (
+            <>
+              <ReadinessNote ids={VIEW_ROWS.workbench} />
+              <CaseContext network={n} />
+            </>
+          ),
+        }}
         ariaLabel={{ en: "Workbench views", es: "Vistas del banco de trabajo" }}
       />
       {open !== "context" && createPortal(s.scene, sceneNode)}
@@ -2298,6 +2314,9 @@ function useInstrument({
       }))}
     />
   );
+  // The readiness note takes one line of the tool pane the group already has (ADR-0071: no new row): the catalog rows
+  // the group reads, and with them the model rows in the Models group.
+  const note = <ReadinessNote ids={VIEW_ROWS[group === "models" ? "models" : "workbench"]} />;
   const paneLabel = b("Tool parameters", "Parámetros de la herramienta");
   const modeClass = `av-mode av-mode-${group}${panel ? " av-panel-open" : ""}`;
   // In the App the sub-views are the row of tabs under the group row and the pane floats over the scene; in Focus the
@@ -2307,6 +2326,7 @@ function useInstrument({
       <Slot node={sceneNode} className="av-scene-slot" />
       <aside className="av-controls" aria-label={paneLabel}>
         {paneHead}
+        {note}
         {subTabs(page)}
       </aside>
     </div>
@@ -2316,6 +2336,7 @@ function useInstrument({
         <Slot node={sceneNode} className="av-scene-slot" />
         <aside className="av-controls" aria-label={paneLabel}>
           {paneHead}
+          {note}
           {page(id)}
         </aside>
       </div>

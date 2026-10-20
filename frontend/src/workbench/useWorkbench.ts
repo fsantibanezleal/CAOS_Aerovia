@@ -10,6 +10,8 @@ import type {
 } from "../contracts";
 import { DEFAULT_OPTIONS, validateNetwork, validateOptions } from "../engine";
 import useEngine from "../useEngine";
+import { STATE_LABEL } from "../readiness/ReadinessNote";
+import { ArtifactUnavailable, requireAvailable } from "../readiness/readiness";
 import {
   download,
   csvCell,
@@ -31,6 +33,8 @@ export default function useWorkbench() {
   const lang = useShellLang();
   const theme = useThemeStore((s) => s.theme);
   const b = (en: string, es: string) => (lang === "en" ? en : es);
+  const langRef = useRef(lang);
+  langRef.current = lang;
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [network, setNetwork] = useState<Network | null>(null),
     [options, setOptions] = useState<Options>(clone(DEFAULT_OPTIONS)),
@@ -65,7 +69,9 @@ export default function useWorkbench() {
   }, [theme, lang]);
   useEffect(() => {
     let alive = true;
-    fetch("/data/catalog.json")
+    // The readiness document says first whether the catalog is there at all (its reason replaces a failed request).
+    requireAvailable(["catalog"])
+      .then(() => fetch("/data/catalog.json"))
       .then((r) => {
         if (!r.ok) throw new Error("The case catalog could not be loaded.");
         return r.json();
@@ -95,7 +101,13 @@ export default function useWorkbench() {
         );
         hasLoaded.current = true;
       })
-      .catch((e) => setError(String(e.message)));
+      .catch((e) =>
+        setError(
+          e instanceof ArtifactUnavailable
+            ? `${STATE_LABEL.missing[langRef.current]}: ${e.reason[langRef.current]}`
+            : String(e.message),
+        ),
+      );
     return () => {
       alive = false;
     };

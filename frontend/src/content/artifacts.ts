@@ -1,36 +1,22 @@
+import { useShellLang } from "@fasl-work/caos-app-shell";
 import { useEffect, useState } from "react";
-import type { Network, Result, SolveOptions } from "../contracts";
 import { readBenchmark } from "../components/VerificationSummary";
 import { validateNetwork, validateOptions } from "../engine/validation";
+import type { Catalog, CatalogCase, CatalogEnsemble } from "../lib/contract.types";
+import { STATE_LABEL } from "../readiness/ReadinessNote";
+import { ArtifactUnavailable, requireAvailable } from "../readiness/readiness";
 
-export interface CaseArtifact {
-  network: Network;
-  options: SolveOptions;
-  result: Result;
-  sourceSha256: string;
-  optionsSha256: string;
-  ensemble: {
-    samples: number;
-    acceptedSamples: number;
-    seed: number;
-    cv: number;
-    device: string;
-    flowP05: number[];
-    flowP50: number[];
-    flowP95: number[];
-    targetProbability: number[];
-    failures: number;
-    failedSampleIndices: number[];
-    [key: string]: unknown;
-  };
-}
-export interface CatalogArtifact {
-  schema: "aerovia.catalog/v1";
-  createdAt: string;
-  sourceSha256: string;
+/**
+ * A case of the catalog as this reader accepts it: the type is the schema's (catalog.schema.json), narrowed in the one
+ * way the validator below narrows it. The schema allows a catalog without ensembles (the solve command writes none);
+ * the site reads only a baked catalog, so `validateCatalog` rejects a case without one.
+ */
+export type CaseArtifact = Omit<CatalogCase, "ensemble"> & { ensemble: CatalogEnsemble };
+/** The catalog as this reader accepts it: the schema's, with its cases and benchmark as validated. */
+export type CatalogArtifact = Omit<Catalog, "cases" | "benchmark"> & {
   cases: CaseArtifact[];
   benchmark: NonNullable<ReturnType<typeof readBenchmark>>;
-}
+};
 type LoadState<T> = { loading: boolean; data: T | null; error: string | null };
 const catalogCache: { promise?: Promise<CatalogArtifact> } = {};
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -132,11 +118,13 @@ export function useCatalog(): LoadState<CatalogArtifact> {
     data: null,
     error: null,
   });
+  const lang = useShellLang();
   useEffect(() => {
     let active = true;
-    catalogCache.promise ??= fetch(
-      `${import.meta.env.BASE_URL}data/catalog.json`,
-    )
+    // The readiness document says first whether the catalog is there at all; a row it lists as missing is reported
+    // with its reason instead of a failed request.
+    catalogCache.promise ??= requireAvailable(["catalog"])
+      .then(() => fetch(`${import.meta.env.BASE_URL}data/catalog.json`))
       .then(async (response) => {
         if (!response.ok)
           throw new Error(
@@ -158,9 +146,11 @@ export function useCatalog(): LoadState<CatalogArtifact> {
             loading: false,
             data: null,
             error:
-              error instanceof Error
-                ? error.message
-                : "Scientific catalog unavailable.",
+              error instanceof ArtifactUnavailable
+                ? `${STATE_LABEL.missing[lang]}: ${error.reason[lang]}`
+                : error instanceof Error
+                  ? error.message
+                  : "Scientific catalog unavailable.",
           });
       },
     );
