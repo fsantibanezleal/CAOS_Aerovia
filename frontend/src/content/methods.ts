@@ -53,12 +53,12 @@ export const classicalMethods: ScientificSection[] = [
     ],
     symbols: [
       [
-        "Pressure coordinates have a gauge freedom; fixed boundaries remove it.",
-        "Las presiones tienen libertad de referencia; los bordes fijos la eliminan.",
+        "Pressure coordinates: gauge freedom, removed by fixed boundaries.",
+        "Presiones: libertad de referencia, eliminada por los bordes fijos.",
       ],
       [
-        "Closed branches retain an identity but carry zero flow in the hydraulic solve.",
-        "Las ramas cerradas conservan identidad pero tienen caudal hidráulico cero.",
+        "Closed branches: identity retained, zero flow in the hydraulic solve.",
+        "Ramas cerradas: identidad conservada, caudal hidráulico cero.",
       ],
     ],
     assumption: [
@@ -67,6 +67,10 @@ export const classicalMethods: ScientificSection[] = [
     ],
     refs: ["mcpherson1993", "scipytrf"],
     diagram: "network",
+    diagramCaption: [
+      "The schematic shows one network under two coupled conservation laws: mass balance at each junction and the resistance law along each airway. Boundary pressures anchor the solution, and the arrows define the positive flow direction without imposing a result.",
+      "El esquema muestra una red bajo dos leyes de conservación acopladas: el balance de masa en cada unión y la ley de resistencia en cada galería. Las presiones de borde anclan la solución y las flechas definen el sentido positivo del caudal sin imponer un resultado.",
+    ],
   },
   {
     id: "fan-control",
@@ -131,6 +135,10 @@ export const classicalMethods: ScientificSection[] = [
     ],
     refs: ["mcpherson1993", "scipybisect"],
     diagram: "fans",
+    diagramCaption: [
+      "The plot shows the fan pressure curve against the network resistance curve, with pressure H in Pa on the vertical axis and volume flow Q in m³/s on the horizontal axis. The operating point is the solved intersection, so it needs both the fan and the network.",
+      "El gráfico muestra la curva de presión del ventilador frente a la curva de resistencia de la red, con la presión H en Pa en el eje vertical y el caudal Q en m³/s en el eje horizontal. El punto operativo es la intersección calculada, por lo que requiere tanto el ventilador como la red.",
+    ],
   },
   {
     id: "resistance-uncertainty",
@@ -188,6 +196,10 @@ export const classicalMethods: ScientificSection[] = [
     ],
     refs: ["numpylognormal", "pytorchsolve", "scipytrf"],
     diagram: "uncertainty",
+    diagramCaption: [
+      "The schematic shows resistance assumptions propagating through the same equations: each realization is checked by the residual gate, and the result is read as a conditional flow interval. The assumed uncertainty is not an empirically calibrated safety probability.",
+      "El esquema muestra los supuestos de resistencia atravesando las mismas ecuaciones: cada realización se verifica con el control de residuos y el resultado se lee como un intervalo condicional de caudal. La incertidumbre supuesta no es una probabilidad de seguridad calibrada empíricamente.",
+    ],
   },
   {
     id: "passive-transport",
@@ -252,5 +264,9 @@ export const classicalMethods: ScientificSection[] = [
     ],
     refs: ["nistcontam", "clawpackadvection", "jong2016", "networkxpaths"],
     diagram: "transport",
+    diagramCaption: [
+      "The schematic shows conservative transport following the solved flow direction: a source pulse enters the network and incoming mass is mixed at each junction. It describes the cross-section mean concentration, with no resolved eddies, fire or toxicology.",
+      "El esquema muestra el transporte conservativo siguiendo el sentido del caudal calculado: un pulso de origen entra en la red y la masa entrante se mezcla en cada unión. Describe la concentración media de sección, sin remolinos resueltos, incendio ni toxicología.",
+    ],
   },
 ];
