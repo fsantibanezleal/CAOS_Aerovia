@@ -1,62 +1,35 @@
 import type { Network, Options, Result } from '../contracts';
+import type * as T from '../lib/contract.types';
 
-export type LearnedMethod = 'topology-mlp' | 'graph-surrogate';
-export type Localized = { en: string; es: string };
-export interface PhysicalSignature {
-  nodeIds: string[]; boundaries: (number | null)[]; edgeIds: string[]; from: string[]; to: string[]; kinds: string[];
-  fanPressure: number[]; fanCoefficient: number[]; fanEfficiency: number[];
-}
-export interface ModelEntry {
-  methodId: LearnedMethod; networkId: string; version: string; license: string; status: string;
-  onnx: { file: string; sha256: string; bytes: number };
-  checkpoint: { file: string; sha256: string; bytes: number };
-  factorBounds: [number, number]; speedBounds: [number, number]; baseResistances: number[]; signature: PhysicalSignature;
-  input: { name: string; dtype: string; shape: [string, number] }; outputs: string[]; outputSpeed: number;
-  onnxParity: { samples: number; flowMaxAbs: number; pressureMaxAbs: number; flowTolerance: number; pressureTolerance: number };
-  trainingCaseIds: string[]; bestEpoch: number; validationLoss: number;
-}
-export interface ModelRegistry { schema: 'aerovia.model-registry/v1'; version: string; sourceSha256: string; entries: ModelEntry[] }
-export interface PredictionMetrics {
-  flowMAE: number; flowRMSE: number; flowMaxError: number; pressureMAE: number; pressureMaxError: number; powerAbsErrorKW: number;
-}
-export interface Prediction {
-  status: 'supported'; lane: string; modelVersion: string; rawFlows: number[]; result: Result; errors: number[]; metrics: PredictionMetrics;
-}
-export interface BenchmarkRow {
-  methodId: string; networkId?: string; regimeId?: string; split?: string; samples: number; cells?: number;
-  flowMAE: number; flowRMSE: number; flowMaxError: number; flowNormalizedRMSE: number;
-  rawFlowMAE?: number; rawFlowRMSE?: number; pressureMAE: number; pressureMaxError: number;
-  massResidualMax: number; pressureResidualMax: number; powerMAE: number;
-  shortfallTruePositive: number; shortfallFalseNegative: number; adequateTrueNegative: number; adequateFalsePositive: number;
-  shortfallRecall: number | null; adequateRecall: number | null; classificationObservations: number;
-  unsupportedFanPredictions: number; nonfinitePredictions: number; inferenceMs?: number; msPerSample?: number;
-  timingScope?: string; runtime?: { device?: string; precision?: string; hardware?: string; threads?: number };
-}
-export interface CalibrationEvidence {
-  methodId: LearnedMethod; networkId: string; samples: number; nominalCoverage: number;
-  flowMaxErrorBoundUnitSpeed: number; pressureMaxErrorBoundUnitSpeed: number;
-  heldoutCovered: number; heldoutSamples: number; heldoutCoverage: number; interpretation: string;
-}
-export interface ScienceArtifact {
-  schema: 'aerovia.science/v1'; version: string; createdAt: string; sourceSha256: string;
-  methods: { id: string; name: Localized; lane: string; status: string; modelVersion: string }[];
-  regimes: { id: string; name: Localized; description: Localized; speed: number }[];
-  cases: { networkId: string; sourceSha256: string; regimes: { id: string; options: Options; reference: Result; predictions: Record<LearnedMethod, Prediction> }[] }[];
-  heldoutFixtures: { networkId: string; options: Options; reference: Result; split: 'test'; sampleId: string; sampleIndex: number }[];
-  benchmark: { rows: BenchmarkRow[]; aggregate: BenchmarkRow[]; calibration: CalibrationEvidence[];
-    teacherParity: { networkId: string; samples: number; flowMaxAbs: number; pressureMaxAbs: number }[];
-    completeness: { cases: number; regimes: number; methods: number; expectedCells: number; actualCells: number; missingCells: number };
-    splitScope: string; metricUnits: Record<string, string>;
-    degradation?: { noiseSigma: number; methodId: LearnedMethod; samples: number; flowMAE: number; flowRMSE: number; pressureMAE: number; outsideDomain: number }[];
-    familyHoldout?: { family: string; excludedCaseIds: string[]; trainingCaseIds: string[]; metrics: BenchmarkRow[]; aggregate: BenchmarkRow; interpretation: string;
-      training: { epochs: number; bestEpoch: number; bestValidationLoss: number; elapsedSeconds: number; parameters: number; seed: number; checkpoint: string; sha256: string; runtime: { device: string; hardware: string; torch: string } };
-      nominalCalibration: string; mlpStatus: string };
-  };
-  training: { totalSamples: number; splits: Record<string, number>; uniqueInputVectors: number; duplicateInputs: number; datasetSeconds: number;
-    models: { methodId: string; caseIds: string[]; epochs: number; bestEpoch: number; parameters: number; elapsedSeconds: number; runtime: { device: string; hardware: string; torch: string }; architecture: { hidden: number; steps: number } }[] };
-  validation: { controls: { networkId: string; id: string; status: string; reason: string }[]; onnx: unknown[]; browserParity: string };
-  provenance: { dataKind: string; noFieldMeasurements: boolean; license: string; calibration: string; sources: string[] };
-}
+// The documents of the learned models are the types generated from the schema files (ADR-0080): the registry
+// (model-registry.schema.json) and the scientific evidence (science.schema.json). The names the code has always used
+// are aliases; only the messages of the in-browser run (SurrogateResponse, DomainCheck) are the app's own.
+export type LearnedMethod = T.ModelEntry['methodId'];
+export type Localized = T.Text;
+export type ModelEntry = T.ModelEntry;
+export type PhysicalSignature = ModelEntry['signature'];
+export type ModelRegistry = T.ModelRegistry;
+type DocumentPrediction = T.Schemas['prediction'];
+/**
+ * The prediction of a method. The committed document (science.schema.json) carries the lane `offline` and an
+ * interpretation of the errors; the in-browser run (predictSurrogate) answers with the same shape on the lane
+ * `live-wasm` and writes no interpretation, so the document's two differences are widened here and nowhere else.
+ */
+export type Prediction = Omit<DocumentPrediction, 'lane' | 'interpretation'> & { lane: DocumentPrediction['lane'] | 'live-wasm'; interpretation?: string };
+export type PredictionMetrics = Prediction['metrics'];
+export type ScienceArtifact = T.Science;
+type Evaluation = ScienceArtifact['benchmark'];
+type TableRow = Evaluation['rows'][number];
+type AggregateRow = Evaluation['aggregate'][number];
+type Shared = Exclude<keyof TableRow & keyof AggregateRow, 'methodId'>;
+/**
+ * A row of the metrics table, whichever section of the evidence it comes from: a held-out row (a network, a regime and
+ * a split), the aggregate of a method (cells and timing) or a row of the family hold-out (its own method id and split).
+ * The keys are the schema's; a key only some sections carry is optional.
+ */
+export type BenchmarkRow = { [K in Shared]: TableRow[K] | AggregateRow[K] } & Partial<Omit<TableRow, Shared | 'methodId' | 'split'>> &
+  Partial<Omit<AggregateRow, Shared | 'methodId'>> & { methodId: string; split?: string };
+export type CalibrationEvidence = Evaluation['calibration'][number];
 export interface SurrogateResponse {
   status: 'supported' | 'out-of-domain' | 'unavailable' | 'failed'; reason: string;
   methodId: LearnedMethod; modelVersion?: string; prediction?: Prediction;

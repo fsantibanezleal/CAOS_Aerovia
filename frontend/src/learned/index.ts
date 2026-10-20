@@ -1,6 +1,7 @@
 import type { InferenceSession } from 'onnxruntime-web/wasm';
 import { MASS_TOLERANCE, PRESSURE_TOLERANCE, validateNetwork, validateOptions } from '../engine';
 import { checkDomain } from './domain';
+import { SCHEMAS } from '../lib/contract.types';
 import type { LearnedMethod, ModelRegistry, ModelEntry, Network, Options, Prediction, Result, ScienceArtifact, SurrogateResponse } from './types';
 export * from './types';
 export { checkDomain } from './domain';
@@ -20,10 +21,10 @@ async function readJson<T>(relative: string, schema: string): Promise<T> {
 }
 
 export function loadRegistry(): Promise<ModelRegistry> {
-  return registryPromise ??= readJson<ModelRegistry>('models/registry.json', 'aerovia.model-registry/v1').catch(error => { registryPromise = undefined; throw error; });
+  return registryPromise ??= readJson<ModelRegistry>('models/registry.json', SCHEMAS.modelRegistry).catch(error => { registryPromise = undefined; throw error; });
 }
 export function loadScience(): Promise<ScienceArtifact> {
-  return sciencePromise ??= readJson<ScienceArtifact>('science.json', 'aerovia.science/v1').catch(error => { sciencePromise = undefined; throw error; });
+  return sciencePromise ??= readJson<ScienceArtifact>('science.json', SCHEMAS.science).catch(error => { sciencePromise = undefined; throw error; });
 }
 
 async function getSession(entry: ModelEntry): Promise<InferenceSession> {

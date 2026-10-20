@@ -10,8 +10,10 @@
     "predev": "node scripts/prepare-data.mjs",
     "dev": "vite --host 127.0.0.1 --port 5908 --strictPort",
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e/tsconfig.json",
+    "contracts:types": "node scripts/gen-contract-types.mjs",
+    "contracts:check": "node scripts/gen-contract-types.mjs --check",
     "test": "vitest run",
-    "build": "npm run typecheck && node scripts/prepare-data.mjs && vite build",
+    "build": "node scripts/gen-contract-types.mjs --check && npm run typecheck && node scripts/prepare-data.mjs && vite build",
     "postbuild": "node scripts/generate-manifest.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4908 --strictPort",
@@ -39,10 +41,17 @@
     "@types/react-dom": "19.3.0",
     "@types/three": "0.185.4",
     "@vitejs/plugin-react": "6.1.1",
+    "openapi-typescript": "7.13.0",
     "prettier": "3.9.6",
     "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vite": "8.2.2",
-    "vitest": "5.0.0"
+    "vitest": "5.0.0",
+    "zz-typescript5": "npm:typescript@5.9.3"
+  },
+  "overrides": {
+    "openapi-typescript": {
+      "typescript": "$typescript"
+    }
   }
 }

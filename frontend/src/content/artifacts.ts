@@ -1,36 +1,19 @@
 import { useEffect, useState } from "react";
-import type { Network, Result, SolveOptions } from "../contracts";
 import { readBenchmark } from "../components/VerificationSummary";
 import { validateNetwork, validateOptions } from "../engine/validation";
+import type { Catalog, CatalogCase, CatalogEnsemble } from "../lib/contract.types";
 
-export interface CaseArtifact {
-  network: Network;
-  options: SolveOptions;
-  result: Result;
-  sourceSha256: string;
-  optionsSha256: string;
-  ensemble: {
-    samples: number;
-    acceptedSamples: number;
-    seed: number;
-    cv: number;
-    device: string;
-    flowP05: number[];
-    flowP50: number[];
-    flowP95: number[];
-    targetProbability: number[];
-    failures: number;
-    failedSampleIndices: number[];
-    [key: string]: unknown;
-  };
-}
-export interface CatalogArtifact {
-  schema: "aerovia.catalog/v1";
-  createdAt: string;
-  sourceSha256: string;
+/**
+ * A case of the catalog as this reader accepts it: the type is the schema's (catalog.schema.json), narrowed in the one
+ * way the validator below narrows it. The schema allows a catalog without ensembles (the solve command writes none);
+ * the site reads only a baked catalog, so `validateCatalog` rejects a case without one.
+ */
+export type CaseArtifact = Omit<CatalogCase, "ensemble"> & { ensemble: CatalogEnsemble };
+/** The catalog as this reader accepts it: the schema's, with its cases and benchmark as validated. */
+export type CatalogArtifact = Omit<Catalog, "cases" | "benchmark"> & {
   cases: CaseArtifact[];
   benchmark: NonNullable<ReturnType<typeof readBenchmark>>;
-}
+};
 type LoadState<T> = { loading: boolean; data: T | null; error: string | null };
 const catalogCache: { promise?: Promise<CatalogArtifact> } = {};
 function isRecord(value: unknown): value is Record<string, unknown> {
