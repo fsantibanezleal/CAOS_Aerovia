@@ -17,5 +17,5 @@ cd frontend
 npm run typecheck
 npm test
 npm run build
-if $browser; then npx playwright install chromium; npm run test:e2e; node verify-learned-browser.mjs; fi
+if $browser; then npx playwright install chromium; npm run test:e2e; node scripts/verify-learned-browser.mjs; fi
 printf 'Verification passed. Next: bash scripts/local/04_preview.sh or review scripts/local/09_deploy.sh.\n'

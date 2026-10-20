@@ -7,16 +7,17 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "predev": "node prepare-data.mjs",
+    "predev": "node scripts/prepare-data.mjs",
     "dev": "vite --host 127.0.0.1 --port 5908 --strictPort",
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e/tsconfig.json",
     "test": "vitest run",
-    "build": "npm run typecheck && node prepare-data.mjs && vite build",
-    "postbuild": "node generate-manifest.mjs",
-    "verify:deployment": "node verify-deployment.mjs",
+    "build": "npm run typecheck && node scripts/prepare-data.mjs && vite build",
+    "postbuild": "node scripts/generate-manifest.mjs",
+    "verify:deployment": "node scripts/verify-deployment.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 4908 --strictPort",
     "test:e2e": "playwright test",
-    "transport": "tsx ../scripts/transport.mts"
+    "transport": "tsx ../scripts/transport.mts",
+    "gate": "node scripts/gate.mjs"
   },
   "dependencies": {
     "@fasl-work/caos-app-shell": "0.15.0",

@@ -26,7 +26,7 @@ if $configure; then
   if ! gh api "repos/$repository/pages" >/dev/null 2>&1; then gh api --method POST "repos/$repository/pages" -f build_type=workflow; fi
   gh api --method PUT "repos/$repository/pages" -f build_type=workflow -f "cname=$domain"
 fi
-if $dispatch; then gh workflow run pages.yml --repo "$repository" --ref main; fi
+if $dispatch; then gh workflow run deploy-pages.yml --repo "$repository" --ref main; fi
 gh api "repos/$repository/pages" --jq '{html_url,build_type,cname,https_enforced,status}'
-gh run list --repo "$repository" --workflow pages.yml --branch main --limit 3
+gh run list --repo "$repository" --workflow deploy-pages.yml --branch main --limit 3
 printf 'Preflight complete for %s. Domain: https://%s. Watch the workflow and follow docs/guides/04_deployment.md for HTTPS and live verification.\n' "$local_head" "$domain"

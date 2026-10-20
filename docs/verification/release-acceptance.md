@@ -55,7 +55,7 @@ benchmark. Only the workbench's own origin was requested; no page errors were ob
 
 A release is complete only after the exact main revision passes CI, deploys at
 <https://aerovia.fasl-work.com/>, and passes HTTPS/asset identity and fresh public browser checks.
-`frontend/verify-deployment.mjs` verifies all manifest-listed runtime bytes against their hashes and
+`frontend/scripts/verify-deployment.mjs` verifies all manifest-listed runtime bytes against their hashes and
 expected source revision. The daily `Verify live Aerovia` workflow repeats identity and browser checks.
 The [deployment guide](../guides/04_deployment.md) documents reproduction and rollback.
 

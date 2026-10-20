@@ -1,11 +1,11 @@
 import { readFile, readdir, writeFile, mkdir } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
-const base = new URL("./dist/", import.meta.url);
+const base = new URL("../dist/", import.meta.url);
 // Pages serves these entry files directly, including refreshes and shared deep links.
 // Asset URLs are absolute; BrowserRouter resolves the same route with a trailing slash.
 const entry = await readFile(new URL("index.html", base));
-for (const route of ["introduction", "methodology", "implementation", "experiments", "benchmark"]) {
+for (const route of ["app", "introduction", "methodology", "implementation", "experiments", "benchmark"]) {
   await mkdir(new URL(`${route}/`, base), { recursive: true });
   await writeFile(new URL(`${route}/index.html`, base), entry);
 }

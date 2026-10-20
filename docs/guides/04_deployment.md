@@ -16,7 +16,7 @@ Source: [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-w
 
 ## What triggers a release
 
-`.github/workflows/pages.yml` verifies pull requests and development branches. Only `main` can upload
+`.github/workflows/deploy-pages.yml` verifies pull requests and development branches. Only `main` can upload
 and deploy the static release. A deployment waits for public-source/history checks, CPU physics tests,
 contract/hash validation, TypeScript checks, browser unit tests, a production build and Chromium user
 journeys. Actions are pinned to reviewed immutable commit SHAs. The verification job has read-only
@@ -75,7 +75,7 @@ triggers the workflow, so a second dispatch is usually unnecessary.
 ## Confirm the release is actually running
 
 ```bash
-gh run list --workflow pages.yml --branch main --limit 3
+gh run list --workflow deploy-pages.yml --branch main --limit 3
 gh run watch RUN_ID --exit-status
 gh api repos/fsantibanezleal/CAOS_Aerovia/pages --jq '{html_url,build_type,cname,https_enforced,status}'
 ```
@@ -85,7 +85,7 @@ revision with `gh run view RUN_ID --json headSha,conclusion,url`.
 
 The production build writes `/release.json` containing `version`, `commit`, `workingTreeDirty` and
 `catalogSha256` and `scienceSha256`.
-`frontend/prepare-data.mjs` reads `VERSION`, obtains the current Git HEAD and verifies the catalog bytes
+`frontend/scripts/prepare-data.mjs` reads `VERSION`, obtains the current Git HEAD and verifies the catalog bytes
 against its manifest before producing that record. Check the source, version and catalog against the
 intended clean checkout, and require a clean build:
 
@@ -106,7 +106,7 @@ and compare it with `git rev-parse origin/main`, `cat VERSION` and
 identity. A dirty local build also records HEAD, with `workingTreeDirty: true`; publish from the clean
 workflow checkout and confirm its matching successful run.
 
-After `npm run build`, its `postbuild` step runs `frontend/generate-manifest.mjs` and writes
+After `npm run build`, its `postbuild` step runs `frontend/scripts/generate-manifest.mjs` and writes
 `asset-manifest.json`. This records the release identity and each served runtime file's byte count and
 SHA-256. It excludes `CNAME`, which configures no runtime behavior, and the asset manifest itself.
 Verify the deployed files from `frontend/`, replacing `FULL_GIT_SHA` with the exact intended 40-character

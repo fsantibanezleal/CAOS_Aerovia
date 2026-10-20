@@ -62,7 +62,7 @@ across different CUDA devices. Manifest hashes verify the bytes of a particular 
 The numerical release bake replaces its artifact directory. Before building the complete website,
 export and validate the matching learned scientific artifacts again with `scripts/surrogates.py export`
 and `validate` using the explicit release paths in the [training guide](../methods/surrogates.md).
-`prepare-data.mjs` requires both numerical and learned evidence; it will reject a partial release.
+`frontend/scripts/prepare-data.mjs` requires both numerical and learned evidence; it will reject a partial release.
 
 ## Independent agreement and failure accounting
 

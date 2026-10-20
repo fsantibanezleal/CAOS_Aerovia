@@ -24,8 +24,8 @@ try {
         if (-not $pagesExists) { Invoke-AeroviaCommand gh @('api', '--method', 'POST', "repos/$repoName/pages", '-f', 'build_type=workflow') }
         Invoke-AeroviaCommand gh @('api', '--method', 'PUT', "repos/$repoName/pages", '-f', 'build_type=workflow', '-f', "cname=$domain")
     }
-    if ($Dispatch) { Invoke-AeroviaCommand gh @('workflow', 'run', 'pages.yml', '--repo', $repoName, '--ref', 'main') }
+    if ($Dispatch) { Invoke-AeroviaCommand gh @('workflow', 'run', 'deploy-pages.yml', '--repo', $repoName, '--ref', 'main') }
     Invoke-AeroviaCommand gh @('api', "repos/$repoName/pages", '--jq', '{html_url,build_type,cname,https_enforced,status}')
-    Invoke-AeroviaCommand gh @('run', 'list', '--repo', $repoName, '--workflow', 'pages.yml', '--branch', 'main', '--limit', '3')
+    Invoke-AeroviaCommand gh @('run', 'list', '--repo', $repoName, '--workflow', 'deploy-pages.yml', '--branch', 'main', '--limit', '3')
     Write-Host "Preflight complete for $localHead. Domain: https://$domain. Use gh run watch <run-id> --repo $repoName --exit-status, then follow docs/guides/04_deployment.md for HTTPS and live checks."
 } finally { Pop-Location }
