@@ -170,7 +170,7 @@ describe("no content is lost: what each section holds is what DeepSection render
   it.each(["en", "es"] as const)(
     "renders every paragraph, equation, symbol, figure and the callout of its %s sections",
     (lang) => {
-      expect(all.length).toBe(25);
+      expect(all.length).toBe(27);
       for (const section of all) {
         const html = render(createElement(DeepSection, { section }), lang);
         const where = `${lang} ${section.id}`;
