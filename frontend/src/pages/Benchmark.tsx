@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import {
   Callout,
   Cite,
+  DocPage,
+  DocSection,
   Equation,
   InlineMath,
-  Refs,
   SubTabs,
   useShellLang,
 } from "@fasl-work/caos-app-shell";
@@ -16,7 +17,8 @@ import {
   type BenchmarkRow,
 } from "../learned";
 import { useCatalog, type CatalogArtifact } from "../content/artifacts";
-import { PageHeading } from "../content/primitives";
+import { DocBody } from "../content/primitives";
+import { benchmarkSectionRefs } from "../content/citations/benchmark";
 import {
   ConfusionMatrix,
   HeldoutLive,
@@ -87,72 +89,81 @@ export default function Benchmark() {
       />
     );
   return (
-    <div className="page-body prose av-doc-scroll">
-      <PageHeading
-        title={["Benchmark", "Benchmark"]}
-        lede={[
-          "Every published number on this page is read from a recorded scientific artifact; live measurements are produced by the controls below. Compare exact numerical agreement, learned held-out errors, degradation and conservation separately. The source networks are authored engineering scenarios, so these results establish computational evidence rather than measured-mine validation.",
-          "Cada cifra publicada se lee de un artefacto científico registrado; las mediciones en vivo se producen con los controles. Compare por separado concordancia exacta, errores aprendidos reservados, degradación y conservación. Las redes son escenarios de ingeniería creados: estos resultados son evidencia computacional, no validación medida de mina.",
-        ]}
-      >
-        <InlineMath tex={String.raw`\varepsilon_Q=\widehat Q-Q^*`} />
-      </PageHeading>
-      <SubTabs
-        orientation="vertical"
-        ariaLabel={es ? "Evidencia comparativa" : "Comparative evidence"}
-        tabs={[
-          {
-            id: "numerical",
-            label: es ? "Referencia en vivo" : "Live reference",
-            content: catalog.data ? (
-              <>
-                <NumericalEvidence catalog={catalog.data} />
-                <ReferenceLive catalog={catalog.data} />
-              </>
-            ) : (
-              <EvidenceState loading={catalog.loading} error={catalog.error} />
-            ),
-          },
-          {
-            id: "heldout",
-            label: es ? "Inferencia reservada" : "Held-out inference",
-            content: scientificPanel((artifact, data) => (
-              <HeldoutLive science={artifact} catalog={data} />
-            )),
-          },
-          {
-            id: "matrix",
-            label: es ? "Matriz y errores" : "Matrix and errors",
-            content: scientificPanel((artifact, data) => (
-              <MatrixEvidence science={artifact} catalog={data} />
-            )),
-          },
-          {
-            id: "robustness",
-            label: es ? "Degradación" : "Degradation",
-            content: scientificPanel((artifact, data) => (
-              <RobustnessEvidence science={artifact} catalog={data} />
-            )),
-          },
-          {
-            id: "uncertainty",
-            label: es ? "Incertidumbre" : "Uncertainty",
-            content: catalog.data ? (
-              <UncertaintyEvidence catalog={catalog.data} />
-            ) : (
-              <EvidenceState loading={catalog.loading} error={catalog.error} />
-            ),
-          },
-          {
-            id: "provenance",
-            label: es ? "Procedencia" : "Provenance",
-            content: scientificPanel((artifact, data) => (
-              <ProvenanceEvidence science={artifact} catalog={data} />
-            )),
-          },
-        ]}
-      />
-    </div>
+    <DocPage
+      title={{ en: "Benchmark", es: "Benchmark" }}
+      lede={
+        <>
+          {es
+            ? "Cada cifra publicada se lee de un artefacto científico registrado; las mediciones en vivo se producen con los controles. Compare por separado concordancia exacta, errores aprendidos reservados, degradación y conservación. Las redes son escenarios de ingeniería creados: estos resultados son evidencia computacional, no validación medida de mina."
+            : "Every published number on this page is read from a recorded scientific artifact; live measurements are produced by the controls below. Compare exact numerical agreement, learned held-out errors, degradation and conservation separately. The source networks are authored engineering scenarios, so these results establish computational evidence rather than measured-mine validation."}{" "}
+          <InlineMath tex={String.raw`\varepsilon_Q=\widehat Q-Q^*`} />
+        </>
+      }
+    >
+      <DocBody>
+        <SubTabs
+          orientation="vertical"
+          ariaLabel={es ? "Evidencia comparativa" : "Comparative evidence"}
+          tabs={[
+            {
+              id: "numerical",
+              label: es ? "Referencia en vivo" : "Live reference",
+              content: catalog.data ? (
+                <>
+                  <NumericalEvidence catalog={catalog.data} />
+                  <ReferenceLive catalog={catalog.data} />
+                </>
+              ) : (
+                <EvidenceState
+                  loading={catalog.loading}
+                  error={catalog.error}
+                />
+              ),
+            },
+            {
+              id: "heldout",
+              label: es ? "Inferencia reservada" : "Held-out inference",
+              content: scientificPanel((artifact, data) => (
+                <HeldoutLive science={artifact} catalog={data} />
+              )),
+            },
+            {
+              id: "matrix",
+              label: es ? "Matriz y errores" : "Matrix and errors",
+              content: scientificPanel((artifact, data) => (
+                <MatrixEvidence science={artifact} catalog={data} />
+              )),
+            },
+            {
+              id: "robustness",
+              label: es ? "Degradación" : "Degradation",
+              content: scientificPanel((artifact, data) => (
+                <RobustnessEvidence science={artifact} catalog={data} />
+              )),
+            },
+            {
+              id: "uncertainty",
+              label: es ? "Incertidumbre" : "Uncertainty",
+              content: catalog.data ? (
+                <UncertaintyEvidence catalog={catalog.data} />
+              ) : (
+                <EvidenceState
+                  loading={catalog.loading}
+                  error={catalog.error}
+                />
+              ),
+            },
+            {
+              id: "provenance",
+              label: es ? "Procedencia" : "Provenance",
+              content: scientificPanel((artifact, data) => (
+                <ProvenanceEvidence science={artifact} catalog={data} />
+              )),
+            },
+          ]}
+        />
+      </DocBody>
+    </DocPage>
   );
 }
 
@@ -160,12 +171,14 @@ function NumericalEvidence({ catalog }: { catalog: CatalogArtifact }) {
   const es = useShellLang() === "es";
   const b = catalog.benchmark;
   return (
-    <section>
-      <h2>
-        {es
-          ? "Verificación numérica canónica"
-          : "Canonical numerical verification"}
-      </h2>
+    <DocSection
+      title={{
+        en: "Canonical numerical verification",
+        es: "Verificación numérica canónica",
+      }}
+      area="results"
+      refs={benchmarkSectionRefs.numerical}
+    >
       <p>
         {es
           ? "El registro corresponde a la corrida fechada del catálogo. La referencia SciPy y el lote de resistencias CUDA tienen funciones diferentes; los tiempos no se convierten en una razón de aceleración entre cargas distintas. Cada comparación independiente usa exactamente las mismas resistencias."
@@ -268,11 +281,7 @@ function NumericalEvidence({ catalog }: { catalog: CatalogArtifact }) {
             : "Residuals and agreement check numerical implementations. Cases are authored, targets supplied and the resistance distribution assumed. None of these values measures accuracy against an observed mine."}
         </p>
       </Callout>
-      <Refs
-        ids={["scipytrf", "pytorchsolve", "numpylognormal"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 
@@ -392,12 +401,14 @@ function MatrixEvidence({
         }
       : null;
   return (
-    <section>
-      <h2>
-        {es
-          ? "Comparación completa sobre entradas iguales"
-          : "Complete comparison on identical inputs"}
-      </h2>
+    <DocSection
+      title={{
+        en: "Complete comparison on identical inputs",
+        es: "Comparación completa sobre entradas iguales",
+      }}
+      area="comparison"
+      refs={benchmarkSectionRefs.matrix}
+    >
       <p>
         {es
           ? "Las filas agregadas se calculan sobre la matriz registrada. Se muestran caudal, presión y potencia en sus unidades, junto con el residuo físico. Los modelos aproximados no se aceptan como solucionadores exactos por producir arreglos finitos. Use los filtros para inspeccionar casos y regímenes que un promedio puede ocultar."
@@ -519,11 +530,7 @@ function MatrixEvidence({
             : "Q̂ is prediction, Q* reference; MAE and RMSE retain m³/s. The matrix declares partition and support."
         }
       />
-      <Refs
-        ids={["sklearnmetrics", "sklearnleakage"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 
@@ -546,12 +553,14 @@ function RobustnessEvidence({
     pressureMAE: es ? "MAE de presión" : "Pressure MAE",
   };
   return (
-    <section>
-      <h2>
-        {es
-          ? "Degradación bajo error sintético de resistencia"
-          : "Degradation under synthetic resistance input error"}
-      </h2>
+    <DocSection
+      title={{
+        en: "Degradation under synthetic resistance input error",
+        es: "Degradación bajo error sintético de resistencia",
+      }}
+      area="robustness"
+      refs={benchmarkSectionRefs.robustness}
+    >
       <p>
         {es
           ? "Se perturba la resistencia observada con ruido multiplicativo lognormal de media uno y se mantiene fija la referencia verdadera del caso reservado. Ambos modelos reciben las mismas perturbaciones. Esto mide sensibilidad a errores sintéticos de entrada, no precisión real de sensores. El experimento local conserva entradas fuera del dominio y cuenta cuántas son; no las recorta para mejorar la curva."
@@ -737,11 +746,7 @@ function RobustnessEvidence({
             : "Noise is synthetic, data are authored and the held-out family remains generated geometry. An honest curve retains degradation and failures; it is not validation across real mines."}
         </p>
       </Callout>
-      <Refs
-        ids={["numpylognormal", "sklearnleakage", "gilmer2017"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 
@@ -751,12 +756,14 @@ function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
   const item = catalog.cases.find((c) => c.network.id === selected)!;
   const e = item.ensemble;
   return (
-    <section>
-      <h2>
-        {es
-          ? "Intervalos condicionales de caudal"
-          : "Conditional flow intervals"}
-      </h2>
+    <DocSection
+      title={{
+        en: "Conditional flow intervals",
+        es: "Intervalos condicionales de caudal",
+      }}
+      area="results"
+      refs={benchmarkSectionRefs.uncertainty}
+    >
       <p>
         {es
           ? "Cada curva se lee del conjunto registrado para las opciones nominales exactas de su caso. Seleccionar otro caso carga sus propios cuantiles; editar un proyecto en la herramienta no recalcula estas bandas. Las realizaciones suponen resistencias independientes lognormales, con coeficiente de variación y semilla registrados."
@@ -857,11 +864,7 @@ function UncertaintyEvidence({ catalog }: { catalog: CatalogArtifact }) {
             : "These quantiles are not fitted to mine observations. Independence, distribution and parameters are assumptions; the band is neither a safety guarantee nor uncertainty for an edited project."}
         </p>
       </Callout>
-      <Refs
-        ids={["numpylognormal", "pytorchsolve", "scipytrf"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }
 
@@ -875,12 +878,14 @@ function ProvenanceEvidence({
   const es = useShellLang() === "es";
   const t = science.training;
   return (
-    <section>
-      <h2>
-        {es
-          ? "Ejecuciones, datos y procedencia"
-          : "Executions, data and provenance"}
-      </h2>
+    <DocSection
+      title={{
+        en: "Executions, data and provenance",
+        es: "Ejecuciones, datos y procedencia",
+      }}
+      area="provenance"
+      refs={benchmarkSectionRefs.provenance}
+    >
       <p>
         {es
           ? "Los recuentos, tiempos y equipos siguientes provienen del artefacto científico. No se infiere entrenamiento por la presencia de un archivo de modelo. Calibración nominal, particiones, registros y comparaciones de exportación definen exactamente qué se ejecutó y sobre qué entradas."
@@ -1097,10 +1102,6 @@ function ProvenanceEvidence({
             : "Methods use a disclosed nominal calibration solution. Learning from the simulator is not training on mine measurements. CUDA, CPU and browser timings belong to different operations and are not combined into a speedup promise."}
         </p>
       </Callout>
-      <Refs
-        ids={["sklearnleakage", "pytorchsolve", "onnxweb"]}
-        label={es ? "Referencias" : "References"}
-      />
-    </section>
+    </DocSection>
   );
 }

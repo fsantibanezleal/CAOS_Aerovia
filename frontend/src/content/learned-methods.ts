@@ -4,6 +4,8 @@ import type { ScientificSection } from "./primitives";
 export const learnedMethods: ScientificSection[] = [
   {
     id: "topology-mlp",
+    area: "method",
+    kind: "learned",
     title: [
       "Calibrated multilayer airflow surrogate",
       "Modelo multicapa de caudal calibrado",
@@ -66,6 +68,8 @@ export const learnedMethods: ScientificSection[] = [
   },
   {
     id: "graph-surrogate",
+    area: "method",
+    kind: "learned",
     title: [
       "Shared message-passing airflow surrogate",
       "Modelo de caudal por mensajes compartidos",

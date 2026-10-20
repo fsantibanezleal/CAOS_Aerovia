@@ -3,6 +3,7 @@ import type { ScientificSection } from "./primitives";
 export const implementationSections: ScientificSection[] = [
   {
     id: "ingestion",
+    area: "contract",
     title: [
       "Ingestion and project boundaries",
       "Ingreso y límites del proyecto",
@@ -44,6 +45,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "geometry",
+    area: "contract",
     title: [
       "Geometry, editing and physical semantics",
       "Geometría, edición y significado físico",
@@ -76,6 +78,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "browser-engine",
+    area: "lanes",
     title: [
       "Browser solve and result synchronization",
       "Cálculo de navegador y sincronización",
@@ -107,6 +110,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "reference-engine",
+    area: "engine",
     title: [
       "Independent nonlinear reference",
       "Referencia no lineal independiente",
@@ -138,6 +142,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "cuda-ensemble",
+    area: "reproducibility",
     title: [
       "CUDA batches and evidence export",
       "Lotes CUDA y exportación de evidencia",
@@ -170,6 +175,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "learned-pipeline",
+    area: "architecture",
     title: [
       "Training, exports and domain checks",
       "Entrenamiento, exportación y dominio",
@@ -202,6 +208,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "transport-engine",
+    area: "engine",
     title: [
       "Transport integration and admission limits",
       "Integración de transporte y límites",
@@ -234,6 +241,7 @@ export const implementationSections: ScientificSection[] = [
   },
   {
     id: "release-runtime",
+    area: "deployment",
     title: [
       "Reproducible deployment and runtime evidence",
       "Despliegue reproducible y evidencia de ejecución",
