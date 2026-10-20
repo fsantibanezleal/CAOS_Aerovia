@@ -58,8 +58,38 @@ def test_the_tables_are_utf8_lf_without_bom() -> None:
         assert not raw.startswith(b"\xef\xbb\xbf") and b"\r\n" not in raw, path.name
 
 
+# The generated types carry the schema description, which names the download's path: a type declaration is not a reader.
+GENERATED_TYPES = "frontend/src/lib/contract.gen.ts"
+SEARCHED = ("frontend/src", "frontend/scripts", "data-pipeline", "scripts")
+
+
+def readers_of_the_download(cwd) -> list[str]:
+    """Every tracked line under the searched folders that names the download, except the generated types file (by its path)."""
+    return subprocess.run(["git", "grep", "-nE", "artifacts/csv", "--", *SEARCHED, f":(exclude){GENERATED_TYPES}"],
+                          cwd=cwd, capture_output=True, text=True).stdout.splitlines()
+
+
 def test_published_download_has_no_reader_in_the_repository() -> None:
     """The catalog row names this test as its consumer: the tables are a published download, so no source reads them."""
-    out = subprocess.run(["git", "grep", "-nE", "artifacts/csv", "--", "frontend/src", "frontend/scripts", "data-pipeline", "scripts"],
-                         cwd=sp.ROOT, capture_output=True, text=True).stdout.splitlines()
+    out = readers_of_the_download(sp.ROOT)
     assert out == [], out
+
+
+def test_the_reader_search_skips_the_generated_types_by_path_and_nothing_else(tmp_path) -> None:
+    """Only the generated file is exempt: the same text in any other source file, or in a file of another name, is a reader."""
+    def git(*args: str) -> None:
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+
+    git("init", "-q")
+    for rel, text in (("frontend/src/lib/contract.gen.ts", "/** data/artifacts/csv/x.csv */"),
+                      ("frontend/src/lib/contract.types.ts", "const a = 1"),
+                      ("scripts/ok.py", "x = 1")):
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text(text, encoding="utf-8")
+    git("add", ".")
+    assert readers_of_the_download(tmp_path) == []
+    (tmp_path / "frontend/src/lib/contract.types.ts").write_text("fetch('data/artifacts/csv/x.csv')", encoding="utf-8")
+    (tmp_path / "frontend/src/lib/contract.gen.tsx").write_text("data/artifacts/csv/y.csv", encoding="utf-8")
+    git("add", ".")
+    hits = readers_of_the_download(tmp_path)
+    assert sorted(h.split(":")[0] for h in hits) == ["frontend/src/lib/contract.gen.tsx", "frontend/src/lib/contract.types.ts"], hits

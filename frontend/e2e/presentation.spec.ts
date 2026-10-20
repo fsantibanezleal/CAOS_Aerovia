@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "./helpers";
 import { expect } from "@playwright/test";
 import {
@@ -71,9 +73,12 @@ for (const { lang, theme } of appearances)
         for (let i = 0, count = await tabs.count(); i < count; i++) {
           await tabs.nth(i).click();
           await expect(tabs.nth(i)).toHaveAttribute("aria-selected", "true");
-          await expect(page.getByRole("tabpanel")).toBeVisible();
+          // The first visible panel in document order is the page's own: since U5 the Introduction nests the executive
+          // view's sub-tabs inside it, so the bare role resolves to two panels.
+          const panel = page.getByRole("tabpanel").first();
+          await expect(panel).toBeVisible();
           await expect(page.locator(".katex-error")).toHaveCount(0);
-          await expect(page.getByRole("tabpanel")).not.toBeEmpty();
+          await expect(panel).not.toBeEmpty();
           await noDocumentOverflow(page);
         }
         if (await tabs.count()) await tabs.first().click();
@@ -519,3 +524,123 @@ for (const viewport of [
       }
     });
   }
+
+// The readiness note takes one paragraph of the tool pane (ADR-0071: no new row). With four rows speaking at once (the
+// worst case the catalog allows a group) it is at its longest, and every control of the pane must still be reachable:
+// scrolled into view inside the pane, with a size, in the viewport.
+function forcedReadiness() {
+  const document = JSON.parse(
+    readFileSync(join(process.cwd(), "..", "data", "readiness.json"), "utf8"),
+  );
+  const text = (en: string, es: string) => ({ en, es });
+  const force: Record<string, object> = {
+    catalog: {
+      state: "stale",
+      reason: text(
+        "Baked by engine 0.0.9; the pipeline is 0.1.0.",
+        "Generado por el motor 0.0.9; el pipeline es 0.1.0.",
+      ),
+    },
+    "model-registry": {
+      state: "training",
+      provenance: "baseline",
+      reason: text(
+        "A baseline answers while a newer model trains.",
+        "Responde una línea base mientras se entrena un modelo nuevo.",
+      ),
+    },
+    "model-io": {
+      state: "partial",
+      missing: ["data/models/topology-mlp/hard-rock.onnx"],
+      reason: text(
+        "An ONNX file the model manifest lists is absent: data/models/topology-mlp/hard-rock.onnx.",
+        "Falta un archivo ONNX que el manifiesto lista: data/models/topology-mlp/hard-rock.onnx.",
+      ),
+    },
+    science: {
+      state: "provider",
+      provenance: "fixture",
+      reason: text(
+        "Served from the provider fixture while the real producer is not built.",
+        "Se sirve desde los datos de prueba del proveedor mientras el productor real no está construido.",
+      ),
+    },
+  };
+  for (const entry of document.contracts)
+    if (force[entry.id]) Object.assign(entry, force[entry.id]);
+  return document;
+}
+
+for (const viewport of [
+  { width: 1280, height: 800 },
+  { width: 390, height: 844 },
+])
+  for (const lang of ["en", "es"] as const)
+    test(`four rows not available at once: every control of the Models pane stays reachable at ${viewport.width}x${viewport.height} in ${lang}`, async ({
+      page,
+    }) => {
+      const forced = forcedReadiness();
+      await page.route("**/data/readiness.json*", (route) =>
+        route.fulfill({ json: forced }),
+      );
+      await page.setViewportSize(viewport);
+      await appearance(page, lang, "dark");
+      await page
+        .getByRole("tab", {
+          name: lang === "es" ? "Modelos aprendidos" : "Learned models",
+          exact: true,
+        })
+        .click();
+      await parameters(page);
+      const note = page.locator(".av-controls [data-readiness]").first();
+      await expect(note).toBeVisible();
+      // Four rows speaking: the note names each of them.
+      for (const id of ["catalog", "model-registry", "model-io", "science"])
+        await expect(note).toContainText(id);
+      const controls = page.locator(".av-controls");
+      const targets = controls.locator(
+        'button, select, input, textarea, a[href], [role="tab"], [tabindex]:not([tabindex="-1"])',
+      );
+      // What the pane holds beyond its height is reached by the reader's own scrolling, so the pane must scroll
+      // (script can scroll an overflow: hidden box that a reader cannot).
+      const room = await controls.evaluate((el) => ({
+        scroll: el.scrollHeight,
+        client: el.clientHeight,
+        overflowY: getComputedStyle(el).overflowY,
+      }));
+      test.info().annotations.push({
+        type: "pane",
+        description: `scrollHeight ${room.scroll}, clientHeight ${room.client}, overflow-y ${room.overflowY}`,
+      });
+      if (room.scroll > room.client + 1)
+        expect(["auto", "scroll"], "the pane holds more than it shows").toContain(
+          room.overflowY,
+        );
+      const total = await targets.count();
+      expect(total).toBeGreaterThan(3);
+      for (let i = 0; i < total; i++) {
+        const target = targets.nth(i);
+        if (!(await target.isVisible())) continue;
+        await target.scrollIntoViewIfNeeded();
+        const [box, pane] = await Promise.all([
+          target.boundingBox(),
+          controls.boundingBox(),
+        ]);
+        const where = `control ${i} of ${total}: ${await target.evaluate((el) => el.outerHTML.slice(0, 90))}`;
+        expect(box, where).not.toBeNull();
+        expect(box!.width, where).toBeGreaterThan(0);
+        expect(box!.height, where).toBeGreaterThan(0);
+        // Inside the pane (a control the pane cuts off is not reachable) and inside the viewport.
+        expect(box!.y, where).toBeGreaterThanOrEqual(pane!.y - 1);
+        expect(box!.y + box!.height, where).toBeLessThanOrEqual(
+          pane!.y + pane!.height + 1,
+        );
+        expect(box!.y + box!.height, where).toBeLessThanOrEqual(
+          viewport.height + 1,
+        );
+        expect(box!.x + box!.width, where).toBeLessThanOrEqual(
+          viewport.width + 1,
+        );
+      }
+      await noDocumentOverflow(page);
+    });

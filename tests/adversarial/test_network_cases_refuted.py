@@ -91,6 +91,7 @@ def test_nc_005_a_renamed_network_and_a_foreign_reference_check_are_caught(tmp_p
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_nc_006_a_case_list_that_omits_a_network_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     browser_plant(tmp_path, tmp_path_factory, "e2e/workbench.spec.ts",
                   "all twelve authored cases remain selectable and solvable through rapid case changes",

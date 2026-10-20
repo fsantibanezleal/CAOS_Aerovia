@@ -34,9 +34,6 @@ def test_uq_003_a_sigma_floor_on_a_zero_variation_ensemble_is_caught(tmp_path: P
              [MODEL + "test_zero_cv_ensemble_collapses_to_deterministic_solution"])
 
 
-@pytest.mark.xfail(strict=True, reason="BLOCKED (gate cannot fail): test_ensemble_batches_bound_memory_and_preserve_seeded_order "
-                   "asserts the counts, the batch size and the parity of the batch with SciPy on the same draws, never the order of the "
-                   "draws, so a generator re-seeded per batch passes it. The gate is the product's; the finding is in the report.")
 def test_uq_004_a_batch_that_reseeds_the_generator_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     # every batch of 256 draws its own block from a generator seeded again: the second batch repeats the first draws
     py_plant(tmp_path, tmp_path_factory,
@@ -63,6 +60,7 @@ def test_uq_006_a_summary_that_defaults_a_missing_failure_count_is_caught(tmp_pa
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_uq_007_a_recorded_interval_kept_after_an_edit_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     browser_plant(tmp_path, tmp_path_factory, "e2e/workbench.spec.ts",
                   "recorded uncertainty selects an airway and disappears when the operating inputs no longer match",

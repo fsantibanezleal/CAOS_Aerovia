@@ -109,6 +109,7 @@ def test_ls_009_a_checkpoint_without_a_key_or_with_a_pickle_payload_is_caught(tm
 
 
 @needs_browser
+@pytest.mark.full_plants
 def test_ls_010_a_changed_topology_answered_by_the_nearest_model_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     fabricated = ("(r) => r.status === 'out-of-domain' ? { ...r, status: 'supported', prediction: { status: 'supported', lane: 'live-wasm', "
                   "modelVersion: 'nearest', rawFlows: reference.flows, result: reference, errors: reference.flows.map(() => 0), "

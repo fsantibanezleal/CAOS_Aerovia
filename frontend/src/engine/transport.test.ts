@@ -140,6 +140,29 @@ describe("conservative passive tracer analytical solutions", () => {
       6,
     );
     expect(result.frames[20].injectedMassMg).toBeCloseTo(100, 8);
+    // A release that ends between two frame times: the integration is cut at its end, so the source runs 7 s and no longer.
+    // Frames at 0, 5, 10, 15 and 20 s; the release ends at 7 s, off every frame.
+    const off = run(single(), {
+      ...pulse,
+      frameCount: 5,
+      maxStepSeconds: 0.01,
+      releases: [
+        {
+          kind: "continuous",
+          edgeId: "ab",
+          startSeconds: 0,
+          durationSeconds: 7,
+          rateMgPerSecond: 10,
+        },
+      ],
+    });
+    assertLedger(off);
+    expect(off.frames.map((frame) => frame.timeSeconds)).toEqual([0, 5, 10, 15, 20]);
+    expect(off.frames[1].injectedMassMg).toBeCloseTo(50, 8);
+    for (const index of [2, 3, 4]) expect(off.frames[index].injectedMassMg).toBeCloseTo(70, 8);
+    expect(off.frames[1].concentrations[0]).toBeCloseTo(1 - Math.exp(-0.5), 6);
+    expect(off.frames[2].concentrations[0]).toBeCloseTo((1 - Math.exp(-0.7)) * Math.exp(-0.3), 6);
+    expect(off.frames[4].concentrations[0]).toBeCloseTo((1 - Math.exp(-0.7)) * Math.exp(-1.3), 6);
   });
   it("combines advection and first-order loss with independently known competing fractions", () => {
     const result = run(single(), {

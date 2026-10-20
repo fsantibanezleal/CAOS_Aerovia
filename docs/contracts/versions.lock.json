@@ -5,9 +5,9 @@
     "sha256": "823fcdd686241602666fe7ea800179ee955e964fd1050485737c65f3d2a2fef7"
   },
   "catalog": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "schema": "docs/contracts/schemas/catalog.schema.json",
-    "sha256": "6d45ae00dd4090ff9549b8103a74260860d265aa0b91aa0be3eb069788596021"
+    "sha256": "d9c2b7f0ef660936515ae62f2d5eed07b13bb38197c357cb6250b609bd1fa08e"
   },
   "reference-checks": {
     "version": "1.0.0",

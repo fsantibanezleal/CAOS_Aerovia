@@ -5,6 +5,7 @@ import pytest
 
 from aerovia_pipeline.cases import create_cases, network, node, edge
 from aerovia_pipeline.model import solve, validate_network, NetworkError
+from aerovia_pipeline import ensemble as ensemble_module
 from aerovia_pipeline.ensemble import resistance_draws, run_ensemble
 
 
@@ -175,10 +176,21 @@ def test_all_closed_boundary_only_graph_is_a_valid_zero_flow_state():
     assert result["shortfalls"]==[5]
 
 
-def test_ensemble_batches_bound_memory_and_preserve_seeded_order():
+def test_ensemble_batches_bound_memory_and_preserve_seeded_order(monkeypatch):
     n=analytic(True)
     result=solve(n)
+    # Record the draws each batch receives: the batches, put end to end, must be the unbatched draws of the same seed, in
+    # order (a generator re-seeded per batch repeats the first draws and passes every count below).
+    seen=[]
+    real_batch_solve=ensemble_module.batch_solve
+    def recording(model,resistance,baseline,device):
+        seen.append(np.array(resistance))
+        return real_batch_solve(model,resistance,baseline,device)
+    monkeypatch.setattr(ensemble_module,"batch_solve",recording)
     ensemble,_=run_ensemble(n,result,samples=264,seed=123,cv=.15)
+    assert [len(batch) for batch in seen]==[256,8]
+    unbatched=resistance_draws(ensemble_module.assemble(n,{})["r"],264,123,.15)
+    assert np.array_equal(np.concatenate(seen),unbatched)
     assert ensemble["failures"]==0
     assert ensemble["acceptedSamples"]==264
     assert ensemble["batchSize"]==256

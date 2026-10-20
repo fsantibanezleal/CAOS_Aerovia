@@ -2,12 +2,13 @@ import csv
 from hashlib import sha256
 from io import BytesIO
 import json
+import os
 from pathlib import Path
 import pytest
 
 from aerovia_pipeline.cli import main
 from aerovia_pipeline.cases import create_cases
-from aerovia_pipeline.io import digest, export_csv, fetch_network, load_networks, verify_artifacts, write_json
+from aerovia_pipeline.io import digest, export_csv, fetch_network, load_networks, promote_artifacts, verify_artifacts, write_json
 from aerovia_pipeline.model import NetworkError, solve
 
 
@@ -104,7 +105,7 @@ def test_download_rejects_credentials_and_insecure_redirect(tmp_path,monkeypatch
         fetch_network("https://example.org/network.json","0"*64,tmp_path/"target")
 
 
-def test_late_failure_preserves_all_previous_accepted_artifact_bytes(tmp_path):
+def test_late_failure_preserves_all_previous_accepted_artifact_bytes(tmp_path,monkeypatch):
     good=create_cases()[0]
     source=tmp_path/"input.json"
     output=tmp_path/"accepted"
@@ -118,6 +119,22 @@ def test_late_failure_preserves_all_previous_accepted_artifact_bytes(tmp_path):
     current={p.relative_to(output):p.read_bytes() for p in output.rglob("*") if p.is_file()}
     assert current==previous
     assert not list(tmp_path.glob(".aerovia-stage-*"))
+    # The failure above happens in the solve, before promotion runs. This one is in the move itself: the staged catalog is
+    # complete and the move that publishes it fails, so the accepted output must be back, byte for byte, with no backup left.
+    staging=tmp_path/".aerovia-stage-late"
+    staging.mkdir()
+    (staging/"manifest.json").write_text("{}",encoding="utf-8")
+    real_replace=os.replace
+    def failing_move(src,dst):
+        if Path(src).name.startswith(".aerovia-stage-"):
+            raise OSError("the move that publishes the staged catalog failed")
+        return real_replace(src,dst)
+    monkeypatch.setattr(os,"replace",failing_move)
+    with pytest.raises(OSError,match="the move that publishes"):
+        promote_artifacts(staging,output)
+    monkeypatch.undo()
+    assert {p.relative_to(output):p.read_bytes() for p in output.rglob("*") if p.is_file()}==previous
+    assert not list(tmp_path.glob(".aerovia-backup-*"))
 
 
 def test_artifact_promotion_refuses_unowned_output_directory(tmp_path):

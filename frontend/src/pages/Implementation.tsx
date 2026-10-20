@@ -15,6 +15,7 @@ import {
   type ContractTable,
 } from "../content/implementation";
 import ScienceDiagram from "../content/ScienceDiagram";
+import { ReadinessTable } from "../readiness/ReadinessTable";
 
 /** A field path with a line-break opportunity after each dot and comma, so a narrow column never cuts a word in two. */
 const breakable = (path: string) =>
@@ -249,6 +250,16 @@ export function ImplementationTopic({ id }: { id: string }) {
         return (
           <DeepSection key={section.id} section={section}>
             {table && <ContractTableView table={table} />}
+            {section.id === "reproduction-record" && (
+              <>
+                <p>
+                  {es
+                    ? "Qué es real en esta versión: cada fila del catálogo de contratos lleva un estado declarado, calculado por el pipeline a partir del catálogo y del repositorio y versionado como readiness.json: disponible, parcial (faltan manifiestos o artefactos), desactualizado (generado por una versión anterior del motor), proveedor (lo sirve un proveedor mientras el productor real no está construido), entrenando (responde una línea base o un modelo publicado mientras uno nuevo se entrena) o ausente. Una vista muestra el resultado con una nota para los estados que aún lo permiten, y un aún no disponible explícito con la razón para el estado que no, nunca un gráfico vacío."
+                    : "What is real in this build: every row of the contract catalog carries a declared state, computed by the pipeline from the catalog and the repository and committed as readiness.json: available, partial (some manifests or artifacts are absent), stale (baked by an earlier version of the engine), provider (served by a provider while the real producer is not built), training (a baseline or a released model answers while a newer one trains) or missing. A view shows the result with a note for the states that still hold one, and an explicit not available yet with the reason for the state that does not, never an empty chart."}
+                </p>
+                <ReadinessTable />
+              </>
+            )}
             {section.id === "learned-pipeline" && (
               <Figure
                 caption={

@@ -56,9 +56,6 @@ def test_op_003_a_tampered_artifact_of_equal_size_is_caught(tmp_path: Path, tmp_
     assert_py_fails(tree, gate)
 
 
-@pytest.mark.xfail(strict=True, reason="BLOCKED (gate cannot fail): the late failure of test_late_failure_preserves_all_previous_accepted_artifact_bytes "
-                   "happens in the solve, before promote_artifacts runs, and the other named gate stops at the ownership check; no test makes "
-                   "the move itself fail, so deleting before moving passes both. The gate is the product's; the finding is in the report.")
 def test_op_004_a_promotion_that_deletes_before_it_moves_is_caught(tmp_path: Path, tmp_path_factory: FACTORY) -> None:
     py_plant(tmp_path, tmp_path_factory,
              [(PIPE + "io.py", "        os.replace(destination,backup)", "        shutil.rmtree(destination)")],

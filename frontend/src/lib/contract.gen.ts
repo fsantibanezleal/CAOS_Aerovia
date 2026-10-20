@@ -137,7 +137,7 @@ export interface components {
             powerP50: number;
             powerP95: number;
             failures: number;
-            failedSampleIndices: unknown[];
+            failedSampleIndices: number[];
             unsupportedFanSamples: number;
             maxMassResidual: number;
             maxPressureResidual: number;
