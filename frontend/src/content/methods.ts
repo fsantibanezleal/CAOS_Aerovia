@@ -3,6 +3,8 @@ import type { ScientificSection } from "./primitives";
 export const classicalMethods: ScientificSection[] = [
   {
     id: "pressure-flow",
+    area: "method",
+    kind: "classical",
     title: [
       "Pressure and flow: a coupled nonlinear network",
       "Presión y caudal: una red no lineal acoplada",
@@ -68,6 +70,8 @@ export const classicalMethods: ScientificSection[] = [
   },
   {
     id: "fan-control",
+    area: "method",
+    kind: "classical",
     title: [
       "Fan operating points, constrained speed and sensitivity",
       "Puntos del ventilador, velocidad restringida y sensibilidad",
@@ -130,6 +134,8 @@ export const classicalMethods: ScientificSection[] = [
   },
   {
     id: "resistance-uncertainty",
+    area: "method",
+    kind: "classical",
     title: [
       "Conditional resistance uncertainty and GPU ensembles",
       "Incertidumbre condicional de resistencia y conjuntos GPU",
@@ -185,6 +191,8 @@ export const classicalMethods: ScientificSection[] = [
   },
   {
     id: "passive-transport",
+    area: "method",
+    kind: "classical",
     title: [
       "Passive tracer transport, schedules and airflow routes",
       "Transporte de trazador, programas y rutas del aire",

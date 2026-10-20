@@ -3,6 +3,7 @@ import type { ScientificSection } from "./primitives";
 export const experimentSections: ScientificSection[] = [
   {
     id: "datasets",
+    area: "datasets",
     title: ["Data provenance and coverage", "Procedencia y cobertura de datos"],
     paragraphs: [
       [
@@ -31,6 +32,7 @@ export const experimentSections: ScientificSection[] = [
   },
   {
     id: "regime-design",
+    area: "question",
     title: [
       "Physical regimes and controlled interventions",
       "Regímenes físicos e intervenciones controladas",
@@ -63,6 +65,7 @@ export const experimentSections: ScientificSection[] = [
   },
   {
     id: "numerical-verification",
+    area: "metrics",
     title: [
       "Independent numerical verification",
       "Verificación numérica independiente",
@@ -101,6 +104,7 @@ export const experimentSections: ScientificSection[] = [
   },
   {
     id: "transport-verification",
+    area: "question",
     title: [
       "Transport conservation and refinement",
       "Conservación y refinamiento de transporte",
@@ -140,6 +144,7 @@ export const experimentSections: ScientificSection[] = [
   },
   {
     id: "learning-protocol",
+    area: "protocol",
     title: [
       "Leakage-safe learning and held-out questions",
       "Aprendizaje sin filtración y preguntas reservadas",
@@ -172,6 +177,7 @@ export const experimentSections: ScientificSection[] = [
   },
   {
     id: "robustness-runtime",
+    area: "question",
     title: [
       "Degradation, target errors and runtime quality",
       "Degradación, error de objetivos y calidad de ejecución",

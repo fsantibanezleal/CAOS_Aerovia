@@ -1,7 +1,15 @@
 import type { Citation } from "@fasl-work/caos-app-shell";
+import { introductionCitations } from "./citations/introduction";
+import { methodologyCitations } from "./citations/methodology";
+import { implementationCitations } from "./citations/implementation";
+import { experimentsCitations } from "./citations/experiments";
+import { benchmarkCitations } from "./citations/benchmark";
 
-/** Primary references verified in the dated research dossier before transcription. */
-export const CONTENT_CITATIONS: Citation[] = [
+/**
+ * Citations that two or more pages reference, verified in the dated research dossier before transcription. A citation only
+ * one page references lives in that page's file under `citations/` (the page units write disjoint files).
+ */
+const SHARED_CITATIONS: Citation[] = [
   {
     id: "mcpherson1993",
     label: "McPherson · ventilation engineering",
@@ -17,13 +25,6 @@ export const CONTENT_CITATIONS: Citation[] = [
     url: "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html",
   },
   {
-    id: "scipybisect",
-    label: "SciPy · bisection",
-    citation:
-      "SciPy documentation. scipy.optimize.bisect: root bracketing by interval subdivision.",
-    url: "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.bisect.html",
-  },
-  {
     id: "pytorchsolve",
     label: "PyTorch · batched linear algebra",
     citation:
@@ -36,20 +37,6 @@ export const CONTENT_CITATIONS: Citation[] = [
     citation:
       "NumPy documentation. Generator.lognormal: logarithmic parameters and sampling.",
     url: "https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.lognormal.html",
-  },
-  {
-    id: "nioshmfire",
-    label: "NIOSH · MFIRE",
-    citation:
-      "National Institute for Occupational Safety and Health. MFIRE software: mine ventilation and fire modeling.",
-    url: "https://www.cdc.gov/niosh/mining/tools/mfire.html",
-  },
-  {
-    id: "battaglia2018",
-    label: "Battaglia et al. 2018",
-    citation:
-      "P. W. Battaglia et al. Relational inductive biases, deep learning, and graph networks. 2018.",
-    url: "https://arxiv.org/abs/1806.01261",
   },
   {
     id: "sklearnleakage",
@@ -114,16 +101,60 @@ export const CONTENT_CITATIONS: Citation[] = [
     url: "https://proceedings.mlr.press/v70/gilmer17a.html",
   },
   {
-    id: "ashraf2024",
-    label: "Ashraf et al. 2024",
-    citation:
-      "I. Ashraf et al. Physics-Informed Graph Neural Networks for Water Distribution Systems. AAAI 2024.",
-    url: "https://arxiv.org/html/2403.18570v1",
-  },
-  {
     id: "onnxweb",
     label: "ONNX Runtime · browser inference",
     citation: "ONNX Runtime documentation. Web inference with JavaScript.",
     url: "https://onnxruntime.ai/docs/get-started/with-javascript/web.html",
   },
 ];
+
+/**
+ * The order the single list had before the split, which the composed list keeps. A citation a page unit adds to its own file
+ * is appended after these, in the order of the page files, so no unit edits this file.
+ */
+const ORDER = [
+  "mcpherson1993",
+  "scipytrf",
+  "scipybisect",
+  "pytorchsolve",
+  "numpylognormal",
+  "nioshmfire",
+  "battaglia2018",
+  "sklearnleakage",
+  "sklearnmetrics",
+  "mdnworkers",
+  "githubpages",
+  "nistcontam",
+  "clawpackadvection",
+  "jong2016",
+  "networkxpaths",
+  "gilmer2017",
+  "ashraf2024",
+  "onnxweb",
+];
+
+const POOL = [
+  ...SHARED_CITATIONS,
+  ...introductionCitations,
+  ...methodologyCitations,
+  ...implementationCitations,
+  ...experimentsCitations,
+  ...benchmarkCitations,
+];
+
+function compose(): Citation[] {
+  const byId = new Map<string, Citation>();
+  for (const c of POOL) {
+    if (byId.has(c.id)) throw new Error(`citation ${c.id} is written twice`);
+    byId.set(c.id, c);
+  }
+  const legacy = ORDER.map((id) => {
+    const c = byId.get(id);
+    if (!c) throw new Error(`ORDER names the unknown citation ${id}`);
+    return c;
+  });
+  return [...legacy, ...POOL.filter((c) => !ORDER.includes(c.id))];
+}
+
+/** Every citation of the product, for the shell's CitationsProvider: the shared ones and each page's own, in the previous order. */
+export const CONTENT_CITATIONS: Citation[] = compose();

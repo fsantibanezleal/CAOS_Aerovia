@@ -1,8 +1,9 @@
-import type { ScientificSection } from "./primitives";
+import type { Bilingual, ScientificSection } from "./primitives";
 
 export const introductionSections: ScientificSection[] = [
   {
     id: "industrial-question",
+    area: "problem",
     title: [
       "The industrial question: where does the supplied air go?",
       "La pregunta industrial: ¿adónde llega el aire suministrado?",
@@ -47,6 +48,7 @@ export const introductionSections: ScientificSection[] = [
   },
   {
     id: "physical-scope",
+    area: "principles",
     title: [
       "A steady network model with explicit physical scope",
       "Un modelo estacionario de red con alcance físico explícito",
@@ -86,6 +88,7 @@ export const introductionSections: ScientificSection[] = [
   },
   {
     id: "mathematical-language",
+    area: "math",
     title: [
       "The mathematical language and its units",
       "El lenguaje matemático y sus unidades",
@@ -175,6 +178,7 @@ export const introductionSections: ScientificSection[] = [
   },
   {
     id: "end-to-end",
+    area: "pipeline",
     title: [
       "From a design question to an inspectable result",
       "De una pregunta de diseño a un resultado inspeccionable",
@@ -208,9 +212,14 @@ export const introductionSections: ScientificSection[] = [
     ],
     refs: ["mdnworkers", "pytorchsolve", "githubpages"],
     diagram: "pipeline",
+    diagramCaption: [
+      "The pipeline runs in three checked stages: the network is validated, the reference solver and the uncertainty batches run, and the artifacts are verified by hash, schema and metrics before publication. The live browser tool is checked separately.",
+      "El proceso corre en tres etapas verificadas: se valida la red, se ejecutan el solucionador de referencia y los lotes de incertidumbre, y los artefactos se verifican por hash, esquema y métricas antes de publicarse. La herramienta en vivo del navegador se verifica por separado.",
+    ],
   },
   {
     id: "verification-validation",
+    area: "honesty",
     title: [
       "What is verified, what is represented, and what remains empirical",
       "Qué se verifica, qué se representa y qué requiere evidencia empírica",
@@ -236,4 +245,32 @@ export const introductionSections: ScientificSection[] = [
     ],
     refs: ["mcpherson1993", "nioshmfire", "sklearnleakage"],
   },
+];
+
+/** The ordered steps of the `pipeline` area, from the design question to the exported result. */
+export const introductionSteps: readonly Bilingual[] = [
+  [
+    "Define the decision, district and delivery target.",
+    "Definir la decisión, el distrito y el objetivo de caudal.",
+  ],
+  [
+    "Load or build the network and check units, geometry and connections.",
+    "Cargar o construir la red y verificar unidades, geometría y conexiones.",
+  ],
+  [
+    "Save a baseline and change an identifiable physical assumption.",
+    "Guardar una referencia y cambiar una hipótesis física identificable.",
+  ],
+  [
+    "Solve pressure and flow; inspect convergence and deficit separately.",
+    "Resolver presión y caudal; revisar convergencia y déficit por separado.",
+  ],
+  [
+    "Inspect energy, routes and transport with their own assumptions.",
+    "Inspeccionar energía, rutas y transporte con sus respectivos supuestos.",
+  ],
+  [
+    "Compare to the baseline and export project, parameters and results.",
+    "Comparar con la referencia y exportar proyecto, parámetros y resultados.",
+  ],
 ];
