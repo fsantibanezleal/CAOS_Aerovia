@@ -16,7 +16,7 @@ try {
         Invoke-AeroviaCommand npm @('run', 'typecheck')
         Invoke-AeroviaCommand npm @('test')
         Invoke-AeroviaCommand npm @('run', 'build')
-        if ($Browser) { Invoke-AeroviaCommand npx @('playwright', 'install', 'chromium'); Invoke-AeroviaCommand npm @('run', 'test:e2e'); Invoke-AeroviaCommand node @('verify-learned-browser.mjs') }
+        if ($Browser) { Invoke-AeroviaCommand npx @('playwright', 'install', 'chromium'); Invoke-AeroviaCommand npm @('run', 'test:e2e'); Invoke-AeroviaCommand node @('scripts/verify-learned-browser.mjs') }
     } finally { Pop-Location }
     Write-Host 'Verification passed. Next: ./scripts/local/04_preview.ps1 or review ./scripts/local/09_deploy.ps1.'
 } finally { Pop-Location }

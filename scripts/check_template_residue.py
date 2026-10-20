@@ -1,126 +1,120 @@
 #!/usr/bin/env python3
-"""Fail an INSTANTIATED product repo that still ships template residue (ADR-0057 / ADR-0061).
+"""T6: an instantiated product carries none of the template's example (ADR-0057, ADR-0078).
 
-The archetype template ships an intentional example PIPELINE (not a package, not a lab) (`data-pipeline/pipeline/`, an SIR model,
-`EX0*` baked cases) so a fresh clone runs end to end. Instantiation is supposed to REPLACE all of
-it with the real product; five shipped products proved that replacement is easy to forget, leaving
-SIR/Pyodide/EX0* text presented as product docs. This guard makes that structurally impossible.
+The template ships a working example (an SIR model, five EX0*/CTRL cases, their artifacts, the example pages and
+diagrams) so a fresh clone runs end to end. A product replaces all of it. Five products shipped pieces of the example
+as their own docs; an earlier version of this guard then forbade the path data-pipeline/pipeline/, which is where a
+product's own pipeline lives, and skipped everything whenever the sentinel file was present, even in a product that
+had never been instantiated. This version:
 
-It is a no-op in the template itself: the template root carries a `.template-source` sentinel, and
-instantiation deletes it (see the README "Instantiate" steps). With the sentinel present the guard
-prints a note and exits 0; once it is gone (a real product) the guard enforces a clean repo.
+  - detects the example by its CONTENT (the model, the case ids, the placeholder identity, the example schemas, the
+    example references), never by a path a product legitimately keeps;
+  - honours the `.template-source` sentinel only in the template repository itself; the sentinel in any other
+    repository fails (instantiation deletes it);
+  - fails on the template blueprint files that must not ship (STRUCTURE.md, .vscode/).
 
-Scanned set = git-tracked files only (never venvs / node_modules / data caches). Exit 1 on any hit.
+Scanned set: git-tracked text files. Allowlist: scripts/.template_residue_allow (path fragments, one per line).
+Usage: python scripts/check_template_residue.py [repo_root]
 """
 from __future__ import annotations
 
+import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-SENTINEL = ROOT / ".template-source"
+ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent
+SENTINEL = ".template-source"
+TEMPLATE_REPO = "CAOS_PRODUCT_TEMPLATE"
+# the guard, its allowlist, the history, and the guard's own tests (which must name what it looks for)
+SELF = {"scripts/check_template_residue.py", "scripts/.template_residue_allow", "CHANGELOG.md", "tests/test_guards.py"}
 
-# This script and its allowlist name the markers by definition; never scan them for content.
-SELF = {"scripts/check_template_residue.py", "scripts/.template_residue_allow"}
-
-# Tracked PATHS that must not exist in an instantiated product (the example pipeline + its cases +
-# known scaffold residue). Matched as substring on the path or a suffix for extensions.
-FORBIDDEN_PATH_SUBSTR = (
-    "data-pipeline/pipeline/",
-    "data/derived/EX01_subcritical",
-    "data/derived/EX02_epidemic",
-    "data/derived/EX03_fast_burn",
-    "data/derived/EX04_slow_spread",
-    "data/derived/manifests/EX0",
-    "data/derived/manifests/CTRL_degenerate",
+# (name, pattern): each one is unambiguous for the template's example.
+MARKERS: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("the example SIR model", re.compile(r"\bSIR\b")),
+    ("an example case id", re.compile(r"\b(?:EX0[1-4]_[a-z_]+|CTRL_degenerate)\b")),
+    # the placeholder package name, never a longer identifier that starts with it (the Vite plugin caos-product-html)
+    ("the placeholder product name", re.compile(r'"name"\s*:\s*"CAOS Product"|\bcaos-product(?:-frontend)?(?![\w-])')),
+    ("an example contract schema id", re.compile(r"\bexample\.(?:trace|manifest|index)/v\d+\b")),
+    ("an example reference", re.compile(r"\b(?:Kermack|McKendrick|Hethcote)\b")),
+    # the example's constant, never a hyphenated id that contains the word (CAOS_Contraste's finding F-SCALED-COVERAGE)
+    ("the example immunisation variants", re.compile(r"(?<![\w-])COVERAGE(?![\w-])|herd threshold")),
+    ("prose about the example engine", re.compile(r"\bEXAMPLE engine\b|\bteaching engine\b")),
+    # the example's executive view (content/executive.json): a product writes its own, never keeps the example's
+    ("the example executive view", re.compile(r"Hospital capacity in respiratory seasons|Capacidad hospitalaria en las temporadas respiratorias|Managing-the-flow-of-patients-through-hospital")),
 )
-FORBIDDEN_PATH_SUFFIX = (
-    ".ts.txt",  # architecture.ts.txt scaffold residue
-)
-FORBIDDEN_PATH_NAME = (
-    "INSTANTIATE.md",
-    "instantiate.md",
-)
-
-# Tracked TEXT content that must not survive instantiation (unambiguous template tokens only;
-# generic capability words like "Pyodide" are intentionally NOT listed, a product may truly use it).
-FORBIDDEN_CONTENT = (
-    "SIRChart",
-    "CAOS product template",
-    "PENDING-training",
-    "EX01_subcritical",
-    "EX02_epidemic",
-)
-
+FORBIDDEN_FILES = ("STRUCTURE.md", ".vscode/")
+# the helper scripts too: precompute.sh and precompute.ps1 named an example case and were never scanned
 TEXT_SUFFIXES = {
-    ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".md", ".json",
-    ".css", ".html", ".yml", ".yaml", ".toml", ".txt", ".cfg", ".ini",
+    ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".md", ".json", ".css", ".html", ".svg",
+    ".yml", ".yaml", ".toml", ".txt", ".cfg", ".ini", ".sh", ".ps1",
 }
 
 
-def tracked_files() -> list[str]:
-    out = subprocess.run(
-        ["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True
-    )
-    return [line.strip() for line in out.stdout.splitlines() if line.strip()]
+def git(*args: str) -> str:
+    try:
+        return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return ""
 
 
-def load_allowlist() -> list[str]:
+def is_template_repo() -> bool:
+    origin = git("remote", "get-url", "origin").strip()
+    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    return origin.rstrip("/").removesuffix(".git").endswith(f"/{TEMPLATE_REPO}") or repo.endswith(f"/{TEMPLATE_REPO}")
+
+
+def allowlist() -> list[str]:
     f = ROOT / "scripts" / ".template_residue_allow"
     if not f.exists():
         return []
-    return [ln.strip() for ln in f.read_text(encoding="utf-8").splitlines()
-            if ln.strip() and not ln.startswith("#")]
-
-
-def allowed(path: str, patterns: list[str]) -> bool:
-    return any(pat in path for pat in patterns)
+    return [ln.strip() for ln in f.read_text(encoding="utf-8").splitlines() if ln.strip() and not ln.startswith("#")]
 
 
 def main() -> int:
-    if SENTINEL.exists():
-        print("check_template_residue: .template-source present: this is the template repo, "
-              "residue check skipped (the example pipeline is intentional here).")
-        return 0
-
-    allow = load_allowlist()
-    files = tracked_files()
-    path_hits: list[str] = []
-    content_hits: list[tuple[str, str]] = []
-
+    # The files of the product as they stand: tracked and untracked, ignored excluded, on disk. A product instantiated
+    # by copying into an existing repository has nothing tracked yet, and a scan of tracked files alone passed it with
+    # nothing scanned (CAOS_Contraste, 2026-10-05).
+    listed = git("ls-files", "--cached", "--others", "--exclude-standard").splitlines()
+    files = sorted({ln.strip() for ln in listed if ln.strip() and (ROOT / ln.strip()).is_file()})
+    if len(files) < 10:
+        print(f"::error::check_template_residue: only {len(files)} files to scan; this is not a product tree")
+        return 1
+    if (ROOT / SENTINEL).exists():
+        if is_template_repo():
+            print(f"check_template_residue: {SENTINEL} present in {TEMPLATE_REPO}: the example is intentional here.")
+            return 0
+        print(f"::error::{SENTINEL} is present in a repository that is not {TEMPLATE_REPO}: "
+              "run scripts/instantiate.py (it replaces the identity and deletes the sentinel).")
+        return 1
+    allow = allowlist()
+    hits: list[str] = []
     for rel in files:
-        if rel in SELF or allowed(rel, allow):
+        if rel in SELF or any(a in rel for a in allow):
             continue
-        low = rel.lower()
-        if (any(s in rel for s in FORBIDDEN_PATH_SUBSTR)
-                or any(low.endswith(sfx) for sfx in FORBIDDEN_PATH_SUFFIX)
-                or Path(rel).name in FORBIDDEN_PATH_NAME):
-            path_hits.append(rel)
-            continue  # a forbidden path need not also be content-scanned
-
+        if any(rel == f or rel.startswith(f) for f in FORBIDDEN_FILES):
+            hits.append(f"{rel}: a template blueprint file; delete it")
+            continue
         if Path(rel).suffix.lower() not in TEXT_SUFFIXES:
             continue
         try:
-            text = (ROOT / rel).read_text(encoding="utf-8", errors="ignore")
+            lines = (ROOT / rel).read_text(encoding="utf-8", errors="ignore").splitlines()
         except OSError:
             continue
-        for token in FORBIDDEN_CONTENT:
-            if token in text:
-                content_hits.append((rel, token))
-
-    if not path_hits and not content_hits:
-        print(f"check_template_residue: OK: no template residue in {len(files)} tracked files.")
+        for n, line in enumerate(lines, 1):
+            for name, pat in MARKERS:
+                if pat.search(line):
+                    hits.append(f"{rel}:{n}: {name}")
+                    break
+    if not hits:
+        print(f"check_template_residue: OK, no example content in {len(files)} tracked files.")
         return 0
-
-    print("::error::template residue found: instantiation left the example pipeline / placeholder text in place.")
-    for p in sorted(path_hits):
-        print(f"  forbidden file: {p}")
-    for rel, token in sorted(content_hits):
-        print(f"  forbidden text: {rel}  (contains '{token}')")
-    print("\nReplace the example pipeline (data-pipeline/pipeline -> your product's lab), rebake the real")
-    print("cases, and purge the placeholder text. If a hit is a false positive, add a path fragment to")
-    print("scripts/.template_residue_allow. This guard is skipped only in the template (.template-source).")
+    print(f"::error::{len(hits)} line(s) of the template's example remain in this product:")
+    for h in hits[:200]:
+        print(f"  {h}")
+    if len(hits) > 200:
+        print(f"  ... and {len(hits) - 200} more")
     return 1
 
 
