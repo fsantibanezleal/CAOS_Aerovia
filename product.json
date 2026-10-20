@@ -1,0 +1,13 @@
+{
+  "name": "Aerovia",
+  "slug": "aerovia",
+  "tagline": {
+    "en": "Design an underground ventilation network, change its operation, and inspect the resulting airflow and tracer history.",
+    "es": "Diseñe una red de ventilación subterránea, cambie su operación e inspeccione el flujo de aire y la historia del trazador que resultan."
+  },
+  "repo": "https://github.com/fsantibanezleal/CAOS_Aerovia",
+  "visibility": "public",
+  "license": "MIT",
+  "holder": "Felipe Santibáñez-Leal",
+  "year": 2026
+}

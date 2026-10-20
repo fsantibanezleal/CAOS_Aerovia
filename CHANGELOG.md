@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.03.000: 2026-10-04
+## [0.03.000], 2026-10-04
 
 Pre-publication fixes (#12).
 
@@ -9,7 +9,7 @@ Pre-publication fixes (#12).
 - The source is MIT licensed, the CAOS standard. The twelve authored cases and the trained models were released under Apache-2.0 and keep that licence in their checksummed metadata (case provenance, catalog, model registry, ONNX doc strings); the README and the docs say so.
 - The CI-budget changes made after v0.02.001 (trunk-only triggers, ADR-0074) ship in this release.
 
-## v0.02.001: 2026-09-10
+## [0.02.001], 2026-09-10
 
 Visual interaction release. The solved ventilation network now exposes a live, data-driven flow field: tracer particles propagate along the signed solved flow, fan rotors animate at the calculated duty, and the scene identifies the active airflow stream. During tracer playback the selected frame remains the source of truth for recoloring and the worker keeps the timeline responsive.
 
@@ -17,7 +17,7 @@ Visual interaction release. The solved ventilation network now exposes a live, d
 - Added a live-airflow status marker and continuous fan rotor motion tied to operating flow.
 - Added a browser regression that proves the stream tick advances, while transport playback and scheduled fan tests continue to pass.
 
-## v0.02.000: 2026-09-10
+## [0.02.000], 2026-09-10
 
 Complete rebuild after the initial interface was rejected. The numerical foundation remains, while the product now supports direct design authoring and calculated time-dependent analysis through the actual shared CAOS shell.
 
@@ -33,7 +33,7 @@ Complete rebuild after the initial interface was rejected. The numerical foundat
 
 Scope remains explicit: authored planning inputs, an isothermal pressure network, passive mixed-cell transport and calibrated learned approximations. This release does not add field calibration, fire/heat/toxicology, emergency response, fan transients or equipment control.
 
-## v0.01.000: 2026-09-09
+## [0.01.000], 2026-09-09
 
 Initial release of the underground ventilation workbench and reproducible local processing system.
 The public application requires no login, server-side calculation or visitor API key.
