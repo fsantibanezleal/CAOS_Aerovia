@@ -45,6 +45,8 @@ def parser():
     verify=sub.add_parser("verify",help="Verify checksums, contracts, conservation and parity acceptance")
     verify.add_argument("--artifacts",type=Path,default=ROOT/"data/artifacts")
     verify.add_argument("--input",type=Path,help="Also require catalog source identity to match this canonical network input")
+    ready=sub.add_parser("readiness",help="Write the readiness document computed from docs/contracts/catalog.md (no bake, no torch)")
+    ready.add_argument("--output",type=Path,default=ROOT/"data/readiness.json")
     return p
 
 
@@ -56,7 +58,7 @@ def main(argv=None):
             cases=create_cases()
             for case in cases:
                 validate_network(case)
-            write_json(args.output,cases)
+            write_json(args.output,cases,schema="network")
             print(json.dumps({"cases":len(cases),"sourceSha256":digest(cases),"license":"Apache-2.0"}))
             return 0
         if args.command=="validate":
@@ -65,6 +67,11 @@ def main(argv=None):
             return 0
         if args.command=="fetch":
             print(json.dumps(fetch_network(args.url,args.sha256,args.output)))
+            return 0
+        if args.command=="readiness":
+            from . import readiness
+            size=readiness.write(args.output,readiness.compute(repo_root=ROOT))
+            print(json.dumps({"readiness":str(args.output),"bytes":size}))
             return 0
         if args.command=="verify":
             print(json.dumps(verify_artifacts(args.artifacts,args.input)))
@@ -112,9 +119,9 @@ def main(argv=None):
                               "ensembleElapsedMs":sum(x["ensemble"]["elapsedMs"] for x in artifacts),"ensembleFailures":sum(x["ensemble"]["failures"] for x in artifacts),
                               "parityMaxAbsFlow":max(x["ensemble"]["parityMaxAbsFlow"] for x in artifacts),"paritySamples":len(parity)})
         catalog={"schema":"aerovia.catalog/v1","createdAt":utc_now(),"sourceSha256":digest(cases),"cases":artifacts,"benchmark":benchmark}
-        write_json(args.output/"catalog.json",catalog)
+        write_json(args.output/"catalog.json",catalog,schema="catalog")
         if parity:
-            write_json(args.output/"reference-checks.json",{"schema":"aerovia.reference-checks/v1","fixtures":parity})
+            write_json(args.output/"reference-checks.json",{"schema":"aerovia.reference-checks/v1","fixtures":parity},schema="reference-checks")
         write_manifest(args.output,{"engineVersion":__version__,"sourceSha256":digest(cases),"device":getattr(args,"device","cpu-reference"),"caseCount":len(cases)})
         verified=verify_artifacts(args.output)
         promote_artifacts(args.output,destination)

@@ -184,11 +184,11 @@ def export(work, models_output, science_output):
                     "implementationAtExport":implementation_files,
                     "domain": "known calibrated authored topologies and bounded effective resistance ratios; closures, altered fans or boundaries rejected",
                     "postprocessing": "model outputs are unit speed; apply q*s,p*s^2 and recompute derived scalars; never silently solve instead"}
-        write_json(staging / "registry.json", registry)
+        write_json(staging / "registry.json", registry, schema="model-registry")
         write_json(staging / "parity-fixtures.json", {"schema": "aerovia.onnx-parity/v1", "flowTolerance": ONNX_FLOW_TOLERANCE,
-                                                    "pressureTolerance": ONNX_PRESSURE_TOLERANCE, "fixtures": fixtures})
+                                                    "pressureTolerance": ONNX_PRESSURE_TOLERANCE, "fixtures": fixtures}, schema="onnx-parity")
         model_files = {p.relative_to(staging).as_posix(): file_identity(p) for p in staging.rglob("*") if p.is_file()}
-        write_json(staging / "manifest.json", {"schema": "aerovia.model-manifest/v1", "sourceSha256": source_identity, "files": model_files})
+        write_json(staging / "manifest.json", {"schema": "aerovia.model-manifest/v1", "sourceSha256": source_identity, "files": model_files}, schema="model-manifest")
         methods = [{"id": "scipy-reference", "name": {"en": "Nonlinear reference", "es": "Referencia no lineal"}, "lane": "offline", "status": "implemented", "modelVersion": "SciPy reference"},
                    {"id": "topology-mlp", "name": {"en": "Topology MLP", "es": "MLP de topología"}, "lane": "offline-and-onnx", "status": "implemented", "modelVersion": VERSION},
                    {"id": "graph-surrogate", "name": {"en": "Graph surrogate", "es": "Modelo de grafos"}, "lane": "offline-and-onnx", "status": "implemented", "modelVersion": VERSION}]
@@ -205,7 +205,7 @@ def export(work, models_output, science_output):
                                   "implementationAtExport":implementation_files,
                                   "sources": ["https://arxiv.org/abs/2403.18570", "https://proceedings.mlr.press/v70/gilmer17a.html", "https://doi.org/10.13272/j.issn.1671-251x.2024090057"]}}
         candidate_science = work/"release-candidate-science.json"
-        write_json(candidate_science,science)
+        write_json(candidate_science,science,schema="science")
         validate_release(staging,candidate_science,work/"networks.json")
         backup = None
         if models_output.exists():
@@ -216,7 +216,7 @@ def export(work, models_output, science_output):
             os.replace(models_output, backup)
         try:
             os.replace(staging, models_output)
-            write_json(science_output, science)
+            write_json(science_output, science, schema="science")
         except Exception:
             if backup is not None:
                 if models_output.exists():
@@ -231,7 +231,7 @@ def export(work, models_output, science_output):
             current = json.loads(artifact_manifest.read_text(encoding="utf-8"))
             if current.get("schema") == "aerovia.manifest/v1":
                 current["files"]["science.json"] = file_identity(science_output)
-                write_json(artifact_manifest, current)
+                write_json(artifact_manifest, current, schema="artifact-manifest")
         return validate_release(models_output, science_output,work/"networks.json")
     finally:
         if staging.exists():

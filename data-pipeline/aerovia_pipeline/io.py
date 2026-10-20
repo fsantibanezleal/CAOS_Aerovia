@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from .model import NetworkError, validate_network, assemble, build_result
+from .contracts import check as check_contract
 import numpy as np
 
 MAX_INPUT_BYTES = 5 * 1024 * 1024
@@ -24,7 +25,10 @@ def utc_now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def write_json(path, value):
+def write_json(path, value, schema=None):
+    """Write JSON atomically; with ``schema`` (a contract name) the document is validated first and a failure writes nothing."""
+    if schema is not None:
+        check_contract(schema, value)
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     content = json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
@@ -125,7 +129,7 @@ def write_manifest(directory, metadata):
         if path.is_file() and path.name != "manifest.json":
             files[path.relative_to(directory).as_posix()] = {"sha256":sha256(path.read_bytes()).hexdigest(),"bytes":path.stat().st_size}
     manifest = {"schema":"aerovia.manifest/v1","createdAt":utc_now(),"files":files,**metadata}
-    write_json(directory / "manifest.json", manifest)
+    write_json(directory / "manifest.json", manifest, schema="artifact-manifest")
     return manifest
 
 
