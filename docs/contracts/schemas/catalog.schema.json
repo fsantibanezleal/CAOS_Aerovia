@@ -389,7 +389,10 @@
         },
         "failedSampleIndices": {
           "type": "array",
-          "items": {}
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
         },
         "unsupportedFanSamples": {
           "type": "integer",
