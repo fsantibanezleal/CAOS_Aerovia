@@ -50,7 +50,7 @@ async function transportExport(page: import("@playwright/test").Page) {
 async function prepareTracer(page: import("@playwright/test").Page) {
   await openWorkbench(page);
   await importProject(page, analyticalNetwork());
-  await mode(page, "Tracer transport");
+  await mode(page, "Transport");
   await numeric(page, "Total tracer", 1000);
   await numeric(page, "Simulation", 20);
 }
@@ -244,7 +244,7 @@ test("directed air routes stop at external boundaries and expose a real nominal 
     name: { en: "Second boundary passage", es: "Segundo paso exterior" },
   });
   await importProject(page, network);
-  await mode(page, "Airflow & paths");
+  await mode(page, "Airflow");
   await page
     .getByRole("combobox", { name: "Analysis", exact: true })
     .selectOption("route");
@@ -272,7 +272,8 @@ test("a search-method restriction does not falsely declare a feasible unequal-bo
   network.nodes[0].boundary = 10;
   network.edges[0].target = 1;
   await importProject(page, network, { ...defaults, speed: 1.5 });
-  await mode(page, "Fan operations");
+  await mode(page, "Airflow");
+  await toolSection(page, "duty");
   await expect(page.locator(".av-viz-readout")).toContainText(
     "0/1 targets short",
   );
