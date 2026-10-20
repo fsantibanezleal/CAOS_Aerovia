@@ -2,13 +2,13 @@
 
 **Design an underground ventilation network, change its operation, and inspect the resulting airflow and tracer history.**
 
-[Open the app](https://aerovia.fasl-work.com/) · [Documentation](docs/README.md) · [Run locally](docs/guides/01_local.md) · [Design and transport](docs/guides/05_spatial-and-transport.md) · [Train the models](docs/methods/surrogates.md)
+[Open the app](https://aerovia.fasl-work.com/app) · [Documentation](docs/README.md) · [Design area](docs/design/README.md) · [Run locally](docs/guides/01_local.md) · [Design and transport](docs/guides/05_spatial-and-transport.md) · [Train the models](docs/methods/surrogates.md)
 
 ![Aerovia's spatial engineering instrument, with an editable mine network and coordinated numerical tools](docs/assets/workbench.png)
 
 Aerovia combines direct spatial authoring, pressure-flow analysis, conservative passive transport and two actual trained airflow surrogates. Draw or import a network, change a connection or fan, and inspect the consequences in the mine, plots and numerical tables. No login, API key or processing-server upload is required. Imported designs stay on the visitor's device.
 
-The interface uses the published **CAOS app shell 0.6.8**, with English/Spanish, light/dark themes, a dominant spatial instrument and one contextual control area divided into named task sections. Linked plots and results share this area with the tools. Focus fills the viewport; mobile controls open as an overlay. Its six routes are **App, Introduction, Methodology, Implementation, Experiments and Benchmark**. The scientific pages provide equations, assumptions, primary references and interactive evidence.
+The interface uses the **CAOS app shell** (pinned exactly: 0.15.0 while the release is built, 0.16.0 at the release), with English/Spanish, light/dark themes and six routes in the shell's order: **App, Introduction, Methodology, Implementation, Experiments and Benchmark**. The site opens on a landing, the Introduction's executive view: a short framing of the industry problem (underground mine ventilation) for a decision maker, with a linked source for every figure, followed by the technical view. The App is at **/app** (until 0.04.000 it was the root; an old link keeps its query string and hash when it is forwarded). It is the shell's case workbench: the twelve authored networks and your own design are the cases, and five question groups (**Design, Airflow, Transport, Uncertainty and Learned models**) and the **Context** view are six peers in one row. The tools of each group are a row of sub-views over one 3D scene, and a rail holds the operating setpoint, the readouts and the project actions. **Focus** fills the viewport with the scene (`?focus=1`); Escape returns to the same case, group and sub-view. The scientific pages provide equations, assumptions, primary references and interactive evidence at the documentation areas the shell defines.
 
 ## What you can do
 
@@ -28,11 +28,11 @@ Visual dynamics follow computed quantities. Tracer colors represent calculated c
 
 ## A first engineering workflow
 
-1. Select **Three-level production** and open its case guide. Pick a working tunnel and inspect its signed flow, entered target and resistance.
+1. Select **Three-level production** in the case selector and read its **Context** view. In **Design**, pick a working tunnel and inspect its signed flow, entered target and resistance.
 2. Save a baseline. Change a physical parameter, or use **Draw**, **Connect**, **Move** and **Split** to alter the design. Inspect the recalculated distribution and consequences elsewhere.
-3. Open **Fan operations** for operating points, speed sweep, sensitivity and feasible common speed. Failed calculation is distinct from a converged maximum-speed result that cannot meet the targets.
-4. Open **Tracer transport**, select the release airway, configure a pulse or continuous source, and choose **Simulate transport**. Play, pause or scrub time; select a tunnel to inspect its concentration history and system mass balance.
-5. Use **Learned screening** to compare actual exported predictions with the current numerical solution where the trained domain permits it. The exact solver also supports validated imported topologies outside that domain.
+3. Open **Airflow**, then **Fan duty**, for operating points, speed sweep, sensitivity and feasible common speed. Failed calculation is distinct from a converged maximum-speed result that cannot meet the targets.
+4. Open **Transport**, select the release airway, configure a pulse or continuous source, and choose **Simulate transport**. Play, pause or scrub time; select a tunnel to inspect its concentration history and system mass balance.
+5. Use **Learned models** to compare actual exported predictions with the current numerical solution where the trained domain permits it. The exact solver also supports validated imported topologies outside that domain.
 6. Save the project and export numerical or transport results. Reproduce the same request locally or bake matching uncertainty.
 
 The [twelve documented cases](docs/cases/README.md) cover production levels, deep workings, room-and-pillar layouts, asymmetric districts, leakage, regulation, development ducts, return restrictions, a booster and alternative intakes. They are **authored engineering scenarios**, not surveyed operating mines, with explicit provenance and Apache-2.0 licensing. Each has six concrete operating regimes in the learned scientific record. Imported data follows the [versioned input contract](docs/data-contract/data-contract.md).
@@ -105,7 +105,7 @@ Default output is `build/surrogates/`; CPU execution and checkpoint resumption a
 
 The [rebuild verification record](docs/verification/rebuild-0.02.000.md) and machine-readable artifacts contain the executed results:
 
-- **312 frontend unit tests** cover numerical engines, authoring, imports, transport, routing, storage and learned-domain behavior; the learned Python environment separately passes **65 tests**.
+- The 0.02.000 record reported 312 frontend unit tests and 65 Python tests of the learned environment. The current tree runs **455 web unit tests** (20 files) and **199 Python tests** (4 more skip without PyTorch), measured on 2026-10-20, covering numerical engines, authoring, imports, transport, routing, storage, the contract catalog and learned-domain behavior; the workbench unit reported **73 browser journeys** passing.
 - The canonical uncertainty record contains **3,072 actual CUDA realizations** and **96 independent same-draw SciPy checks**, with no failed accepted draws.
 - Learned preparation generated **33,792 numerical states**. All **3,072 held-out inputs** received independent SciPy verification.
 - **24 ONNX exports** implement two learned methods across twelve calibrated networks. The artifact contains **144 learned replay predictions** and **216 held-out method/case/regime cells**, including the classical reference.
@@ -131,6 +131,10 @@ Passive tracer transport uses mixed finite cells and quasi-steady operating chan
 
 Run the complete local gate with `./scripts/local/06_verify.ps1 -Browser` or `bash scripts/local/06_verify.sh --browser`. Local checks and screenshots are distinct from public deployment and its fresh runtime verification.
 
+## Contracts, design and release guards
+
+Every committed document and boundary is a row of the [contract catalog](docs/contracts/catalog.md): 17 contracts, each with a schema file, an example, a producer and a consumer test, its missing-data behavior and a swap test. `data/readiness.json` records what is real in a build, and the site labels what is not. The [design area](docs/design/README.md) holds the software design document, the technology matrix with its versions, the measured resources and, for each feature, requirements that each name the test or script that fails when they are violated. After `npm ci` in `frontend/`, `python scripts/check_sdd.py` and `python scripts/check_tech_matrix.py` hold that area to the repository. Together with the contract, readiness, version, deploy-place, SVG, web-baseline, documentation-path and content-standard guards in `scripts/`, they are the checks of a release.
+
 ## Repository map
 
 | Path                                                     | Responsibility                                                                                           |
@@ -141,5 +145,7 @@ Run the complete local gate with `./scripts/local/06_verify.ps1 -Browser` or `ba
 | `data/cases.json`, `data/artifacts/`, `data/models/`     | Authored inputs, numerical/scientific evidence, model registry, exports, checkpoints and parity records. |
 | `scripts/`, `tests/`, `frontend/e2e/`                    | Reproducible local operations, numerical checks and actual browser journeys.                             |
 | `docs/`, `deploy/`, `.github/workflows/`                 | Methods, decisions, operating guides, release checks and publication.                                    |
+| `docs/design/`, `docs/contracts/`                        | The software design document, the features with their gates, and the contract catalog with its schemas.  |
+| `content/executive.json`, `frontend/public/executive/`   | The executive view of the Introduction and its three illustrations.                                      |
 
 Start with the [documentation index](docs/README.md). Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md); vulnerability reporting follows [SECURITY.md](SECURITY.md). The source is [MIT licensed](LICENSE) since 0.03.000. The twelve authored cases and the trained models were released under Apache-2.0 and keep that licence in their recorded metadata (case provenance, catalog, model registry and ONNX doc strings, all covered by checksums); both licences are permissive and the author is the same. External references and dependencies retain their own licenses. [Public-source and local-data boundaries](docs/security/security.md) describe what is published and what remains on the visitor's device.
