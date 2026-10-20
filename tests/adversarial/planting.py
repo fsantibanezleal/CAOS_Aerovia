@@ -82,7 +82,7 @@ def drop_row(repo: Path, rel: str, rid: str) -> None:
 
 def git_commit(repo: Path) -> str:
     """Make the copy a git repository with one commit (the base a ``--base`` check compares with); returns its SHA."""
-    env = ["-c", "user.email=plant@example.invalid", "-c", "user.name=plant", "-c", "core.autocrlf=false"]
+    env = ["-c", "user.email=plant", "-c", "user.name=plant", "-c", "core.autocrlf=false"]
     subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
     subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
     subprocess.run(["git", *env, "commit", "-q", "-m", "base"], cwd=repo, check=True, capture_output=True)
