@@ -96,7 +96,7 @@ createRoot(document.getElementById("root")!).render(
           <DocumentLanguage />
           <React.Suspense
             fallback={
-              <div className="page-body prose" role="status">
+              <div data-state="loading" role="status">
                 Loading / Cargando…
               </div>
             }
