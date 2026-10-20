@@ -48,6 +48,28 @@ jobs:
         run: python scripts/check_svg_animation.py
       - name: Web baseline (tokens, classes, numbers, images, animation loops)
         run: python scripts/check_web_baseline.py
+      - name: Contract versions follow their schemas, each with its History entry, against the base (ADR-0080)
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          base="$BEFORE"
+          if [ -z "${base//0/}" ]; then base=origin/develop; fi  # a new branch or a manual run has no before SHA
+          python scripts/check_contract_versions.py --base "$base"
+      - name: The contract catalog, every row complete and every path it names present (ADR-0080)
+        run: python scripts/check_contracts.py docs/contracts/catalog.md --repo-root .
+      - name: The readiness document is current with the catalog and the committed evidence (ADR-0080)
+        run: python scripts/check_readiness.py
+      - name: Every committed document valid against its schema file (ADR-0080)
+        run: pip install jsonschema==4.26.0 && python scripts/check_documents.py
+      - name: Rows still served by a provider (listed while building; none on main)
+        run: |
+          set +e
+          python scripts/check_skeleton.py docs/contracts/catalog.md
+          code=$?
+          set -e
+          if [ "$code" -eq 2 ] && [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            echo "::error::main is a release: every catalog row must be real"; exit 1; fi
+          [ "$code" -eq 0 ] || [ "$code" -eq 2 ]
 
   guards:
     runs-on: ubuntu-latest
@@ -56,35 +78,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Base-integrity guards (the regressions this archetype forbids)
-        run: |
-          fail=0
-          # the tracked paths, read once. `git ls-files | grep -q` failed at random under pipefail: grep -q exits on its first
-          # match, git ls-files dies of SIGPIPE and the pipeline reports 141, so a test (and its negation) flipped run to run.
-          # Every test below reads the list from a here-string: no pipe, no early-closing reader.
-          files="$(git ls-files)"
-          # a real .env must never be tracked; an example file (.env.example, frontend/.env.example) may be
-          envs="$(grep -E '(^|/)\.env(\..+)?$' <<<"$files" | grep -vE '(^|/)\.env(\..+)?\.example$' || true)"
-          if [ -n "$envs" ]; then
-            echo "::error::a real .env is tracked (only an .env.example may be): $(tr '\n' ' ' <<<"$envs")"; fail=1; fi
-          # venvs, native binaries and heavy model blobs must never be tracked. The product's own trained checkpoints are
-          # compact (14 files, 1.6 MB) and committed by design under data/models/, with their checksums in the model
-          # manifest; that folder is the one exemption (a deviation from the template's step, decision recorded in the
-          # base-wiring report).
-          blobs="$(grep -iE '(^|/)\.?venv|\.(dll|so|dylib|pt|pth)$' <<<"$files" | grep -vE '^data/models/.*\.pt$' || true)"
-          if [ -n "$blobs" ]; then
-            echo "::error::a venv or native/heavy binary is tracked"; fail=1; fi
-          # raw or heavy data must never be tracked; commit only compact derived artifacts under data/derived/
-          if grep -qiE '\.(parquet|h5|hdf5|nc|mat|npy)$' <<<"$files"; then
-            echo "::error::raw or heavy data tracked; commit only compact derived artifacts (data/derived/)"; fail=1; fi
-          # no leaked local machine paths in tracked sources
-          if git grep -nE '[A-Z]:\_(Repos|worktrees|Temp)|[A-Z]:/_(Repos|worktrees|Temp)' -- . ':!.github' >/dev/null 2>&1; then
-            echo "::error::a local machine path in a tracked file"; fail=1; fi
-          if [ "$fail" -eq 0 ]; then echo "guards: OK"; fi
-          exit $fail
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
+      - name: Base-integrity guards (the regressions this archetype forbids; the committed models are declared in the contract catalog, ADR-0080)
+        run: python scripts/check_base_integrity.py
       - name: No template residue (an instantiated product replaces the example)
         run: python scripts/check_template_residue.py
       - name: Every path a document names exists

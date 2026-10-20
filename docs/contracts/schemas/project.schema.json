@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project.schema.json",
+  "title": "Aerovia project file",
+  "description": "Contract project 1.0.0: the project file the App exports (Project dialog, and the autosave in local storage under aerovia.project.v1) and imports: the network, the operating options, an optional baseline of inputs only (its result is recomputed on load) and the save time. Written by frontend/src/storage.ts serializeProject and checked there (validatedInputs); also accepted by data-pipeline/aerovia_pipeline/io.py load_networks and project_options for the pipeline. The size limit is 2 MiB (frontend/src/engine/validation.ts LIMITS.fileBytes), checked before parsing. Nothing is committed: the row has no documents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "network",
+    "options",
+    "savedAt"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.project/v1"
+    },
+    "network": {
+      "$ref": "network.schema.json#/$defs/network"
+    },
+    "options": {
+      "$ref": "network.schema.json#/$defs/options"
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "network",
+        "options"
+      ],
+      "properties": {
+        "network": {
+          "$ref": "network.schema.json#/$defs/network"
+        },
+        "options": {
+          "$ref": "network.schema.json#/$defs/options"
+        }
+      }
+    },
+    "savedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$",
+      "description": "An ISO UTC timestamp; the importer rejects an impossible calendar date."
+    }
+  }
+}

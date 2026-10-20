@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "branch-table.schema.json",
+  "title": "Aerovia branch table record",
+  "description": "Contract branch-table 1.0.0: one row of data/artifacts/csv/<case>.csv, written by aerovia_pipeline/io.py export_csv (UTF-8, LF, header row of 15 columns, values as text). The schema describes a row after parsing: numbers as numbers, closed as a boolean (True or False), an empty ensemble cell as null (a solve writes no ensemble, a bake does). x-columns is the header, in order. No reader in the repository: a published download. Units are in the column names.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "edge_id",
+    "kind",
+    "from_node",
+    "to_node",
+    "area_m2",
+    "resistance_Pa_s2_m6",
+    "target_m3_s",
+    "flow_m3_s",
+    "velocity_m_s",
+    "shortfall_m3_s",
+    "closed",
+    "flow_p05_m3_s",
+    "flow_p50_m3_s",
+    "flow_p95_m3_s",
+    "target_probability"
+  ],
+  "x-columns": [
+    "edge_id",
+    "kind",
+    "from_node",
+    "to_node",
+    "area_m2",
+    "resistance_Pa_s2_m6",
+    "target_m3_s",
+    "flow_m3_s",
+    "velocity_m_s",
+    "shortfall_m3_s",
+    "closed",
+    "flow_p05_m3_s",
+    "flow_p50_m3_s",
+    "flow_p95_m3_s",
+    "target_probability"
+  ],
+  "properties": {
+    "edge_id": {
+      "$ref": "#/$defs/id"
+    },
+    "kind": {
+      "enum": [
+        "intake",
+        "return",
+        "working",
+        "crosscut",
+        "fan"
+      ]
+    },
+    "from_node": {
+      "$ref": "#/$defs/id"
+    },
+    "to_node": {
+      "$ref": "#/$defs/id"
+    },
+    "area_m2": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 1000
+    },
+    "resistance_Pa_s2_m6": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "target_m3_s": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "flow_m3_s": {
+      "type": "number"
+    },
+    "velocity_m_s": {
+      "type": "number"
+    },
+    "shortfall_m3_s": {
+      "type": "number",
+      "minimum": 0
+    },
+    "closed": {
+      "type": "boolean",
+      "description": "Written by Python as True or False."
+    },
+    "flow_p05_m3_s": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "flow_p50_m3_s": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "flow_p95_m3_s": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "target_probability": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$",
+      "description": "A portable identifier of 1 to 80 characters (the pipeline limit; the browser reader accepts up to 100)."
+    }
+  }
+}

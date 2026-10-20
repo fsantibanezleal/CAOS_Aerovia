@@ -1,0 +1,26 @@
+{
+  "schema": "aerovia.manifest/v1",
+  "createdAt": "2026-09-10T01:48:50Z",
+  "files": {
+    "catalog.json": {
+      "sha256": "f50fbe1c46fb4857b973ac0a514f0ac2dde86b0e22b79ed54059b40857138f4f",
+      "bytes": 31138
+    },
+    "csv/room-pillar.csv": {
+      "sha256": "4aeea7174beb9e4c38c464ae80cf5b842d8744f006ca80b4b28715f5d6b6534a",
+      "bytes": 6353
+    },
+    "reference-checks.json": {
+      "sha256": "2644d53844c67de1a6e19a20b58b2e5ac552c8c668663b303387cf74d96a707a",
+      "bytes": 65458
+    },
+    "science.json": {
+      "sha256": "fdd0f8c6c3bf15ae126bfc501dff08912ed4488d8b288e10595b04bcfba07a8c",
+      "bytes": 247401
+    }
+  },
+  "engineVersion": "0.1.0",
+  "sourceSha256": "205668688c71f57d4b357da8572c3fc0f45dc2ba4c3d0a1ecccd4453d7da13e5",
+  "device": "cuda",
+  "caseCount": 1
+}

@@ -1,0 +1,2214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "science.schema.json",
+  "title": "Aerovia scientific evidence",
+  "description": "Contract science 1.0.0: data/artifacts/science.json, written by data-pipeline/aerovia_pipeline/surrogate_export.py (export) and extended by frontend/scripts/verify-learned-browser.mjs (validation.browserEvidence, validation.browserParity). Methods, regimes, per-case predictions, held-out fixtures, the benchmark (rows, aggregate, calibration, degradation, family hold-out), training receipts, ONNX validation and provenance. Read by the documentation pages and the Benchmark through frontend/src/learned/index.ts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "createdAt",
+    "sourceSha256",
+    "methods",
+    "regimes",
+    "cases",
+    "heldoutFixtures",
+    "benchmark",
+    "training",
+    "validation",
+    "provenance"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.science/v1"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "methods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "lane",
+          "status",
+          "modelVersion"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "graph-surrogate",
+              "scipy-reference",
+              "topology-mlp"
+            ]
+          },
+          "name": {
+            "$ref": "#/$defs/text"
+          },
+          "lane": {
+            "type": "string",
+            "enum": [
+              "offline",
+              "offline-and-onnx"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "implemented"
+            ]
+          },
+          "modelVersion": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "regimes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "description",
+          "speed"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "boost",
+              "nominal",
+              "return-restriction",
+              "roughness",
+              "turndown",
+              "working-restriction"
+            ]
+          },
+          "name": {
+            "$ref": "#/$defs/text"
+          },
+          "description": {
+            "$ref": "#/$defs/text"
+          },
+          "speed": {
+            "type": "number"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "networkId",
+          "sourceSha256",
+          "regimes"
+        ],
+        "properties": {
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sourceSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "regimes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "options",
+                "reference",
+                "predictions"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "enum": [
+                    "boost",
+                    "nominal",
+                    "return-restriction",
+                    "roughness",
+                    "turndown",
+                    "working-restriction"
+                  ]
+                },
+                "options": {
+                  "$ref": "network.schema.json#/$defs/options"
+                },
+                "reference": {
+                  "$ref": "catalog.schema.json#/$defs/result"
+                },
+                "predictions": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "topology-mlp",
+                    "graph-surrogate"
+                  ],
+                  "properties": {
+                    "topology-mlp": {
+                      "$ref": "#/$defs/prediction"
+                    },
+                    "graph-surrogate": {
+                      "$ref": "#/$defs/prediction"
+                    }
+                  }
+                }
+              }
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "heldoutFixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "networkId",
+          "split",
+          "sampleId",
+          "sampleIndex",
+          "options",
+          "reference"
+        ],
+        "properties": {
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "split": {
+            "type": "string",
+            "enum": [
+              "test"
+            ]
+          },
+          "sampleId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sampleIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "options": {
+            "$ref": "network.schema.json#/$defs/options"
+          },
+          "reference": {
+            "$ref": "catalog.schema.json#/$defs/result"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "benchmark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "createdAt",
+        "rows",
+        "aggregate",
+        "calibration",
+        "teacherParity",
+        "completeness",
+        "splitScope",
+        "metricUnits"
+      ],
+      "properties": {
+        "schema": {
+          "const": "aerovia.surrogate-evaluation/v1"
+        },
+        "createdAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "networkId",
+              "regimeId",
+              "split",
+              "samples",
+              "edgeObservations",
+              "nodeObservations",
+              "flowMAE",
+              "flowRMSE",
+              "flowMaxError",
+              "flowNormalizedRMSE",
+              "rawFlowMAE",
+              "rawFlowRMSE",
+              "pressureMAE",
+              "pressureRMSE",
+              "pressureMaxError",
+              "massResidualMax",
+              "pressureResidualMax",
+              "powerMAE",
+              "powerMaxError",
+              "unsupportedFanPredictions",
+              "nonfinitePredictions",
+              "normalization",
+              "shortfallTruePositive",
+              "shortfallFalseNegative",
+              "adequateTrueNegative",
+              "adequateFalsePositive",
+              "shortfallRecall",
+              "adequateRecall",
+              "classificationObservations",
+              "classificationMeaning"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "scipy-reference",
+                  "topology-mlp"
+                ]
+              },
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "regimeId": {
+                "type": "string",
+                "enum": [
+                  "boost",
+                  "nominal",
+                  "return-restriction",
+                  "roughness",
+                  "turndown",
+                  "working-restriction"
+                ]
+              },
+              "split": {
+                "type": "string",
+                "enum": [
+                  "test"
+                ]
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edgeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nodeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "flowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowNormalizedRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rawFlowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rawFlowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "massResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unsupportedFanPredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nonfinitePredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "normalization": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shortfallTruePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallFalseNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateTrueNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateFalsePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallRecall": {
+                "type": [
+                  "null",
+                  "number"
+                ],
+                "minimum": 0
+              },
+              "adequateRecall": {
+                "type": [
+                  "null",
+                  "number"
+                ],
+                "minimum": 0
+              },
+              "classificationObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "classificationMeaning": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "aggregate": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "samples",
+              "cells",
+              "edgeObservations",
+              "nodeObservations",
+              "flowMAE",
+              "flowRMSE",
+              "flowNormalizedRMSE",
+              "flowMaxError",
+              "pressureMAE",
+              "pressureMaxError",
+              "massResidualMax",
+              "pressureResidualMax",
+              "powerMAE",
+              "unsupportedFanPredictions",
+              "nonfinitePredictions",
+              "shortfallTruePositive",
+              "shortfallFalseNegative",
+              "adequateTrueNegative",
+              "adequateFalsePositive",
+              "classificationObservations",
+              "shortfallRecall",
+              "adequateRecall",
+              "inferenceMs",
+              "msPerSample",
+              "timingScope",
+              "runtime"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "scipy-reference",
+                  "topology-mlp"
+                ]
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cells": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edgeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nodeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "flowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowNormalizedRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "massResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unsupportedFanPredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nonfinitePredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallTruePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallFalseNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateTrueNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateFalsePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "classificationObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "adequateRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "inferenceMs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "msPerSample": {
+                "type": "number"
+              },
+              "timingScope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "runtime": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "device",
+                  "precision"
+                ],
+                "properties": {
+                  "device": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "precision": {
+                    "type": "string"
+                  },
+                  "hardware": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "torch": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cuda": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "tf32": {
+                    "type": "boolean"
+                  },
+                  "threads": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "deterministicAlgorithms": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "calibration": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "networkId",
+              "samples",
+              "nominalCoverage",
+              "flowMaxErrorBoundUnitSpeed",
+              "pressureMaxErrorBoundUnitSpeed",
+              "heldoutCovered",
+              "heldoutSamples",
+              "heldoutCoverage",
+              "interpretation"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "topology-mlp"
+                ]
+              },
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nominalCoverage": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxErrorBoundUnitSpeed": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxErrorBoundUnitSpeed": {
+                "type": "number",
+                "minimum": 0
+              },
+              "heldoutCovered": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "heldoutSamples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "heldoutCoverage": {
+                "type": "number",
+                "minimum": 0
+              },
+              "interpretation": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "teacherParity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "networkId",
+              "samples",
+              "flowMaxAbs",
+              "pressureMaxAbs"
+            ],
+            "properties": {
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "flowMaxAbs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxAbs": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "completeness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cases",
+            "regimes",
+            "methods",
+            "expectedCells",
+            "actualCells",
+            "missingCells"
+          ],
+          "properties": {
+            "cases": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "regimes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "methods": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expectedCells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "actualCells": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "missingCells": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "splitScope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metricUnits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "flowMAE",
+            "flowRMSE",
+            "flowMaxError",
+            "pressureMAE",
+            "pressureResidualMax",
+            "massResidualMax",
+            "powerMAE"
+          ],
+          "properties": {
+            "flowMAE": {
+              "type": "string",
+              "minLength": 1
+            },
+            "flowRMSE": {
+              "type": "string",
+              "minLength": 1
+            },
+            "flowMaxError": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pressureMAE": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pressureResidualMax": {
+              "type": "string",
+              "minLength": 1
+            },
+            "massResidualMax": {
+              "type": "string",
+              "minLength": 1
+            },
+            "powerMAE": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "degradation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "samples",
+              "cells",
+              "edgeObservations",
+              "nodeObservations",
+              "flowMAE",
+              "flowRMSE",
+              "flowNormalizedRMSE",
+              "flowMaxError",
+              "pressureMAE",
+              "pressureMaxError",
+              "massResidualMax",
+              "pressureResidualMax",
+              "powerMAE",
+              "unsupportedFanPredictions",
+              "nonfinitePredictions",
+              "shortfallTruePositive",
+              "shortfallFalseNegative",
+              "adequateTrueNegative",
+              "adequateFalsePositive",
+              "classificationObservations",
+              "shortfallRecall",
+              "adequateRecall",
+              "noiseSigma",
+              "outsideDomain"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "topology-mlp"
+                ]
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cells": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edgeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nodeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "flowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowNormalizedRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "massResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unsupportedFanPredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nonfinitePredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallTruePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallFalseNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateTrueNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateFalsePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "classificationObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "adequateRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "noiseSigma": {
+                "type": "number"
+              },
+              "outsideDomain": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "degradationRows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "networkId",
+              "noiseSigma",
+              "outsideDomain",
+              "samples",
+              "edgeObservations",
+              "nodeObservations",
+              "flowMAE",
+              "flowRMSE",
+              "flowMaxError",
+              "flowNormalizedRMSE",
+              "rawFlowMAE",
+              "rawFlowRMSE",
+              "pressureMAE",
+              "pressureRMSE",
+              "pressureMaxError",
+              "massResidualMax",
+              "pressureResidualMax",
+              "powerMAE",
+              "powerMaxError",
+              "unsupportedFanPredictions",
+              "nonfinitePredictions",
+              "normalization",
+              "shortfallTruePositive",
+              "shortfallFalseNegative",
+              "adequateTrueNegative",
+              "adequateFalsePositive",
+              "shortfallRecall",
+              "adequateRecall",
+              "classificationObservations",
+              "classificationMeaning"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "topology-mlp"
+                ]
+              },
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "noiseSigma": {
+                "type": "number"
+              },
+              "outsideDomain": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edgeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nodeObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "flowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowNormalizedRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rawFlowMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rawFlowRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureRMSE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "massResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureResidualMax": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMAE": {
+                "type": "number",
+                "minimum": 0
+              },
+              "powerMaxError": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unsupportedFanPredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "nonfinitePredictions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "normalization": {
+                "type": "string",
+                "minLength": 1
+              },
+              "shortfallTruePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallFalseNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateTrueNegative": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "adequateFalsePositive": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "shortfallRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "adequateRecall": {
+                "type": "number",
+                "minimum": 0
+              },
+              "classificationObservations": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "classificationMeaning": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "degradationProtocol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "formula",
+            "meaning",
+            "seed",
+            "samplesPerCase",
+            "trueLabelsUnchanged",
+            "clippedInputs",
+            "domainPolicy"
+          ],
+          "properties": {
+            "formula": {
+              "type": "string",
+              "minLength": 1
+            },
+            "meaning": {
+              "type": "string",
+              "minLength": 1
+            },
+            "seed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "samplesPerCase": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "trueLabelsUnchanged": {
+              "type": "boolean"
+            },
+            "clippedInputs": {
+              "type": "boolean"
+            },
+            "domainPolicy": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "familyHoldout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "family",
+            "excludedCaseIds",
+            "trainingCaseIds",
+            "metrics",
+            "aggregate",
+            "training",
+            "nominalCalibration",
+            "mlpStatus",
+            "interpretation"
+          ],
+          "properties": {
+            "family": {
+              "type": "string",
+              "minLength": 1
+            },
+            "excludedCaseIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "trainingCaseIds": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "methodId",
+                  "networkId",
+                  "regimeId",
+                  "split",
+                  "samples",
+                  "edgeObservations",
+                  "nodeObservations",
+                  "flowMAE",
+                  "flowRMSE",
+                  "flowMaxError",
+                  "flowNormalizedRMSE",
+                  "rawFlowMAE",
+                  "rawFlowRMSE",
+                  "pressureMAE",
+                  "pressureRMSE",
+                  "pressureMaxError",
+                  "massResidualMax",
+                  "pressureResidualMax",
+                  "powerMAE",
+                  "powerMaxError",
+                  "unsupportedFanPredictions",
+                  "nonfinitePredictions",
+                  "normalization",
+                  "shortfallTruePositive",
+                  "shortfallFalseNegative",
+                  "adequateTrueNegative",
+                  "adequateFalsePositive",
+                  "shortfallRecall",
+                  "adequateRecall",
+                  "classificationObservations",
+                  "classificationMeaning"
+                ],
+                "properties": {
+                  "methodId": {
+                    "type": "string",
+                    "enum": [
+                      "graph-surrogate-family-holdout"
+                    ]
+                  },
+                  "networkId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "regimeId": {
+                    "type": "string",
+                    "enum": [
+                      "boost",
+                      "nominal",
+                      "return-restriction",
+                      "roughness",
+                      "turndown",
+                      "working-restriction"
+                    ]
+                  },
+                  "split": {
+                    "type": "string",
+                    "enum": [
+                      "topology-family-test"
+                    ]
+                  },
+                  "samples": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "edgeObservations": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "nodeObservations": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "flowMAE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "flowRMSE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "flowMaxError": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "flowNormalizedRMSE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "rawFlowMAE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "rawFlowRMSE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "pressureMAE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "pressureRMSE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "pressureMaxError": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "massResidualMax": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "pressureResidualMax": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "powerMAE": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "powerMaxError": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "unsupportedFanPredictions": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "nonfinitePredictions": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "normalization": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "shortfallTruePositive": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "shortfallFalseNegative": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "adequateTrueNegative": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "adequateFalsePositive": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "shortfallRecall": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "adequateRecall": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "classificationObservations": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "classificationMeaning": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "minItems": 1
+            },
+            "aggregate": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methodId",
+                "samples",
+                "cells",
+                "edgeObservations",
+                "nodeObservations",
+                "flowMAE",
+                "flowRMSE",
+                "flowNormalizedRMSE",
+                "flowMaxError",
+                "pressureMAE",
+                "pressureMaxError",
+                "massResidualMax",
+                "pressureResidualMax",
+                "powerMAE",
+                "unsupportedFanPredictions",
+                "nonfinitePredictions",
+                "shortfallTruePositive",
+                "shortfallFalseNegative",
+                "adequateTrueNegative",
+                "adequateFalsePositive",
+                "classificationObservations",
+                "shortfallRecall",
+                "adequateRecall"
+              ],
+              "properties": {
+                "methodId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "samples": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "cells": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "edgeObservations": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "nodeObservations": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "flowMAE": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "flowRMSE": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "flowNormalizedRMSE": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "flowMaxError": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pressureMAE": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pressureMaxError": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "massResidualMax": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "pressureResidualMax": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "powerMAE": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "unsupportedFanPredictions": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "nonfinitePredictions": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "shortfallTruePositive": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "shortfallFalseNegative": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "adequateTrueNegative": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "adequateFalsePositive": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "classificationObservations": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "shortfallRecall": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "adequateRecall": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            "training": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methodId",
+                "caseIds",
+                "architecture",
+                "seed",
+                "epochs",
+                "bestEpoch",
+                "bestValidationLoss",
+                "batchSize",
+                "elapsedSeconds",
+                "runtime",
+                "checkpoint",
+                "sha256",
+                "bytes",
+                "resumableCheckpoint",
+                "datasetHashes",
+                "parameters"
+              ],
+              "properties": {
+                "methodId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "caseIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "architecture": {
+                  "$ref": "#/$defs/architecture"
+                },
+                "seed": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "epochs": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "bestEpoch": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "bestValidationLoss": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "batchSize": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "elapsedSeconds": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "runtime": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "device",
+                    "hardware",
+                    "torch",
+                    "cuda",
+                    "precision",
+                    "tf32",
+                    "threads",
+                    "deterministicAlgorithms"
+                  ],
+                  "properties": {
+                    "device": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "hardware": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "torch": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "cuda": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "precision": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "tf32": {
+                      "type": "boolean"
+                    },
+                    "threads": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "deterministicAlgorithms": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "checkpoint": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "resumableCheckpoint": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "datasetHashes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  }
+                },
+                "parameters": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "nominalCalibration": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mlpStatus": {
+              "type": "string",
+              "minLength": 1
+            },
+            "interpretation": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "diagnosticsCreatedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+        }
+      },
+      "description": "The held-out evaluation; the degradation, family hold-out and diagnosticsCreatedAt keys come from the separate diagnostics run (surrogate_diagnostics.py) and are absent before it."
+    },
+    "training": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "models",
+        "totalSamples",
+        "splits",
+        "datasetSha256",
+        "uniqueInputVectors",
+        "duplicateInputs",
+        "teacher",
+        "datasetSeconds"
+      ],
+      "properties": {
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "caseIds",
+              "architecture",
+              "seed",
+              "epochs",
+              "bestEpoch",
+              "bestValidationLoss",
+              "batchSize",
+              "elapsedSeconds",
+              "runtime",
+              "checkpoint",
+              "sha256",
+              "bytes",
+              "resumableCheckpoint",
+              "datasetHashes",
+              "parameters"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "topology-mlp"
+                ]
+              },
+              "caseIds": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "architecture": {
+                "$ref": "#/$defs/architecture"
+              },
+              "seed": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "epochs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bestEpoch": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "bestValidationLoss": {
+                "type": "number",
+                "minimum": 0
+              },
+              "batchSize": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "elapsedSeconds": {
+                "type": "number",
+                "minimum": 0
+              },
+              "runtime": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "device",
+                  "hardware",
+                  "torch",
+                  "cuda",
+                  "precision",
+                  "tf32",
+                  "threads",
+                  "deterministicAlgorithms"
+                ],
+                "properties": {
+                  "device": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "hardware": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "torch": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cuda": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "precision": {
+                    "type": "string"
+                  },
+                  "tf32": {
+                    "type": "boolean"
+                  },
+                  "threads": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "deterministicAlgorithms": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "checkpoint": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "resumableCheckpoint": {
+                "type": "string",
+                "minLength": 1
+              },
+              "datasetHashes": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "parameters": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "totalSamples": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "splits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "train",
+            "validation",
+            "calibration",
+            "test"
+          ],
+          "properties": {
+            "train": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "validation": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "calibration": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "test": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "datasetSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "uniqueInputVectors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicateInputs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "teacher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "datasetSeconds": {
+          "type": "number"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "onnx",
+        "controls",
+        "browserParity"
+      ],
+      "properties": {
+        "onnx": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "methodId",
+              "networkId",
+              "samples",
+              "rawFlowMaxAbs",
+              "flowMaxAbs",
+              "pressureMaxAbs",
+              "flowTolerance",
+              "pressureTolerance",
+              "runtime",
+              "singleSamplePassed"
+            ],
+            "properties": {
+              "methodId": {
+                "type": "string",
+                "enum": [
+                  "graph-surrogate",
+                  "topology-mlp"
+                ]
+              },
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "samples": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "rawFlowMaxAbs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowMaxAbs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "pressureMaxAbs": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flowTolerance": {
+                "type": "number"
+              },
+              "pressureTolerance": {
+                "type": "number"
+              },
+              "runtime": {
+                "type": "string",
+                "minLength": 1
+              },
+              "singleSamplePassed": {
+                "type": "boolean"
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "networkId",
+              "id",
+              "status",
+              "reason"
+            ],
+            "properties": {
+              "networkId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "enum": [
+                  "closure",
+                  "fan-off",
+                  "resistance-extrapolation",
+                  "unknown-connectivity"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "out-of-domain",
+                  "supported"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expectedFlowMaxAbs": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "interpretation": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "browserParity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "browserEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file",
+            "sha256",
+            "bytes",
+            "models",
+            "samples",
+            "maxFlowAbs",
+            "maxPressureAbs"
+          ],
+          "properties": {
+            "file": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "models": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "samples": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxFlowAbs": {
+              "type": "number",
+              "minimum": 0
+            },
+            "maxPressureAbs": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      },
+      "description": "ONNX parity per model, the domain controls and the browser parity statement; browserEvidence is added when verify-learned-browser.mjs publishes."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataKind",
+        "license",
+        "noFieldMeasurements",
+        "calibration",
+        "implementationAtExport",
+        "sources"
+      ],
+      "properties": {
+        "dataKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "license": {
+          "type": "string",
+          "minLength": 1
+        },
+        "noFieldMeasurements": {
+          "type": "boolean"
+        },
+        "calibration": {
+          "type": "string",
+          "minLength": 1
+        },
+        "implementationAtExport": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sha256",
+              "bytes"
+            ],
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "text": {
+      "additionalProperties": false,
+      "properties": {
+        "en": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "es": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "es"
+      ],
+      "type": "object",
+      "description": "A reader-facing string, bilingual at the source."
+    },
+    "prediction": {
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "interpretation": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "lane": {
+          "enum": [
+            "offline"
+          ],
+          "type": "string"
+        },
+        "metrics": {
+          "$ref": "#/$defs/metrics"
+        },
+        "modelVersion": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "rawFlows": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "result": {
+          "$ref": "catalog.schema.json#/$defs/result"
+        },
+        "status": {
+          "enum": [
+            "supported"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "lane",
+        "modelVersion",
+        "rawFlows",
+        "result",
+        "errors",
+        "metrics",
+        "interpretation"
+      ],
+      "type": "object",
+      "description": "One learned prediction for a case and regime: raw flows, the physical result recomputed from them (message states that residual acceptance failed for a learned approximation) and its errors against the reference."
+    },
+    "metrics": {
+      "additionalProperties": false,
+      "properties": {
+        "flowMAE": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "flowMaxError": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "flowRMSE": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "powerAbsErrorKW": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "pressureMAE": {
+          "minimum": 0,
+          "type": "number"
+        },
+        "pressureMaxError": {
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "flowMAE",
+        "flowRMSE",
+        "flowMaxError",
+        "pressureMAE",
+        "pressureMaxError",
+        "powerAbsErrorKW"
+      ],
+      "type": "object"
+    },
+    "architecture": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "steps": {
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "hidden",
+        "steps"
+      ],
+      "type": "object"
+    }
+  }
+}

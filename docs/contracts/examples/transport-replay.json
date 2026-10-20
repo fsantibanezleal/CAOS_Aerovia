@@ -1,0 +1,2091 @@
+{
+  "schema": "aerovia.transport-replay/v1",
+  "version": "0.03.000",
+  "network": {
+    "schema": "aerovia.network/v1",
+    "id": "room-pillar",
+    "name": {
+      "en": "Room-and-pillar district",
+      "es": "Distrito de cámaras y pilares"
+    },
+    "description": {
+      "en": "An interconnected five-by-five roadway grid contains six regulated cross-passages. Low-resistance short circuits can starve the far production strip.",
+      "es": "Una malla de cinco por cinco galerías tiene seis cruces regulados. Los cortocircuitos de baja resistencia pueden reducir el caudal de la franja productiva lejana."
+    },
+    "provenance": {
+      "kind": "authored",
+      "source": "Aerovia authored engineering case library; reproducible with scripts/pipeline.py create",
+      "license": "Apache-2.0"
+    },
+    "nodes": [
+      {
+        "id": "atmosphere-in",
+        "x": -170,
+        "y": -140,
+        "z": 0,
+        "boundary": 0
+      },
+      {
+        "id": "atmosphere-out",
+        "x": 850,
+        "y": 720,
+        "z": 0,
+        "boundary": 0
+      },
+      {
+        "id": "r0c0",
+        "x": 0,
+        "y": 0,
+        "z": -180
+      },
+      {
+        "id": "r0c1",
+        "x": 160,
+        "y": 0,
+        "z": -182
+      },
+      {
+        "id": "r0c2",
+        "x": 320,
+        "y": 0,
+        "z": -184
+      },
+      {
+        "id": "r0c3",
+        "x": 480,
+        "y": 0,
+        "z": -186
+      },
+      {
+        "id": "r0c4",
+        "x": 640,
+        "y": 0,
+        "z": -188
+      },
+      {
+        "id": "r1c0",
+        "x": 0,
+        "y": 145,
+        "z": -183
+      },
+      {
+        "id": "r1c1",
+        "x": 160,
+        "y": 145,
+        "z": -185
+      },
+      {
+        "id": "r1c2",
+        "x": 320,
+        "y": 145,
+        "z": -187
+      },
+      {
+        "id": "r1c3",
+        "x": 480,
+        "y": 145,
+        "z": -189
+      },
+      {
+        "id": "r1c4",
+        "x": 640,
+        "y": 145,
+        "z": -191
+      },
+      {
+        "id": "r2c0",
+        "x": 0,
+        "y": 290,
+        "z": -186
+      },
+      {
+        "id": "r2c1",
+        "x": 160,
+        "y": 290,
+        "z": -188
+      },
+      {
+        "id": "r2c2",
+        "x": 320,
+        "y": 290,
+        "z": -190
+      },
+      {
+        "id": "r2c3",
+        "x": 480,
+        "y": 290,
+        "z": -192
+      },
+      {
+        "id": "r2c4",
+        "x": 640,
+        "y": 290,
+        "z": -194
+      },
+      {
+        "id": "r3c0",
+        "x": 0,
+        "y": 435,
+        "z": -189
+      },
+      {
+        "id": "r3c1",
+        "x": 160,
+        "y": 435,
+        "z": -191
+      },
+      {
+        "id": "r3c2",
+        "x": 320,
+        "y": 435,
+        "z": -193
+      },
+      {
+        "id": "r3c3",
+        "x": 480,
+        "y": 435,
+        "z": -195
+      },
+      {
+        "id": "r3c4",
+        "x": 640,
+        "y": 435,
+        "z": -197
+      },
+      {
+        "id": "r4c0",
+        "x": 0,
+        "y": 580,
+        "z": -192
+      },
+      {
+        "id": "r4c1",
+        "x": 160,
+        "y": 580,
+        "z": -194
+      },
+      {
+        "id": "r4c2",
+        "x": 320,
+        "y": 580,
+        "z": -196
+      },
+      {
+        "id": "r4c3",
+        "x": 480,
+        "y": 580,
+        "z": -198
+      },
+      {
+        "id": "r4c4",
+        "x": 640,
+        "y": 580,
+        "z": -200
+      }
+    ],
+    "edges": [
+      {
+        "id": "decline-intake",
+        "from": "atmosphere-in",
+        "to": "r0c0",
+        "kind": "intake",
+        "name": {
+          "en": "Decline Intake",
+          "es": "Rampa de admisión"
+        },
+        "resistance": 0.045,
+        "area": 32,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "district-fan",
+        "from": "r4c4",
+        "to": "atmosphere-out",
+        "kind": "fan",
+        "name": {
+          "en": "District Fan",
+          "es": "Ventilador del distrito"
+        },
+        "resistance": 0.03,
+        "area": 32,
+        "target": 0,
+        "level": 0,
+        "fan": {
+          "pressure": 2700,
+          "coefficient": 0.012,
+          "efficiency": 0.79
+        }
+      },
+      {
+        "id": "east-0-0",
+        "from": "r0c0",
+        "to": "r0c1",
+        "kind": "intake",
+        "name": {
+          "en": "East 0 0",
+          "es": "Galería este · fila 1 · tramo 1"
+        },
+        "resistance": 0.12,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-0-0",
+        "from": "r0c0",
+        "to": "r1c0",
+        "kind": "return",
+        "name": {
+          "en": "North 0 0",
+          "es": "Cruce norte · fila 1 · columna 1"
+        },
+        "resistance": 0.16,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-0-1",
+        "from": "r0c1",
+        "to": "r0c2",
+        "kind": "intake",
+        "name": {
+          "en": "East 0 1",
+          "es": "Galería este · fila 1 · tramo 2"
+        },
+        "resistance": 0.12,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-0-1",
+        "from": "r0c1",
+        "to": "r1c1",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 0 1",
+          "es": "Cruce norte · fila 1 · columna 2"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-0-2",
+        "from": "r0c2",
+        "to": "r0c3",
+        "kind": "intake",
+        "name": {
+          "en": "East 0 2",
+          "es": "Galería este · fila 1 · tramo 3"
+        },
+        "resistance": 0.12,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-0-2",
+        "from": "r0c2",
+        "to": "r1c2",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 0 2",
+          "es": "Cruce norte · fila 1 · columna 3"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-0-3",
+        "from": "r0c3",
+        "to": "r0c4",
+        "kind": "intake",
+        "name": {
+          "en": "East 0 3",
+          "es": "Galería este · fila 1 · tramo 4"
+        },
+        "resistance": 0.12,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-0-3",
+        "from": "r0c3",
+        "to": "r1c3",
+        "kind": "return",
+        "name": {
+          "en": "North 0 3",
+          "es": "Cruce norte · fila 1 · columna 4"
+        },
+        "resistance": 0.23500000000000001,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-0-4",
+        "from": "r0c4",
+        "to": "r1c4",
+        "kind": "return",
+        "name": {
+          "en": "North 0 4",
+          "es": "Cruce norte · fila 1 · columna 5"
+        },
+        "resistance": 0.26,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-1-0",
+        "from": "r1c0",
+        "to": "r1c1",
+        "kind": "intake",
+        "name": {
+          "en": "East 1 0",
+          "es": "Galería este · fila 2 · tramo 1"
+        },
+        "resistance": 0.16,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-1-0",
+        "from": "r1c0",
+        "to": "r2c0",
+        "kind": "return",
+        "name": {
+          "en": "North 1 0",
+          "es": "Cruce norte · fila 2 · columna 1"
+        },
+        "resistance": 0.16,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-1-1",
+        "from": "r1c1",
+        "to": "r1c2",
+        "kind": "intake",
+        "name": {
+          "en": "East 1 1",
+          "es": "Galería este · fila 2 · tramo 2"
+        },
+        "resistance": 0.16,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-1-1",
+        "from": "r1c1",
+        "to": "r2c1",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 1 1",
+          "es": "Cruce norte · fila 2 · columna 2"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-1-2",
+        "from": "r1c2",
+        "to": "r1c3",
+        "kind": "intake",
+        "name": {
+          "en": "East 1 2",
+          "es": "Galería este · fila 2 · tramo 3"
+        },
+        "resistance": 0.16,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-1-2",
+        "from": "r1c2",
+        "to": "r2c2",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 1 2",
+          "es": "Cruce norte · fila 2 · columna 3"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-1-3",
+        "from": "r1c3",
+        "to": "r1c4",
+        "kind": "intake",
+        "name": {
+          "en": "East 1 3",
+          "es": "Galería este · fila 2 · tramo 4"
+        },
+        "resistance": 0.16,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-1-3",
+        "from": "r1c3",
+        "to": "r2c3",
+        "kind": "return",
+        "name": {
+          "en": "North 1 3",
+          "es": "Cruce norte · fila 2 · columna 4"
+        },
+        "resistance": 0.23500000000000001,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-1-4",
+        "from": "r1c4",
+        "to": "r2c4",
+        "kind": "return",
+        "name": {
+          "en": "North 1 4",
+          "es": "Cruce norte · fila 2 · columna 5"
+        },
+        "resistance": 0.26,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-2-0",
+        "from": "r2c0",
+        "to": "r2c1",
+        "kind": "intake",
+        "name": {
+          "en": "East 2 0",
+          "es": "Galería este · fila 3 · tramo 1"
+        },
+        "resistance": 0.2,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-2-0",
+        "from": "r2c0",
+        "to": "r3c0",
+        "kind": "return",
+        "name": {
+          "en": "North 2 0",
+          "es": "Cruce norte · fila 3 · columna 1"
+        },
+        "resistance": 0.16,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-2-1",
+        "from": "r2c1",
+        "to": "r2c2",
+        "kind": "intake",
+        "name": {
+          "en": "East 2 1",
+          "es": "Galería este · fila 3 · tramo 2"
+        },
+        "resistance": 0.2,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-2-1",
+        "from": "r2c1",
+        "to": "r3c1",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 2 1",
+          "es": "Cruce norte · fila 3 · columna 2"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-2-2",
+        "from": "r2c2",
+        "to": "r2c3",
+        "kind": "intake",
+        "name": {
+          "en": "East 2 2",
+          "es": "Galería este · fila 3 · tramo 3"
+        },
+        "resistance": 0.2,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-2-2",
+        "from": "r2c2",
+        "to": "r3c2",
+        "kind": "crosscut",
+        "name": {
+          "en": "North 2 2",
+          "es": "Cruce norte · fila 3 · columna 3"
+        },
+        "resistance": 9,
+        "area": 15,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-2-3",
+        "from": "r2c3",
+        "to": "r2c4",
+        "kind": "working",
+        "name": {
+          "en": "East 2 3",
+          "es": "Galería este · fila 3 · tramo 4"
+        },
+        "resistance": 1.3,
+        "area": 18,
+        "target": 22,
+        "level": 0
+      },
+      {
+        "id": "north-2-3",
+        "from": "r2c3",
+        "to": "r3c3",
+        "kind": "return",
+        "name": {
+          "en": "North 2 3",
+          "es": "Cruce norte · fila 3 · columna 4"
+        },
+        "resistance": 0.23500000000000001,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-2-4",
+        "from": "r2c4",
+        "to": "r3c4",
+        "kind": "return",
+        "name": {
+          "en": "North 2 4",
+          "es": "Cruce norte · fila 3 · columna 5"
+        },
+        "resistance": 0.26,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-3-0",
+        "from": "r3c0",
+        "to": "r3c1",
+        "kind": "intake",
+        "name": {
+          "en": "East 3 0",
+          "es": "Galería este · fila 4 · tramo 1"
+        },
+        "resistance": 0.24,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-3-0",
+        "from": "r3c0",
+        "to": "r4c0",
+        "kind": "return",
+        "name": {
+          "en": "North 3 0",
+          "es": "Cruce norte · fila 4 · columna 1"
+        },
+        "resistance": 0.16,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-3-1",
+        "from": "r3c1",
+        "to": "r3c2",
+        "kind": "intake",
+        "name": {
+          "en": "East 3 1",
+          "es": "Galería este · fila 4 · tramo 2"
+        },
+        "resistance": 0.24,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-3-1",
+        "from": "r3c1",
+        "to": "r4c1",
+        "kind": "return",
+        "name": {
+          "en": "North 3 1",
+          "es": "Cruce norte · fila 4 · columna 2"
+        },
+        "resistance": 0.185,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-3-2",
+        "from": "r3c2",
+        "to": "r3c3",
+        "kind": "intake",
+        "name": {
+          "en": "East 3 2",
+          "es": "Galería este · fila 4 · tramo 3"
+        },
+        "resistance": 0.24,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-3-2",
+        "from": "r3c2",
+        "to": "r4c2",
+        "kind": "return",
+        "name": {
+          "en": "North 3 2",
+          "es": "Cruce norte · fila 4 · columna 3"
+        },
+        "resistance": 0.21000000000000002,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-3-3",
+        "from": "r3c3",
+        "to": "r3c4",
+        "kind": "working",
+        "name": {
+          "en": "East 3 3",
+          "es": "Galería este · fila 4 · tramo 4"
+        },
+        "resistance": 1.5,
+        "area": 18,
+        "target": 22,
+        "level": 0
+      },
+      {
+        "id": "north-3-3",
+        "from": "r3c3",
+        "to": "r4c3",
+        "kind": "return",
+        "name": {
+          "en": "North 3 3",
+          "es": "Cruce norte · fila 4 · columna 4"
+        },
+        "resistance": 0.23500000000000001,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "north-3-4",
+        "from": "r3c4",
+        "to": "r4c4",
+        "kind": "return",
+        "name": {
+          "en": "North 3 4",
+          "es": "Cruce norte · fila 4 · columna 5"
+        },
+        "resistance": 0.26,
+        "area": 20,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-4-0",
+        "from": "r4c0",
+        "to": "r4c1",
+        "kind": "intake",
+        "name": {
+          "en": "East 4 0",
+          "es": "Galería este · fila 5 · tramo 1"
+        },
+        "resistance": 0.28,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-4-1",
+        "from": "r4c1",
+        "to": "r4c2",
+        "kind": "intake",
+        "name": {
+          "en": "East 4 1",
+          "es": "Galería este · fila 5 · tramo 2"
+        },
+        "resistance": 0.28,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-4-2",
+        "from": "r4c2",
+        "to": "r4c3",
+        "kind": "intake",
+        "name": {
+          "en": "East 4 2",
+          "es": "Galería este · fila 5 · tramo 3"
+        },
+        "resistance": 0.28,
+        "area": 18,
+        "target": 0,
+        "level": 0
+      },
+      {
+        "id": "east-4-3",
+        "from": "r4c3",
+        "to": "r4c4",
+        "kind": "working",
+        "name": {
+          "en": "East 4 3",
+          "es": "Galería este · fila 5 · tramo 4"
+        },
+        "resistance": 1.7000000000000002,
+        "area": 18,
+        "target": 22,
+        "level": 0
+      }
+    ]
+  },
+  "options": {
+    "speed": 1,
+    "resistanceScale": 1,
+    "overrides": {}
+  },
+  "request": {
+    "durationSeconds": 120,
+    "frameCount": 4,
+    "cellsPerEdge": 2,
+    "releases": [
+      {
+        "kind": "pulse",
+        "edgeId": "east-2-3",
+        "startSeconds": 0,
+        "massMg": 1000
+      }
+    ]
+  },
+  "result": {
+    "schema": "aerovia.transport/v1",
+    "completed": true,
+    "frames": [
+      {
+        "timeSeconds": 0,
+        "flowStateIndex": 0,
+        "concentrations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.34719509866461157,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cellConcentrations": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.34719509866461157,
+            0.34719509866461157
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "nodeConcentrations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.09665696813700002,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "injectedMassMg": 1000,
+        "storedMassMg": 999.9999999999999,
+        "escapedMassMg": 0,
+        "removedMassMg": 0,
+        "massBalanceErrorMg": 1.1368683772161603e-13
+      },
+      {
+        "timeSeconds": 40,
+        "flowStateIndex": 0,
+        "concentrations": [
+          0,
+          0.000131305355735408,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.29393313730992765,
+          0,
+          0.04643882084167136,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.0059803064574826805,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cellConcentrations": [
+          [
+            0,
+            0
+          ],
+          [
+            0.0002428099941129715,
+            1.980071735784449e-05
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.25449696429125995,
+            0.3333693103285953
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.06308589337228432,
+            0.02979174831105841
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.008935120403583087,
+            0.0030254925113822745
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "nodeConcentrations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.09280795417394823,
+          0,
+          0,
+          0,
+          0,
+          0.020536518148079906,
+          0,
+          0,
+          0,
+          0,
+          0.002042708187849413
+        ],
+        "injectedMassMg": 1000,
+        "storedMassMg": 999.9946442950813,
+        "escapedMassMg": 0.005355704918826252,
+        "removedMassMg": 0,
+        "massBalanceErrorMg": -1.696958545904792e-13
+      },
+      {
+        "timeSeconds": 80,
+        "flowStateIndex": 0,
+        "concentrations": [
+          0,
+          0.002250653793947178,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.24436254369032678,
+          0,
+          0.06987113244578129,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.023915438184321007,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cellConcentrations": [
+          [
+            0,
+            0
+          ],
+          [
+            0.0036551074778728874,
+            0.0008462001100214685
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.18654844230976037,
+            0.3021766450708932
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.07954313979905742,
+            0.06019912509250514
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.029595813830058517,
+            0.018235062538583497
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "nodeConcentrations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.08412410908650855,
+          0,
+          0,
+          0,
+          0,
+          0.041497411029814205,
+          0,
+          0,
+          0,
+          0,
+          0.01231168525897044
+        ],
+        "injectedMassMg": 1000,
+        "storedMassMg": 999.0508921695825,
+        "escapedMassMg": 0.9491078304175271,
+        "removedMassMg": 0,
+        "massBalanceErrorMg": -6.639133687258436e-14
+      },
+      {
+        "timeSeconds": 120,
+        "flowStateIndex": 0,
+        "concentrations": [
+          0,
+          0.007659566416227722,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.20030894004684813,
+          0,
+          0.07579441082672116,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.03986772338353609,
+          0,
+          0,
+          0,
+          0
+        ],
+        "cellConcentrations": [
+          [
+            0,
+            0
+          ],
+          [
+            0.011172278613437035,
+            0.0041468542190184095
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.1367415969974818,
+            0.2638762830962144
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.07837087753846166,
+            0.07321794411498064
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0.04433747226758798,
+            0.035397974499484196
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "nodeConcentrations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.07346152519272438,
+          0,
+          0,
+          0,
+          0,
+          0.05047174883403076,
+          0,
+          0,
+          0,
+          0,
+          0.023899491428701455
+        ],
+        "injectedMassMg": 1000,
+        "storedMassMg": 991.3570486160366,
+        "escapedMassMg": 8.642951383963359,
+        "removedMassMg": 0,
+        "massBalanceErrorMg": -8.881784197001252e-15
+      }
+    ],
+    "flowStates": [
+      {
+        "timeSeconds": 0,
+        "options": {
+          "speed": 1,
+          "resistanceScale": 1,
+          "overrides": {}
+        },
+        "result": {
+          "schema": "aerovia.result/v1",
+          "converged": true,
+          "iterations": 13,
+          "massResidual": 2.957065703412809e-10,
+          "pressureResidual": 1.1368683772161603e-13,
+          "flows": [
+            86.39692110520647,
+            86.3969211052065,
+            39.22485376654366,
+            47.17206733866295,
+            34.3495847231977,
+            4.8752690433460755,
+            30.69048951024653,
+            3.659095212951345,
+            15.16284494695942,
+            15.527644563291163,
+            15.162844946956577,
+            16.300364766882673,
+            30.871702571782066,
+            17.3518446913164,
+            3.8237891189120963,
+            17.533585237365365,
+            3.4773546669023445,
+            13.853291391570593,
+            19.207938409086857,
+            29.01613633852385,
+            10.395828136721875,
+            20.47587443506486,
+            11.271542164296585,
+            2.9480750913365243,
+            11.63235777953354,
+            3.1165390516651175,
+            11.194350974142198,
+            19.645945214475383,
+            40.210487312665904,
+            11.68209809319986,
+            8.79377634187666,
+            12.00773236985527,
+            2.622440814974721,
+            11.245064092973756,
+            3.87920732861772,
+            18.12173379931235,
+            12.769275508135705,
+            58.33222111197821,
+            8.793776341869561,
+            11.416217156548576,
+            15.29542448509465,
+            28.064699993228118
+          ],
+          "pressures": [
+            0,
+            0,
+            -335.8992589406672,
+            -520.5299573014753,
+            -662.1172337802117,
+            -775.1459713456379,
+            -802.7353953719019,
+            -691.9318888612034,
+            -734.4441915065523,
+            -782.6180337772028,
+            -831.8062915813558,
+            -862.512480762118,
+            -844.4218120100956,
+            -866.0364605397472,
+            -891.4459930920503,
+            -918.5083425942653,
+            -1081.4158844462272,
+            -911.5036414309824,
+            -944.2567812371769,
+            -978.8613340370338,
+            -1009.2096859862547,
+            -1501.8055398259642,
+            -923.8765218071344,
+            -945.5290624653653,
+            -982.0214664316981,
+            -1047.5274692818832,
+            -2386.4940249887104
+          ],
+          "velocities": [
+            2.6999037845377023,
+            2.699903784537703,
+            2.1791585425857587,
+            2.3586033669331474,
+            1.9083102623998722,
+            0.3250179362230717,
+            1.7050271950136962,
+            0.24393968086342302,
+            0.8423802748310789,
+            0.7763822281645582,
+            0.7581422473478289,
+            0.9055758203823707,
+            1.5435851285891034,
+            0.9639913717398001,
+            0.25491927459413977,
+            0.9740880687425203,
+            0.2318236444601563,
+            0.7696272995316996,
+            0.9603969204543429,
+            1.4508068169261925,
+            0.5775460075956597,
+            1.023793721753243,
+            0.6261967869053658,
+            0.19653833942243495,
+            0.6462420988629745,
+            0.20776927011100782,
+            0.6219083874523443,
+            0.9822972607237691,
+            2.0105243656332954,
+            0.6490054496222144,
+            0.439688817093833,
+            0.6670962427697372,
+            0.13112204074873607,
+            0.6247257829429864,
+            0.19396036643088602,
+            1.006762988850686,
+            0.6384637754067852,
+            2.9166110555989104,
+            0.4885431301038645,
+            0.6342342864749209,
+            0.8497458047274805,
+            1.5591499996237843
+          ],
+          "fanPowerKW": 285.4846124611719,
+          "totalIntake": 86.39692110520647,
+          "targetRatio": 0.5088341351882817,
+          "shortfalls": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10.805649025857802,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            3.8782662006876514,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "elapsedMs": 3.9816999999999894
+        }
+      }
+    ],
+    "edgeLengths": [
+      284.4292530665578,
+      322.02484376209236,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      160.01249951175691,
+      145.03103116229988,
+      145.03103116229988,
+      160.01249951175691,
+      160.01249951175691,
+      160.01249951175691,
+      160.01249951175691
+    ],
+    "edgeVolumes": [
+      9101.73609812985,
+      10304.795000386956,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2900.6206232459976,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2900.6206232459976,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2175.4654674344984,
+      2880.2249912116245,
+      2900.6206232459976,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2880.2249912116245,
+      2900.6206232459976,
+      2900.6206232459976,
+      2880.2249912116245,
+      2880.2249912116245,
+      2880.2249912116245,
+      2880.2249912116245
+    ],
+    "cellsPerEdge": 2,
+    "steps": 12,
+    "elapsedMs": 5.823100000000011,
+    "warnings": [
+      "Passive tracer with well-mixed airway cells; cell count controls numerical dispersion. This is not CFD or a field-calibrated exposure model.",
+      "Lengths use node geometry unless explicitly overridden. Pressure boundaries are clean external reservoirs."
+    ]
+  }
+}

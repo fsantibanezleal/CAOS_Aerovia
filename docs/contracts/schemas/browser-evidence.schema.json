@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "browser-evidence.schema.json",
+  "title": "Aerovia browser model evidence",
+  "description": "Contract browser-evidence 1.0.0: data/models/browser-evidence.json, written by frontend/scripts/verify-learned-browser.mjs --publish: every exported ONNX model run in a real browser (ONNX Runtime Web, WASM) on the exported float32 fixtures, with the largest flow and pressure differences, plus the domain-rejection controls. Read by the Benchmark page (download link); its digest is recorded in the model manifest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "createdAt",
+    "sourceSha256",
+    "browser",
+    "rows",
+    "controls",
+    "modelCount",
+    "flowTolerance",
+    "pressureTolerance",
+    "maxFlowAbs",
+    "maxPressureAbs",
+    "runtime"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aerovia.browser-model-evidence/v1"
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$"
+    },
+    "sourceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "browser": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "methodId",
+          "networkId",
+          "modelSha256",
+          "sample",
+          "rawFlowMaxAbs",
+          "flowMaxAbs",
+          "pressureMaxAbs",
+          "inferenceMs",
+          "totalMs"
+        ],
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "enum": [
+              "graph-surrogate",
+              "topology-mlp"
+            ]
+          },
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modelSha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "sample": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rawFlowMaxAbs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "flowMaxAbs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "pressureMaxAbs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "inferenceMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "totalMs": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "methodId",
+          "networkId",
+          "closure",
+          "extrapolation",
+          "fanOffFlow"
+        ],
+        "properties": {
+          "methodId": {
+            "type": "string",
+            "enum": [
+              "graph-surrogate",
+              "topology-mlp"
+            ]
+          },
+          "networkId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "closure": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The domain-rejection code the browser model returned."
+          },
+          "extrapolation": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The domain-rejection code the browser model returned."
+          },
+          "fanOffFlow": {
+            "const": 0,
+            "description": "Maximum absolute flow at fan speed zero: exact zero scaling."
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "modelCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "flowTolerance": {
+      "type": "number"
+    },
+    "pressureTolerance": {
+      "type": "number"
+    },
+    "maxFlowAbs": {
+      "type": "number",
+      "minimum": 0
+    },
+    "maxPressureAbs": {
+      "type": "number",
+      "minimum": 0
+    },
+    "runtime": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

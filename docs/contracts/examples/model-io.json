@@ -1,0 +1,38 @@
+{
+  "inputs": [
+    {
+      "name": "logResistanceRatios",
+      "dtype": "float32",
+      "shape": [
+        "batch",
+        42
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "name": "rawFlows",
+      "dtype": "float32",
+      "shape": [
+        "batch",
+        42
+      ]
+    },
+    {
+      "name": "flows",
+      "dtype": "float32",
+      "shape": [
+        "batch",
+        42
+      ]
+    },
+    {
+      "name": "pressures",
+      "dtype": "float32",
+      "shape": [
+        "batch",
+        27
+      ]
+    }
+  ]
+}

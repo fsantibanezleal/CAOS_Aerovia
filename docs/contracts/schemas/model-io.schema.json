@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "model-io.schema.json",
+  "title": "Aerovia ONNX model io",
+  "description": "Contract model-io 1.0.0: the input and output tensors of an exported ONNX file (data/models/*/*.onnx), as read from the graph with the onnx package: one input (a batch of log resistance ratios, one per branch) and three outputs in graph order (rawFlows and flows per branch, pressures per node), all float32 with a symbolic batch axis. The registry entry of the file declares the same names and widths (tests/contracts/test_model_io.py compares them); the browser reads the file through ONNX Runtime Web (frontend/src/learned/index.ts).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "inputs",
+    "outputs"
+  ],
+  "properties": {
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/$defs/tensor"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/tensor"
+      }
+    }
+  },
+  "$defs": {
+    "tensor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "dtype",
+        "shape"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dtype": {
+          "const": "float32"
+        },
+        "shape": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "batch"
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ],
+          "minItems": 2,
+          "maxItems": 2,
+          "items": false
+        }
+      }
+    }
+  }
+}
