@@ -102,7 +102,7 @@ Every pinned dependency of `requirements.txt`, `requirements-gpu.txt` and `requi
 | export | onnx | 1.22.0 | writing and validating the ONNX graphs | 1.23.2, current, not adopted |
 | export | onnxruntime | 1.29.0 | the CPU runtime of the export parity checks; the browser runtime is pinned to the same minor | 1.31.0, current, not adopted |
 | export | onnxscript | 0.7.2 | listed in `requirements-surrogates.txt` beside the `dynamo=True` exporter call (`surrogate_export.py` line 30); the repository does not say why it is needed | none recorded in the sizing |
-| tests | pytest | 8.4.2 | the pipeline, contract and guard tests | 9.1.1, current; the sizing assigns the template's pin to the adversarial-suite unit (U10a), outside this document's write scope |
+| tests | pytest | 9.1.1 | the pipeline, contract and guard tests and the planted-defect suite (`tests/adversarial`) | 9.1.1, current; the template's pin |
 | contracts | jsonschema | 4.26.0 | validates every document against its schema file, at the pipeline writers and in the contract tests | the template's pin; none other considered |
 | shell | @fasl-work/caos-app-shell | 0.15.0 | the shared app shell (pinned exactly, ADR-0078); 0.16.0 is adopted at the release | a hand-rolled shell, forbidden by ADR-0078 |
 | web | react | 19.3.0 | the UI; a peer dependency of the shell | 19.3.1, current, not adopted |
