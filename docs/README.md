@@ -7,12 +7,14 @@ steps needed to run the tools on another engineering network.
 
 | You want to… | Read |
 |---|---|
-| Use the workbench | [App](https://aerovia.fasl-work.com/) and [workflow overview](../README.md) |
+| Use the workbench | [App](https://aerovia.fasl-work.com/app) (the root of the site is the landing; until 0.04.000 the App was the root) and [workflow overview](../README.md) |
 | Run a clone | [Local installation](guides/01_local.md) and [numbered scripts](../scripts/local/README.md) |
 | Process another network | [Processing guide](guides/02_processing.md), [data contract](data-contract/data-contract.md), [JSON Schema](data-contract/network.schema.json) |
 | Reproduce CUDA results | [GPU guide](guides/03_gpu.md), [uncertainty](methods/uncertainty.md), [executed evidence](methods/execution-evidence.md) |
 | Assess numerical validity | [Ventilation model](methods/ventilation-model.md) and [browser engine](engine/README.md) |
 | Review release verification | [Acceptance and measured interaction](verification/release-acceptance.md) |
+| Review the design and what each requirement is checked by | [Design area](design/README.md), [design document](design/SDD.md) and [measured resources](design/measured-resources.md) |
+| Check a contract, its version or what is real in a build | [Contract catalog](contracts/catalog.md) and its [schemas](contracts/schemas/) |
 | Inspect a worked intervention | [Twelve documented cases](cases/README.md) |
 | Maintain or extend the product | [Architecture](architecture.md) and [diagram](assets/architecture.svg) |
 | Publish a release | [Deployment guide](guides/04_deployment.md) and [deployment summary](../deploy/README.md) |
@@ -21,7 +23,11 @@ steps needed to run the tools on another engineering network.
 ## Architecture and software
 
 - [System architecture](architecture.md): browser state, worker requests, independent processing,
-  contracts, verified artifacts and publication.
+  contracts, verified artifacts and publication. (It was written for 0.03.000: the App is now the shell's case workbench with
+  five question groups, described in the [design area](design/features/base-0-08/design.md).)
+- [Design area](design/README.md): the software design document, the features with their requirements and gates, the
+  adversarial validation and the measured resources. The [contract catalog](contracts/catalog.md) lists every boundary with its
+  schema, example, tests, missing-data behavior and version.
 - [ADR-001: Original workbench, superseded](architecture/ADR-001-original-workbench.md): task-led composition and
   retained bilingual, theme, accessibility and documentation requirements.
 - [ADR-002: Computation and hosting](architecture/ADR-002-numerical-and-hosting-scope.md): live,
